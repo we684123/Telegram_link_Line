@@ -9,7 +9,7 @@ function doPost(e) {
     var Line_id = "你的LineID"; //你的lineID
     var CHANNEL_ACCESS_TOKEN = '你的Line token';
     var text = "";//空的
-    var email = "你的Email"
+    var email = "你的Email" //有問題的話會寄信給你
     //然後還要自己在sheet中新增一個名為"Log"的分頁(page)，亦或自己去下面改名稱
 
 
@@ -72,7 +72,11 @@ function doPost(e) {
             "payload": payload
         }
         var url = "https://api.telegram.org/bot" + Telrgram_bot_key + "/sendMessage?chat_id=" + Telegram_id + "&text=";
-        var text_id = estringa.events[0].source.userId;
+        if(estringa.events[0].source.userId){
+          var text_id = estringa.events[0].source.userId;
+        }else {
+          var text_id = estringa.events[0].source.groupId;
+        }
         UrlFetchApp.fetch(url+text_id);
         UrlFetchApp.fetch("https://api.telegram.org/bot" + Telrgram_bot_key + "/", data);
 
