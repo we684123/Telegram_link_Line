@@ -40,8 +40,6 @@ use telegram to Send and receive messages(from Line).
   Line則要到後台改(http://imgur.com/PYdDF7b)
 
 # Screenshot
-![Imgur](http://i.imgur.com/jXROwBF.png)
-![Imgur](http://i.imgur.com/mxeheeh.png)
 ![Imgur](http://i.imgur.com/I0Qsimh.png)
 
 # 版本資訊
