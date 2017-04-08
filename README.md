@@ -6,9 +6,9 @@ use telegram to Send and receive messages(from Line).
 
 
 # 準備
-- 需要使用者申請 Telegram_bot跟Line_bot(Developer Trial)
-的)
-- 需有一google帳號並在其中創建：
+ ##### 需要使用者申請 Telegram_bot跟Line_bot(Developer Trial)
+
+ ##### 需有一google帳號並在其中創建：
 
 
 1.一個doc檔，並將v2中的"doc.gs"內容複製上去。
@@ -56,6 +56,9 @@ use telegram to Send and receive messages(from Line).
   "https://api.telegram.org/botKEY/setWebhook?url=https://XXX"(這個格式)
   Line則要到後台改(http://imgur.com/PYdDF7b)
 
+
+- NOTE：
+    你必須先跟你的機器人對話過他才能傳訊息給你。
 # Screenshot
 ![Imgur](http://i.imgur.com/I0Qsimh.png)
 
