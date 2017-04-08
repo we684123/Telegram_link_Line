@@ -43,6 +43,7 @@ use telegram to Send and receive messages(from Line).
 
 ----
 - 註一
+
   doc和sheet的ID在網址中，例如網址：
   https://docs.google.com/spreadsheets/d/1vp35X4AfgP2mGLib0PZQ0NLaw_Ur0PSD_0rjgbwOfx/edit#gid=0
 
@@ -51,10 +52,12 @@ use telegram to Send and receive messages(from Line).
 
 
 - 註二
+
   第一次會要求權限，同意就好。
 
 
 - 註三
+
   Telegram用
   "https://api.telegram.org/botKEY/setWebhook?url=https://XXX"(這個格式)
   Line則要到後台改(http://imgur.com/PYdDF7b)
@@ -70,12 +73,14 @@ use telegram to Send and receive messages(from Line).
   (整體通知功能暫時沒用因為telegram已經有了，所以猶豫中)
 
   待做功能：
+
   - 自動依時間編排房間位置
   - 刪除聊天室
   - 重生資料(有bug時緊急排除)
   - 傳送照片、聲音、影片、位置...等
 
   待排除bug：
+
   - doc的資料不穩定，Telegram端同時傳兩個指令有機率塞入兩次"data"，此時需手動排除。因此請盡量等他給予回應後再傳下一個指令。
 
 # doc的json說明
@@ -117,15 +122,25 @@ use telegram to Send and receive messages(from Line).
     }
 
 data = 存放房間資訊
+
 mode = 暫存指令(通常為0)
+
 Notice = 管理整體通知(但可能廢除)(未作用)
+
 opposite = 暫存指令對象房間
+
 last = 來自Line端的最後訊息房間(未作用)
+
 Order = 預計用來做自動依時間排序房間(未作用)
+
 keyword = 關鍵字設定，出現關鍵字自動通知
+
 RoomKeyboard = 房間的keyboard，為節省重生時間而生
+
 FastMatch = 快速索引用
+
 FastMatch2 = 快速索引用
+
 
 
 # Author
