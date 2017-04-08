@@ -1,10 +1,7 @@
 # Telegram_link_Line
-用Telegram來收發Line的訊息。
-
-use telegram to Send and receive messages(from Line).
-
-......(我是分隔線)......
-
+>用Telegram來收發Line的訊息。
+>use telegram to Send and receive messages(from Line).
+*****
 舊版的在v1資料夾，此為針對v2的README。
 
 
@@ -14,36 +11,34 @@ use telegram to Send and receive messages(from Line).
  ##### 需有一google帳號並在其中創建：
 
 
-1.一個doc檔，並將v2中的"doc.gs"內容複製上去。
+1.  一個doc檔，並將v2中的"doc.gs"內容複製上去。
 
 
-2.一個sheet檔，並在其"A1"中填入0，然後將除了第1列的格式全部設為字串。
-
-在sheet中新增5個分頁(page)：
-"Debug"、"Log"、"紀錄發送的訊息"、"Line訊息區"、"JSON備份"
-
-
-3.一個gs檔(google apps script)，並將v2其中的"Telegram_link_Line.gs"的內容複製上去，之後依檔案中16~23行的要求填入資料(註一)。
+2.  一個sheet檔，並在其"A1"中填入0，然後將除了第1列的格式全部設為字串。
+  在sheet中新增5個分頁(page)：
+  "Debug"、"Log"、"紀錄發送的訊息"、"Line訊息區"、"JSON備份"
 
 
-......(我是分隔線)......
+3.  一個gs檔(google apps script)，並將v2其中的"Telegram_link_Line.gs"的內容複製上去，之後依檔案中16~23行的要求填入資料(註一)。
 
-接下來按下左上角的
 
-"發佈" ->
+>
+>接下來按下左上角的
+>
+>"發佈" ->
+>
+>"部屬為網路應用程式" ->
+>
+>(專案版本 選"新增") ->
+>(將應用程式執行為 改成"我") ->
+>(具有應用程式存取的使用者 改成"任何人甚至匿名使用者") ->
+>確定(or更新)(註二) ->
+>
+>將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)
+>
 
-"部屬為網路應用程式" ->
+>將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)
 
-(專案版本 選"新增") ->
-(將應用程式執行為 改成"我") ->
-(具有應用程式存取的使用者 改成"任何人甚至匿名使用者") ->
-確定(or更新)(註二) ->
-
-將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)
-
-......(我是分隔線)......
-
-將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)
 
 ----
 - 註一
