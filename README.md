@@ -35,11 +35,8 @@ use telegram to Send and receive messages(from Line).
 "部屬為網路應用程式" ->
 
 (專案版本 選"新增") ->
-
 (將應用程式執行為 改成"我") ->
-
 (具有應用程式存取的使用者 改成"任何人甚至匿名使用者") ->
-
 確定(or更新)(註二) ->
 
 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)
@@ -67,7 +64,7 @@ use telegram to Send and receive messages(from Line).
 
   Telegram用
   "https://api.telegram.org/botKEY/setWebhook?url=https://XXX"(這個格式)
-  
+
   Line則要到後台改(http://imgur.com/PYdDF7b)
 
 
