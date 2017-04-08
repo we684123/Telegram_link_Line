@@ -10,11 +10,15 @@ use telegram to Send and receive messages(from Line).
 的)
 - 需有一google帳號並在其中創建：
 
+
 1.一個doc檔，並將v2中的"doc.gs"內容複製上去。
+
 
 2.一個sheet檔，並在其"A1"中填入0，然後將除了第1列的格式全部設為字串。
 
+
 3.一個gs檔(google apps script)，並將v2其中的"Telegram_link_Line.gs"的內容複製上去，之後依檔案中16~23行的要求填入資料(註一)。
+
 
 ......(我是分隔線)......
 
