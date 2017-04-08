@@ -1,8 +1,11 @@
 # Telegram_link_Line
 用Telegram來收發Line的訊息。
+
 use telegram to Send and receive messages(from Line).
-----
-舊版的在v1資料夾，此為針對v1的README。
+
+......(我是分隔線)......
+
+舊版的在v1資料夾，此為針對v2的README。
 
 
 # 準備
