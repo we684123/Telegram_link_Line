@@ -16,7 +16,7 @@ function doPost(e) {
     var sheet_key = ""; //你的sheet ID
     var doc_key = ""; //你的doc ID
     var Telegram_bot_key = ""; //Telegram bot的token
-    var Telegram_id = ""; //你的Telegram ID
+    var Telegram_id = ""; //你的Telegram帳號ID(要通知你)
     var Line_id = ""; //你的line ID
     var CHANNEL_ACCESS_TOKEN = ''; //你的Line token
     var text = ""; //不用理
