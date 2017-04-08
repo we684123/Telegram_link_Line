@@ -653,7 +653,7 @@ function start(payload, Telegram_bot_key, sheet_key) {
     Sheet.getRange(LastRow + 1, 2).setValue(d);
 }
 //=================================================================================
-function CP() {
+function CP() { //備份
     var SpreadSheet = SpreadsheetApp.openById("1aiNAMjxk3_9mrt0zF3nQ0ejxQVHx_4VheSw-Sa0iFdY");
     var Sheet = SpreadSheet.getSheetByName("JSON備份");
     var LastRow = Sheet.getLastRow();
@@ -665,11 +665,11 @@ function CP() {
     Sheet.getRange(LastRow + 1, 2).setValue(f);
 }
 //=================================================================================
-function TTTTTTTT() {
+function TTTTTTTT() { //debug用
     var text = "030"
-    var Telegram_bot_key = "343559800:AAGbpyqQldaCBtNM8VAkkMakacYoAIFp36M"
-    var sheet_key = "1aiNAMjxk3_9mrt0zF3nQ0ejxQVHx_4VheSw-Sa0iFdY";
-    var Telegram_id = "207014603";
+    var Telegram_bot_key = "343559800:AAGbpyqQldaCBtNM8VAkkM"
+    var sheet_key = "1aiNAMjxk3_9mrt0zF3nQ0ejxQVHx_4VhY";
+    var Telegram_id = "207014";
     var notification = true
     sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification)
 }
