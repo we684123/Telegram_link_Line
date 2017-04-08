@@ -19,6 +19,9 @@ use telegram to Send and receive messages(from Line).
 
 2.一個sheet檔，並在其"A1"中填入0，然後將除了第1列的格式全部設為字串。
 
+在sheet中新增5個分頁(page)：
+"Debug"、"Log"、"紀錄發送的訊息"、"Line訊息區"、"JSON備份"
+
 
 3.一個gs檔(google apps script)，並將v2其中的"Telegram_link_Line.gs"的內容複製上去，之後依檔案中16~23行的要求填入資料(註一)。
 
@@ -40,6 +43,10 @@ use telegram to Send and receive messages(from Line).
 確定(or更新)(註二) ->
 
 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)
+
+......(我是分隔線)......
+
+將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)
 
 ----
 - 註一
