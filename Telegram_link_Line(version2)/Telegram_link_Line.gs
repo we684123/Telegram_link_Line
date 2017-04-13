@@ -29,7 +29,19 @@ function doPost(e) {
     var LastRowD = SheetD.getLastRow();
     //SheetD.getRange(LastRowD + 1, 2).setValue("ggggggggggg LastRowD= " + );
     /*/
+    
+    //資料崩潰檢查修復==============================================================
+    var doc = DocumentApp.openById(doc_key)
+    var f = doc.getText()
+    try {
+        var ALL = JSON.parse(f);
+    } catch (d) {
+        var Dlen = f.search('}{"');
+        var ff = f.substring(0, Dlen + 1)
+        var r = ff;
+        doc.setText(r); //寫入
 
+    }
     //以下正式開始===============================================================
     if (estringa.update_id) { //利用兩方json不同來判別
         //以下來自telegram
