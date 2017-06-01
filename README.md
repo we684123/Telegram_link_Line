@@ -2,7 +2,7 @@
 >用Telegram來收發Line的訊息。
 >use telegram to Send and receive messages(from Line).
 *****
-舊版的在v1資料夾，此為針對v2的README。
+舊版的在v1資料夾，此為針對v2的README。    
 如果是 Telegram_Bot 新手推薦看完 [這個影片](https://youtu.be/On9yeMtG2Wg)後在來使用。
 
 # 準備
