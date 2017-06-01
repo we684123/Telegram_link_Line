@@ -115,6 +115,7 @@ function doPost(e) {
       //以下指令分流
       switch (Stext) {
         case '/main':
+        case '/start':
           var text = "🔮 開啟主選單"
           keyboard_main(Telegram_bot_key, sheet_key, Telegram_id, text, doc_key)
           break;
