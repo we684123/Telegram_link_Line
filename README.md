@@ -16,10 +16,8 @@
 2.  一個sheet檔
     * 在sheet中新增5個分頁(page)：
   "Debug"、"Log"、"紀錄發送的訊息"、"Line訊息區"、"JSON備份"   
-    * 其中 "Line訊息區" 在其"A1"中填入0(整數數字)，然後將除了第1列的格式全部設為字串(純文字)。    
-    (下方有說明圖)    
-    [Imgur](http://i.imgur.com/za6Ia6Q.png)    
-    [Imgur](http://i.imgur.com/rj9vlR3.png)    
+    * 其中 "Line訊息區" 在其"A1"中填入0(整數數字)，然後將除了第1列的格式全部設為字串(純文字)。      
+    [說明圖1](http://i.imgur.com/za6Ia6Q.png)、[說明圖2](http://i.imgur.com/rj9vlR3.png)    
 
 
 3.  一個gs檔(google apps script)，並將v2其中的"Telegram_link_Line.gs"的內容複製上去，之後依檔案中16~23行的要求填入資料(註一)。
@@ -32,8 +30,18 @@
     * 確定(or更新)(註二) ->
     * 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)
     * 將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)
+##### Telegram bot 需要新增兩個指令：
 
+       main - 開啟主選單
+       exit - 離開對話
 
+  * 跟 @BotFather 對話  ->    
+  * 然後 /mybots  ->    
+  * 選你的bot  ->    
+  * 在進去 "edit Bot"  ->    
+  * "edit commands"  ->    
+  * 貼上上方指令並送出  ->    
+  * 完成！
 ----
 - 註一
 
@@ -52,15 +60,18 @@
 - 註三
 
   Telegram用
-  "https://api.telegram.org/botKEY/setWebhook?url=https://XXX"(這個格式)
+  "https://api.telegram.org/botKEY/setWebhook?url=https://XXX"    
+  (這個格式("KEY"改成你的botkey 跟 "url="後面接gs專案網址 ))    
+  (設定post的方式就是將你改好的網址丟到任一瀏覽器上，並按Enter送出)
 
-  Line則要到後台改(http://imgur.com/PYdDF7b)
+  Line則要到後台改([長這樣](http://i.imgur.com/k0pSRfR.png))
 
 
 - NOTE：
-    你必須先跟你的機器人對話過他才能傳訊息給你。
+    你必須先跟你的機器人對話過他才能傳訊息給你。    
+    如有出現問題請記得看一下 sheet 的 log !!!
 # Screenshot
-![Imgur](http://i.imgur.com/I0Qsimh.png)
+![Imgur](http://i.imgur.com/4Vqwybc.png)
 
 # doc的json說明
 
@@ -86,7 +97,7 @@
         "keyword": ["mi", "bot"],
         "RoomKeyboard": [
             [{
-                "text": "🔮 回主選單"
+                "text": "🔭 訊息狀態"
             }],
             [{
                 "text": "(這個房間是空的)❎"
@@ -112,7 +123,7 @@ last = 來自Line端的最後訊息房間(未作用)
 
 Order = 預計用來做自動依時間排序房間(未作用)
 
-keyword = 關鍵字設定，出現關鍵字自動通知
+keyword = 關鍵字設定，出現關鍵字自動通知(未作用)
 
 RoomKeyboard = 房間的keyboard，為節省重生時間而生
 
@@ -121,8 +132,13 @@ FastMatch = 快速索引用
 FastMatch2 = 快速索引用
 
 # 版本資訊
-  2017/05/22-簡化UI(最近都在忙證照，都沒時間更新(汗.. )    
-  * * *
+  2017/06/01-更新說明文件    
+  待做功能增加：    
+  - 一鍵完成創建doc、sheet並設定格式，
+  - 顯示自己ID      
+
+  2017/05/22-簡化UI(最近都在忙證照，都沒時間更新(汗.. )        
+
   2017/04/13-加入自動修正doc.json崩潰
   * * *
   2017/04/08-初步發佈最基本款(收發訊息)
