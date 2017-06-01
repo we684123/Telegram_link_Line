@@ -3,7 +3,7 @@
 >use telegram to Send and receive messages(from Line).
 *****
 舊版的在v1資料夾，此為針對v2的README。
-
+如果是 Telegram_Bot 新手推薦看完 [這個影片](https://youtu.be/On9yeMtG2Wg)後在來使用。
 
 # 準備
  ##### 需要使用者申請 Telegram_bot跟Line_bot(Developer Trial)
@@ -20,7 +20,7 @@
     [說明圖1](http://i.imgur.com/za6Ia6Q.png)、[說明圖2](http://i.imgur.com/rj9vlR3.png)    
 
 
-3.  一個gs檔(google apps script)，並將v2其中的"Telegram_link_Line.gs"的內容複製上去，之後依檔案中16~23行的要求填入資料(註一)。
+3.  一個gs檔(google apps script)，並將v2其中的"Telegram_link_Line.gs"的內容複製上去，之後依檔案中16~23行的要求填入資料(註一)。 然成後請如下操作：
     * 接下來按下左上角的
     * "發佈" ->
     * "部屬為網路應用程式" ->
