@@ -532,7 +532,7 @@ function CP() {
   var Sheet = SpreadSheet.getSheetByName("JSON備份");
   var LastRow = Sheet.getLastRow();
 
-  var doc = DocumentApp.openById("1eWLaajllOpwIQb3atnEvkiKzPfoMTb-mNkY")
+  var doc = DocumentApp.openById("XXX")//這個麻煩改成doc的ID
   var f = doc.getText();
   var d = new Date();
   Sheet.getRange(LastRow + 1, 1).setValue(d);
