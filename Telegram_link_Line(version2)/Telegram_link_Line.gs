@@ -528,7 +528,7 @@ function start(payload, Telegram_bot_key, sheet_key) {
 }
 //=================================================================================
 function CP() {
-  var SpreadSheet = SpreadsheetApp.openById("1aiNAMjxk3_9mrt0zF3nQ0ejxQSw-Sa0iFdY");
+  var SpreadSheet = SpreadsheetApp.openById("XXX"); //這個麻煩改成sheet的ID
   var Sheet = SpreadSheet.getSheetByName("JSON備份");
   var LastRow = Sheet.getLastRow();
 
