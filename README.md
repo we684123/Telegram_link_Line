@@ -1,3 +1,8 @@
+# 公告!!!
+因為最近Line在json中加入userID，可能導致不穩(然後我又段考所以...诶嘿)
+
+
+
 # Telegram_link_Line
 >用Telegram來收發Line的訊息。
 >use telegram to Send and receive messages(from Line).
