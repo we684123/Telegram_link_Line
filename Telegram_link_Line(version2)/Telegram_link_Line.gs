@@ -1,5 +1,26 @@
+function base() {
+  //前期準備，不懂看README
+  var sheet_key = ""; //你的sheet ID
+  var doc_key = ""; //你的doc ID
+  var Telegram_bot_key = ""; //Telegram bot的token
+  var Telegram_id = ""; //你的Telegram帳號ID(要通知你)
+  var Line_id = ""; //你的line ID
+  var CHANNEL_ACCESS_TOKEN = ''; //你的Line token
+  var email = "@gmail.com" //你的email
+  //前期準備完成!==============================================================
+  var base_json = {
+    "sheet_key": sheet_key,
+    "doc_key": doc_key,
+    "Telegram_bot_key": Telegram_bot_key,
+    "Telegram_id": Telegram_id,
+    "Line_id": Line_id,
+    "CHANNEL_ACCESS_TOKEN": CHANNEL_ACCESS_TOKEN,
+    "email": email
+  }
+  return base_json
+}
+//============================================================================
 function doPost(e) {
-
   // debug用(要debug記得把14、15行註解掉)
   //以下模擬Telegram發訊息(調整text)
   //var e = '{"update_id":9104623,"message":{"message_id":336,"from":{"id":2001460,"first_name":"Wx","last_name":"Ex","username":"we684124"},"chat":{"id":20701460,"first_name":"Wx","last_name":"Ex","username":"we684124","type":"private"},"date":149086785,"text":"📖 開啟聊天室"}}'
@@ -9,19 +30,17 @@ function doPost(e) {
   //var e = '{"events":[{"type":"message","replyToken":"a215829a32474a749fad411cc6315566","source":{"roomId":"R578f0ca78ce9972bd679c1f86589f979","type":"room"},"timestamp":1490864585838,"message":{"type":"text","id":"5861041407629","text":"030//"}}]}'
   //var estringa = JSON.parse(e);
   //
-
-  //前期準備，不懂看README
-  var estringa = JSON.parse(e.postData.contents); //不用理(接收並解新)
-  var ee = JSON.stringify(estringa); //不用理
-  var sheet_key = ""; //你的sheet ID
-  var doc_key = ""; //你的doc ID
-  var Telegram_bot_key = ""; //Telegram bot的token
-  var Telegram_id = ""; //你的Telegram帳號ID(要通知你)
-  var Line_id = ""; //你的line ID
-  var CHANNEL_ACCESS_TOKEN = ''; //你的Line token
-  var text = ""; //不用理
-  var email = "@gmail.com" //你的email
-  //前期準備完成!==============================================================
+  var estringa = JSON.parse(e.postData.contents);
+  var ee = JSON.stringify(estringa);
+  var text = "";
+  var base_json = base();
+  var sheet_key = base_json.sheet_key
+  var doc_key = base_json.doc_key
+  var email = base_json.email
+  var Telegram_bot_key = base_json.Telegram_bot_key
+  var Telegram_id = base_json.Telegram_id
+  var Line_id = base_json.Line_id
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
 
   /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -40,7 +59,6 @@ function doPost(e) {
     var ff = f.substring(0, Dlen + 1)
     var r = ff;
     doc.setText(r); //寫入
-
   }
   //以下正式開始===============================================================
   if (estringa.update_id) { //利用兩方json不同來判別
@@ -56,42 +74,42 @@ function doPost(e) {
     if (mode == "🚀 發送訊息" && Stext != "/exit") {
       //以下準備接收telegram資訊並發到line
       text = Stext;
-
       var Line_id = ALL.opposite.RoomId;
       var url = 'https://api.line.me/v2/bot/message/push';
-
+      //--------------------------------------------------
       var retMsg = [{
         'type': 'text',
         'text': text
       }];
-
       var header = {
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
       }
-
       var payload = {
         'to': Line_id,
         'messages': retMsg
       }
-
       var options = {
         'headers': header,
         'method': 'post',
         'payload': JSON.stringify(payload)
       }
-
+      //--------------------------------------------------
       UrlFetchApp.fetch(url, options);
       ALL.mode = 0;
       text = "已傳送至 " + date.opposite.Name;
       var notification = true
-      sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification);
+      sendtext(text, notification);
       //================================================================
     } else if (mode == "🔖 重新命名") {
       if (ALL.FastMatch[Stext] != undefined) {
         text = "名子不可重複，請重新輸入一個!";
         var notification = true
-        sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification);
+        sendtext(text, notification);
+      } else if ( In(Stext)) {
+        text = "名子不可跟命令重複，請重新輸入一個!";
+        var notification = true
+        sendtext(text, notification);
       } else {
         var OName = ALL.opposite.Name
         var FM = ALL.FastMatch[OName]
@@ -108,23 +126,22 @@ function doPost(e) {
         REST_keyboard(doc_key) //重新編排keyborad
         //=====================================================================
         var text = "🔖 重新命名完成~\n" + OName + " \n->\n " + Stext + "\n🔮 開啟主選單"
-        keyboard_main(Telegram_bot_key, sheet_key, Telegram_id, text, doc_key)
+        keyboard_main(text, doc_key)
       }
       //================================================================
     } else {
       //以下指令分流
       switch (Stext) {
         case '/main':
-        case '/start':
           var text = "🔮 開啟主選單"
-          keyboard_main(Telegram_bot_key, sheet_key, Telegram_id, text, doc_key)
+          keyboard_main(text, doc_key)
           break;
         case '🔙 返回房間':
           var keyboard = ALL.RoomKeyboard;
           var resize_keyboard = true
           var one_time_keyboard = false
           var text = "請選擇聊天室"
-          ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, Telegram_bot_key, sheet_key, Telegram_id, text)
+          ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, text)
 
           break;
         case '🔭 訊息狀態':
@@ -140,31 +157,31 @@ function doPost(e) {
             text = "沒有任何未讀。"
           }
           var notification = true
-          sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification);
+          sendtext(text, notification);
           break;
         case '✔ 關閉鍵盤':
           var text = "已關閉鍵盤，如欲再次開啟請按 /main"
-          ReplyKeyboardRemove(Telegram_id, Telegram_bot_key, sheet_key, text)
+          ReplyKeyboardRemove(text)
           break;
         case '🚀 發送訊息':
           ALL.mode = "🚀 發送訊息"
           var r = JSON.stringify(ALL);
           doc.setText(r); //寫入
           text = "將對 " + ALL.opposite.Name + "發送訊息\n" + "如欲離開請輸入 /exit \n請輸入訊息："
-          ReplyKeyboardRemove(Telegram_id, Telegram_bot_key, sheet_key, text)
+          ReplyKeyboardRemove(text)
           break;
         case '/exit':
           ALL.mode = 0
           var r = JSON.stringify(ALL);
           doc.setText(r); //寫入
           text = "=============================\n已停止對話!"
-          keyboard_main(Telegram_bot_key, sheet_key, Telegram_id, text, doc_key)
+          keyboard_main(text, doc_key)
           break;
         case '📬 讀取留言':
           if (ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount == 0) {
             text = "這個房間並沒有未讀的通知喔~ ";
             var notification = true
-            sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification);
+            sendtext(text, notification);
           } else {
             var SpreadSheet = SpreadsheetApp.openById(sheet_key);
             var SheetM = SpreadSheet.getSheetByName("Line訊息區");
@@ -174,7 +191,7 @@ function doPost(e) {
             for (var i = 2; i <= (Amount + 1); i++) {
               text = SheetM.getRange(i, col).getDisplayValue()
               var notification = false
-              sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification);
+              sendtext(text, notification);
               SheetM.getRange(i, col).setValue("")
             }
             ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
@@ -184,7 +201,7 @@ function doPost(e) {
 
             text = "=======讀取完畢======="
             var notification = true
-            sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification);
+            sendtext(text, notification);
           }
 
           break;
@@ -193,7 +210,17 @@ function doPost(e) {
           var r = JSON.stringify(ALL);
           doc.setText(r); //寫入
           text = "===================\n將對 " + ALL.opposite.Name + " 重新命名!!!\n" + "請輸入新名子："
-          ReplyKeyboardRemove(Telegram_id, Telegram_bot_key, sheet_key, text)
+          ReplyKeyboardRemove(text)
+          break;
+        case '🔥 刪除聊天室':
+
+
+
+
+          var r = JSON.stringify(ALL);
+          doc.setText(r); //寫入
+          text = "===================\n將對 " + ALL.opposite.Name + " 重新命名!!!\n" + "請輸入新名子："
+          ReplyKeyboardRemove(text)
           break;
         case '🐳 開啟通知':
           var OName = ALL.opposite.Name
@@ -208,7 +235,7 @@ function doPost(e) {
           doc.setText(r); //寫入
           text = "已開啟 " + OName + " 的通知"
           var notification = false
-          sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification);
+          sendtext(text, notification);
           //以下處理RoomKeyboard==================================================
           REST_keyboard(doc_key) //重新編排keyborad
           break;
@@ -225,7 +252,7 @@ function doPost(e) {
           doc.setText(r); //寫入
           text = "已暫停 " + OName + " 的通知"
           var notification = false
-          sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification);
+          sendtext(text, notification);
           //以下處理RoomKeyboard==================================================
           REST_keyboard(doc_key) //重新編排keyborad
           break;
@@ -261,11 +288,11 @@ function doPost(e) {
             ]
             var resize_keyboard = false
             var one_time_keyboard = false
-            ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, Telegram_bot_key, sheet_key, Telegram_id, text)
+            ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, text)
           } else {
             text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
             var notification = false
-            sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification);
+            sendtext(text, notification);
           }
       }
     }
@@ -317,7 +344,7 @@ function doPost(e) {
       if (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId) {
         text = text; //雖然沒意義但還是寫一下
         var notification = false
-        sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification);
+        sendtext(text, notification);
       } else {
         //以下處理sheet========================================================
         var col = ALL.FastMatch2[Room_text] + 1; //找欄位
@@ -333,7 +360,7 @@ function doPost(e) {
         if (Notice) {
           text = "系統公告，你有新訊息!\n來自：" + ALL.data[col - 1].Name;
           var notification = false
-          sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification);
+          sendtext(text, notification);
         }
       }
 
@@ -378,7 +405,7 @@ function doPost(e) {
       //以下通知有新的ID進來===================================================
       text = "系統公告!!! 已有新ID登入，Room_id =\n" + Room_text + "\n請盡快重新命名。"
       var notification = false
-      sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification);
+      sendtext(text, notification);
     }
   } else {
     GmailApp.sendEmail("email", "telegram-line出事啦", d + "\n" + ee);
@@ -409,31 +436,31 @@ function Log(estringa, from, sheet_key, email) {
   }
 }
 //=================================================================================
-function sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification) {
+function sendtext(text, notification) {
   var payload = {
     "method": "sendMessage",
-    'chat_id': Telegram_id,
+    'chat_id': "Telegram_id",
     'text': text,
     'disable_notification': notification
-  }
-  start(payload, Telegram_bot_key, sheet_key);
+  } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
+  start(payload);
 }
 //=================================================================
-function ReplyKeyboardRemove(Telegram_id, Telegram_bot_key, sheet_key, text) {
+function ReplyKeyboardRemove(text) {
   var ReplyKeyboardRemove = {
     'remove_keyboard': true,
     'selective': false
   }
   var payload = {
     "method": "sendMessage",
-    'chat_id': Telegram_id,
+    'chat_id': "Telegram_id",
     'text': text,
     'reply_markup': JSON.stringify(ReplyKeyboardRemove)
   }
-  start(payload, Telegram_bot_key, sheet_key);
+  start(payload);
 }
 //=================================================================================
-function ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, Telegram_bot_key, sheet_key, Telegram_id, text) {
+function ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, text) {
   var ReplyKeyboardMakeup = {
     'keyboard': keyboard,
     'resize_keyboard': resize_keyboard,
@@ -441,25 +468,26 @@ function ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, Teleg
   }
   var payload = {
     "method": "sendMessage",
-    'chat_id': Telegram_id,
+    'chat_id': "Telegram_id",
     'text': text,
     'reply_markup': JSON.stringify(ReplyKeyboardMakeup)
   }
-  start(payload, Telegram_bot_key, sheet_key);
+  start(payload);
 }
 //=================================================================================
-function keyboard_main(Telegram_bot_key, sheet_key, Telegram_id, text, doc_key) {
+function keyboard_main(text, doc_key) {
   var doc = DocumentApp.openById(doc_key)
   var f = doc.getText();
   var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
   var keyboard_main = ALL.RoomKeyboard
   var resize_keyboard = false
   var one_time_keyboard = false
-  ReplyKeyboardMakeup(keyboard_main, resize_keyboard, one_time_keyboard, Telegram_bot_key, sheet_key, Telegram_id, text)
+  ReplyKeyboardMakeup(keyboard_main, resize_keyboard, one_time_keyboard, text)
 }
 //=================================================================================
-function REST_keyboard(doc_key) {
-  var doc = DocumentApp.openById(doc_key)
+function REST_keyboard() {
+  var base_json = base()
+  var doc = DocumentApp.openById(base_json.doc_key)
   var f = doc.getText();
   var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
   var keyboard = [];
@@ -512,7 +540,12 @@ function REST_keyboard(doc_key) {
   doc.setText(r); //寫入
 }
 //=================================================================================
-function start(payload, Telegram_bot_key, sheet_key) {
+function start(payload) {
+  var base_json = base()
+  var sheet_key = base_json.sheet_key
+  var Telegram_bot_key = base_json.Telegram_bot_key
+  var Telegram_id = base_json.Telegram_id
+  payload.chat_id = Telegram_id //補上Telegram_id
   var data = {
     "method": "post",
     "payload": payload
@@ -524,15 +557,29 @@ function start(payload, Telegram_bot_key, sheet_key) {
   Sheet.getRange(LastRow + 1, 1).setValue(d);
   Sheet.getRange(LastRow + 1, 3).setValue(data);
   var returned = UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
-  Sheet.getRange(LastRow + 1, 2).setValue(d);
+  Sheet.getRange(LastRow + 1, 2).setValue(returned); //確認有發成功
+}
+//=================================================================================
+function In (name) {
+  var arr = ["/main", "🔙 返回房間", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言", "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知"];
+
+  var flag = arr.some(function(value, index, array) {
+
+    return value == name ? true : false;
+
+  });
+  return flag
 }
 //=================================================================================
 function CP() {
-  var SpreadSheet = SpreadsheetApp.openById("XXX"); //這個麻煩改成sheet的ID
+  var base_json = base()
+  var sheet_key = base_json.sheet_key
+  var doc_key = base_json.doc_key
+  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
   var Sheet = SpreadSheet.getSheetByName("JSON備份");
   var LastRow = Sheet.getLastRow();
 
-  var doc = DocumentApp.openById("XXX")//這個麻煩改成doc的ID
+  var doc = DocumentApp.openById(doc_key)
   var f = doc.getText();
   var d = new Date();
   Sheet.getRange(LastRow + 1, 1).setValue(d);
@@ -540,10 +587,8 @@ function CP() {
 }
 //=================================================================================
 function TTTTTTTT() {
-  var text = "030"
-  var Telegram_bot_key = "343559800:AAGbpyqQldYoAIFp36M"
-  var sheet_key = "1aiNAMjxk3_9mrt0zF3nQw-Sa0iFdY";
-  var Telegram_id = "207014";
-  var notification = true
-  sendtext(text, Telegram_bot_key, sheet_key, Telegram_id, notification)
+  var arr = ["/main", "🔙 返回房間", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言", "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知"];
+  var r = In("/main")
+  Logger.log("rrrrrrrrrrrr "+r)
 }
+//=================================================================================
