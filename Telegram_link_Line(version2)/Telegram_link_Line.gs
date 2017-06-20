@@ -21,7 +21,7 @@ function base() {
 }
 //============================================================================
 function doPost(e) {
-  // debug用(要debug記得把14、15行註解掉)
+  // debug用(要debug記得把33、34行註解掉)
   //以下模擬Telegram發訊息(調整text)
   //var e = '{"update_id":9104623,"message":{"message_id":336,"from":{"id":2001460,"first_name":"Wx","last_name":"Ex","username":"we684124"},"chat":{"id":20701460,"first_name":"Wx","last_name":"Ex","username":"we684124","type":"private"},"date":149086785,"text":"📖 開啟聊天室"}}'
   //var estringa = JSON.parse(e);
