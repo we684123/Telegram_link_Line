@@ -73,10 +73,10 @@
   Line則要到後台改([長這樣](http://i.imgur.com/k0pSRfR.png))
 
 
-- NOTE：
+- NOTE：    
     你必須先跟你的機器人對話過他才能傳訊息給你。      
     如有出現問題請記得看一下 sheet 的 log !!!
-- NOTE2：
+- NOTE2：    
     現在Line伺服器在群組中有時會發userID有時不會，    
     所以有些知道是誰說得有些不知道，我現在也很困擾。
 # Screenshot
