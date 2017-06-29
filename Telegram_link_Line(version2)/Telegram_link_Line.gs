@@ -410,7 +410,7 @@ function doPost(e) {
       var userName = getUserName(estringa.events[0].source.userId); //如果有則用
 
     if (estringa.events[0].message.text) {
-      if (estringa.events[0].source.userId) {
+      if (userName) {
         text = userName + ":" + String(estringa.events[0].message.text); //取得訊息
       } else {
         text = String(estringa.events[0].message.text); //取得訊息
@@ -479,7 +479,7 @@ function doPost(e) {
       //以下處理data========================================
       var data_len = ALL.data.length;
 
-      if (userId) {
+      if (userName) {
         var U = userName
       } else {
         var U = Room_text
@@ -496,7 +496,7 @@ function doPost(e) {
       //以下處理FastMatch===================================
       var data_len = ALL.data.length
       var Room_Name = ALL.data[data_len - 1].Name //這個已經有✅了!
-      if (userId) {
+      if (userName) {
         var U = userName
       } else {
         var U = Room_text
@@ -513,7 +513,7 @@ function doPost(e) {
       var col = ALL.FastMatch2[Room_text] + 1; //找欄位
       var LastRowM = parseInt(SheetM.getRange(1, col).getDisplayValue());
 
-      if (estringa.events[0].source.userId) { //取得名子
+      if (userName) { //取得名子
         text = userName + ":" + String(estringa.events[0].message.text); //取得訊息
       } else {
         text = String(estringa.events[0].message.text); //取得訊息
@@ -528,7 +528,7 @@ function doPost(e) {
       //以下處理RoomKeyboard==================================================
       REST_keyboard()
       //以下通知有新的ID進來===================================================
-      if (userId) {
+      if (userName) {
         var U = userName
       } else {
         var U = Room_text
@@ -764,8 +764,15 @@ function getUserName(userId) {
     'headers': header,
     'method': 'get'
   }
-  var profile = JSON.parse(UrlFetchApp.fetch("https://api.line.me/v2/bot/profile/" + userId, options))
-  return profile.displayName
+  try{
+    var profile = JSON.parse(UrlFetchApp.fetch("https://api.line.me/v2/bot/profile/" + userId, options))
+    var userName = profile.displayName
+  }catch (r) {
+    var userName = 0
+  }
+
+
+  return userName
 }
 //=================================================================================
 function CP() {
