@@ -393,6 +393,7 @@ function doPost(e) {
 
     if (estringa.events[0].source.type == "user") {
       var Room_text = estringa.events[0].source.userId;
+      var userId = estringa.events[0].source.userId
     } else if (estringa.events[0].source.type == "room") {
       var Room_text = estringa.events[0].source.roomId;
       if (estringa.events[0].source.userId) {
@@ -405,8 +406,15 @@ function doPost(e) {
       }
     } //強制轉ID
 
+    if (estringa.events[0].source.userId)
+      var userName = getUserName(estringa.events[0].source.userId); //如果有則用
+
     if (estringa.events[0].message.text) {
-      text = String(estringa.events[0].message.text); //取得訊息
+      if (estringa.events[0].source.userId) {
+        text = userName + ":" + String(estringa.events[0].message.text); //取得訊息
+      } else {
+        text = String(estringa.events[0].message.text); //取得訊息
+      }
     } else if (estringa.events[0].message.type == "image") {
       text = String("照片(" + estringa.events[0].message.id + ")") //取得照片
     } else if (estringa.events[0].message.type == "sticker") {
@@ -470,9 +478,16 @@ function doPost(e) {
       ALL.FastMatch2 = r; //打包好塞回去
       //以下處理data========================================
       var data_len = ALL.data.length;
+
+      if (userId) {
+        var U = userName
+      } else {
+        var U = Room_text
+      }
+
       var N = {
         "RoomId": Room_text,
-        "Name": (Room_text + "✅"),
+        "Name": (U + "✅"),
         "status": "normal",
         "Amount": 0,
         "Notice": true
@@ -481,7 +496,12 @@ function doPost(e) {
       //以下處理FastMatch===================================
       var data_len = ALL.data.length
       var Room_Name = ALL.data[data_len - 1].Name //這個已經有✅了!
-      var R = ',"' + Room_text + '✅":' + newcol + "}"
+      if (userId) {
+        var U = userName
+      } else {
+        var U = Room_text
+      }
+      var R = ',"' + U + '✅":' + newcol + "}"
       var r = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace("}", R));
       ALL.FastMatch = r; //打包好塞回去
 
@@ -492,6 +512,13 @@ function doPost(e) {
       //以下處理sheet(寫入訊息)========================================================
       var col = ALL.FastMatch2[Room_text] + 1; //找欄位
       var LastRowM = parseInt(SheetM.getRange(1, col).getDisplayValue());
+
+      if (estringa.events[0].source.userId) { //取得名子
+        text = userName + ":" + String(estringa.events[0].message.text); //取得訊息
+      } else {
+        text = String(estringa.events[0].message.text); //取得訊息
+      }
+
       SheetM.getRange(2, col).setValue(String(text)) //更新內容
       SheetM.getRange(1, col).setValue(1) //更新數量
       //以下處理doc(寫入訊息)==========================================================
@@ -501,7 +528,12 @@ function doPost(e) {
       //以下處理RoomKeyboard==================================================
       REST_keyboard()
       //以下通知有新的ID進來===================================================
-      text = "已有新ID登入!!! Room_id =\n" + Room_text + "\n請盡快重新命名。"
+      if (userId) {
+        var U = userName
+      } else {
+        var U = Room_text
+      }
+      text = "已有新ID登入!!! id =\n" + U + "\n請盡快重新命名。"
       var notification = false
       sendtext(text, notification);
     }
@@ -696,7 +728,6 @@ function REST_FastMatch1and2() { //重製快速索引
   doc.setText(r); //寫入
 }
 //=================================================================================
-
 function AllRead() {
   var base_json = base()
   var sheet_key = base_json.sheet_key
@@ -720,6 +751,21 @@ function AllRead() {
 
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
+}
+//=================================================================================
+function getUserName(userId) {
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var options = {
+    'headers': header,
+    'method': 'get'
+  }
+  var profile = JSON.parse(UrlFetchApp.fetch("https://api.line.me/v2/bot/profile/" + userId, options))
+  return profile.displayName
 }
 //=================================================================================
 function CP() {
