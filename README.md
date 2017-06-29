@@ -55,7 +55,8 @@
   https://docs.google.com/spreadsheets/d/1vp35X4AfgP2mGLib0PZQ0NLaw_Ur0PSD_0rjgbwOfx/edit#gid=0
 
   那ID就是"1vp35X4AfgP2mGLib0PZQ0NLaw_Ur0PSD_0rjgbwOfx"
-  (介於"d/"跟"/edit")
+  (介於"d/"跟"/edit")    
+  不知道自己的Telegram ID可以在Telegram中找 @you_id_bot 問。    
 
 
 - 註二
@@ -141,6 +142,11 @@ FastMatch = 快速索引用
 FastMatch2 = 快速索引用
 
 # 版本資訊
+  2017/06/29 -     
+  現在如果對方私訊你的bot你也能知道對方是誰了。    
+  群組中你可以知道是誰的發言了(有些不行但我也沒辦法QQ)。    
+  順便做了一個跟你說你的id的bot @you_id_bot    
+
   2017/06/25 - 一頭拉苦的up(+爆肝)    
   完成 "對應Line更新的修正"、"快速切換房間"、"刪除聊天室"、"重生資料"、"全部已讀"、"重新整理"。    
 
