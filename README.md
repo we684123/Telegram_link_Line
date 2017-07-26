@@ -29,7 +29,7 @@
     * (具有應用程式存取的使用者 改成"任何人甚至匿名使用者") ->
     * 確定(or更新)(註二) ->
     * 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)
-    * 將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)(須自己設doc、sheet ID)
+    * 將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)
 ##### Telegram bot 需要新增兩個指令：
 
        main - 開啟主選單
@@ -59,6 +59,9 @@
 
   不知道自己的Telegram ID可以在Telegram中找 @you_id_bot 問。    
 
+  然後關於gs文件中第7行的 "Line_id"、第8行的 "CHANNEL_ACCESS_TOKEN"在如下圖line的後台中。     
+  ![Imgur](http://i.imgur.com/meQfSFm.jpg)
+
 
 - 註二
 
@@ -69,8 +72,8 @@
 
   Telegram用
   "https://api.telegram.org/bot<token>/setWebhook?url=https://XXX"    
-  (這個格式("KEY"改成你的botkey 跟 "url="後面接gs專案網址 ))    
-  (設定post的方式就是將你改好的網址丟到任一瀏覽器上，並按Enter送出)
+  (這個格式("<token>"改成你的botkey 跟 "url="後面接gs專案網址 ))    
+  (設定Webhook的方式就是將你改好的網址丟到任一瀏覽器上，並按Enter送出)
 
   Line則要到後台改([長這樣](http://i.imgur.com/k0pSRfR.png))
 
@@ -79,8 +82,8 @@
     你必須先跟你的機器人對話過他才能傳訊息給你。      
     如有出現問題請記得看一下 sheet 的 log !!!
 - NOTE2：    
-    現在Line伺服器在群組中有時會發userID有時不會，    
-    所以有些知道是誰說得有些不知道，我現在也很困擾。
+    現在Line伺服器在群組中有時會發userID(須對方line app更新)    
+    所以有些知道是誰說的，有些不知道，我現在也很困擾。
 # Screenshot
 ![Imgur](http://i.imgur.com/4Vqwybc.png)
 
