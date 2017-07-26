@@ -68,7 +68,7 @@
 - 註三
 
   Telegram用
-  "https://api.telegram.org/botKEY/setWebhook?url=https://XXX"    
+  "https://api.telegram.org/bot<token>/setWebhook?url=https://XXX"    
   (這個格式("KEY"改成你的botkey 跟 "url="後面接gs專案網址 ))    
   (設定post的方式就是將你改好的網址丟到任一瀏覽器上，並按Enter送出)
 
@@ -144,7 +144,7 @@ FastMatch2 = 快速索引用
 
 # 版本資訊
   2017/06/30 - debug    
-      
+
   2017/06/29 -     
   現在如果對方私訊你的bot你也能知道對方是誰了。    
   群組中你可以知道是誰的發言了(有些不行但我也沒辦法QQ)。    
