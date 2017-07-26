@@ -301,6 +301,7 @@ function doPost(e) {
           sendtext(text, notification);
           break;
         case '/AllRead':
+        case '/allread':
           AllRead();
           text = "已全已讀"
           var notification = true
