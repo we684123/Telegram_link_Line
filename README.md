@@ -15,7 +15,7 @@
 
 2.  一個sheet檔
     * 在sheet中新增5個分頁(page)：    
-  _"Debug"、"Log"、"紀錄發送的訊息"、"Line訊息區"、"JSON備份"_   
+  __"Debug"、"Log"、"紀錄發送的訊息"、"Line訊息區"、"JSON備份"__   
     * 其中 "Line訊息區" 在其"A1"中填入0(整數數字)，然後將除了第1列的格式全部設為字串(純文字)。      
     [說明圖1](http://i.imgur.com/za6Ia6Q.png)、[說明圖2](http://i.imgur.com/rj9vlR3.png)    
 
