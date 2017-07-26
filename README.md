@@ -44,7 +44,7 @@
   * 完成！
 ##### Telegram bot 新增兩個指令(2016/06/25)：
 
-      /AllRead - 全部已讀
+      /allRead - 全部已讀
       /debug - 重生資料(bot壞掉時用)(不會讓房間不見)
 
   * 這兩個指令推薦新增在"@BotFather 中的編輯bot 的 About內，因為不常用又怕點到，還是要丟到指令中也可，隨意。
@@ -70,9 +70,9 @@
 
 - 註三
 
-  Telegram用
-  "https://api.telegram.org/bot<token>/setWebhook?url=https://XXX"    
-  (這個格式("<token>"改成你的botkey 跟 "url="後面接gs專案網址 ))    
+  Telegram用     
+  "https://api.telegram.org/bot&lt;token&gt;/setWebhook?url=https://XXX"    
+  (這個格式("&lt;token&gt;"改成你的botkey 跟 "url="後面接gs專案網址 ))    
   (設定Webhook的方式就是將你改好的網址丟到任一瀏覽器上，並按Enter送出)
 
   Line則要到後台改([長這樣](http://i.imgur.com/k0pSRfR.png))
