@@ -71,7 +71,9 @@
 - 註三
 
   Telegram用     
-  "https://api.telegram.org/bot&lt;token&gt;/setWebhook?url=https://XXX"    
+  ```html
+  "https://api.telegram.org/bot<token>/setWebhook?url=https://XXX"
+  ```    
   (這個格式("&lt;token&gt;"改成你的botkey 跟 "url="後面接gs專案網址 ))    
   (設定Webhook的方式就是將你改好的網址丟到任一瀏覽器上，並按Enter送出)
 
