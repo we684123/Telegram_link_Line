@@ -20,7 +20,7 @@
     [說明圖1](http://i.imgur.com/za6Ia6Q.png)、[說明圖2](http://i.imgur.com/rj9vlR3.png)    
 
 
-3.  一個gs檔(google apps script)，並將v2其中的"Telegram_link_Line.gs"的內容複製上去，之後依檔案中16~23行的要求填入資料(註一)。 然成後請如下操作：
+3.  一個gs檔(google apps script)，並將v2其中的"Telegram_link_Line.gs"的內容複製上去，之後依檔案中3~9行的要求填入資料(註一)。 然成後請如下操作：
     * 接下來按下左上角的
     * "發佈" ->
     * "部屬為網路應用程式" ->
@@ -74,7 +74,7 @@
   ```html
   "https://api.telegram.org/bot<token>/setWebhook?url=https://XXX"
   ```    
-  (這個格式("&lt;token&gt;"改成你的botkey 跟 "url="後面接gs專案網址 ))    
+  (這個格式("&lt;token&gt;"改成你的bot token 跟 "url="後面接gs專案網址 ))    
   (設定Webhook的方式就是將你改好的網址丟到任一瀏覽器上，並按Enter送出)
 
   Line則要到後台改([長這樣](http://i.imgur.com/k0pSRfR.png))
