@@ -29,7 +29,8 @@
     * (具有應用程式存取的使用者 改成"任何人甚至匿名使用者") ->
     * 確定(or更新)(註二) ->
     * 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)
-    * 將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)(用來備份整個doc)
+    * 將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)(用來備份整個doc)    
+    [說明圖1](http://i.imgur.com/KGXuqhT.png)、[說明圖2](http://i.imgur.com/GWpqmYH.png)、[說明圖3](http://i.imgur.com/tP8HUgR.png)、[說明圖4](http://i.imgur.com/HHs9qOH.png)
 ##### Telegram bot 需要新增兩個指令：
 
        main - 開啟主選單
