@@ -82,7 +82,11 @@ function doPost(e) {
         'chat_id': estringa.message.from.id,
         'text': text
       }
-      start(payload);
+      var data = {
+        "method": "post",
+        "payload": payload
+      }
+      UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
       return 0;
     }
 
@@ -765,10 +769,10 @@ function getUserName(userId) {
     'headers': header,
     'method': 'get'
   }
-  try{
+  try {
     var profile = JSON.parse(UrlFetchApp.fetch("https://api.line.me/v2/bot/profile/" + userId, options))
     var userName = profile.displayName
-  }catch (r) {
+  } catch (r) {
     var userName = 0
   }
 
