@@ -407,7 +407,7 @@ function doPost(e) {
     Log(estringa, from, sheet_key, email); //log
 
     if (estringa.events[0].source.type == "user") {
-      var Room_text = estringa.events[0].source.userId;
+      var Room_text = estringa.events[0].source.userId; //Room_text = 要發送的地址
       var userId = estringa.events[0].source.userId
     } else if (estringa.events[0].source.type == "room") {
       var Room_text = estringa.events[0].source.roomId;
@@ -421,10 +421,19 @@ function doPost(e) {
       }
     } //強制轉ID
 
-    if (estringa.events[0].source.userId)
+    if (estringa.events[0].source.userId){
       var u = estringa.events[0].source.userId
-      var g = estringa.events[0].source.groupId
-      var userName = newGetUserName(u,g); //如果有則用
+      if(estringa.events[0].source.groupId){ //看是group or room 再取出對應數值
+        var g = estringa.events[0].source.groupId
+      }else {
+        var g = estringa.events[0].source.roomId
+      }
+      if(estringa.events[0].source.type == "user"){
+        var userName = getUserName(u); //如果有則用
+      }else {
+        var userName = newGetUserName(u,g);
+      }
+    }
 
     if (estringa.events[0].message.text) {
       if (userName) {
@@ -785,7 +794,7 @@ function getUserName(userId) {
     var profile = JSON.parse(UrlFetchApp.fetch("https://api.line.me/v2/bot/profile/" + userId, options))
     var userName = profile.displayName
   } catch (r) {
-    var userName = 0
+    var userName = "未知姓名"
   }
   return userName
 }
