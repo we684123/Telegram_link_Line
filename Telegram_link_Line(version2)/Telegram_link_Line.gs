@@ -21,19 +21,29 @@ function base() {
 }
 //============================================================================
 function doPost(e) {
-  // debug用(要debug記得把33、34行註解掉)
-  //以下模擬Telegram發訊息(調整text)
-  //var e = '{"update_id":9104623,"message":{"message_id":336,"from":{"id":2001460,"first_name":"Wx","last_name":"Ex","username":"we684124"},"chat":{"id":207014603,"first_name":"Wx","last_name":"Ex","username":"we684124","type":"private"},"date":149086785,"text":"/delete"}}'
-  //var estringa = JSON.parse(e);
-
-  //以下模擬Line發訊息(調整text)
-  //var e = '{"events":[{"type":"message","replyToken":"a215829a32474a749fad411cc6315566","source":{"roomId":"R578f0ca78ce9972bd679c1f86589f979","type":"room"},"timestamp":1490864585838,"message":{"type":"text","id":"5861041407629","text":"030//"}}]}'
-  //var estringa = JSON.parse(e);
-  //
-  var estringa = JSON.parse(e.postData.contents);
-  var ee = JSON.stringify(estringa);
-  var text = "";
   var base_json = base();
+  var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
+  //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
+  //模擬Line的話記得把要模擬的東西複製到分頁debug中的B2
+
+  if(debug == 1){  //模擬Telegram
+    var sheet_key = base_json.sheet_key
+    var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+    var SheetD = SpreadSheet.getSheetByName("Debug");
+    var e = SheetD.getRange(1, 2).getDisplayValue(); //讀取debug分頁中的模擬資訊
+    var estringa = JSON.parse(e);
+  }else if(debug == 2){  //模擬Line
+    var sheet_key = base_json.sheet_key
+    var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+    var SheetD = SpreadSheet.getSheetByName("Debug");
+    var e = SheetD.getRange(2, 2).getDisplayValue(); //讀取debug分頁中的模擬資訊
+    var estringa = JSON.parse(e);
+  }else {
+    var estringa = JSON.parse(e.postData.contents);
+    var ee = JSON.stringify(estringa);
+  }
+
+  var text = "";
   var sheet_key = base_json.sheet_key
   var doc_key = base_json.doc_key
   var email = base_json.email
@@ -412,7 +422,9 @@ function doPost(e) {
     } //強制轉ID
 
     if (estringa.events[0].source.userId)
-      var userName = getUserName(estringa.events[0].source.userId); //如果有則用
+      var u = estringa.events[0].source.userId
+      var g = estringa.events[0].source.groupId
+      var userName = newGetUserName(u,g); //如果有則用
 
     if (estringa.events[0].message.text) {
       if (userName) {
@@ -775,7 +787,31 @@ function getUserName(userId) {
   } catch (r) {
     var userName = 0
   }
-
+  return userName
+}
+//=================================================================================
+function newGetUserName(userId,groupId) {
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var options = {
+    'headers': header,
+    'method': 'get'
+  }
+  try {
+    var profile = UrlFetchApp.fetch("https://api.line.me/v2/bot/group/" + groupId + "/member/" + userId, options)
+    profile = JSON.parse(profile)
+    var userName = profile.displayName
+  } catch (r) {
+    var userName = "未知姓名"
+  }
+  //Logger.log("TTTTTT = ",userName)
+  //var notification = false
+  //sendtext(profile, notification);
+  //sendtext(userName, notification);
 
   return userName
 }
