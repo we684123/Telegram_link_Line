@@ -88,7 +88,7 @@
     現在Line伺服器在群組中有時會發userID(須對方line app更新)    
     所以有些知道是誰說的，有些不知道，我現在也很困擾。
 # Screenshot
-![Imgur](http://i.imgur.com/4Vqwybc.png)
+![Imgur](http://i.imgur.com/n9vBs6V.png)
 
 # doc的json說明
 
