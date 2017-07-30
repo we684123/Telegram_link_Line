@@ -3,7 +3,9 @@
 >use telegram to Send and receive messages(from Line).
 *****
 舊版的在v1分支，此為針對v2的README。    
-如果是 Telegram_Bot 新手推薦看完 [這個影片](https://youtu.be/On9yeMtG2Wg)後在來使用。
+如果是 Telegram_Bot 新手推薦看完 [這個影片](https://youtu.be/On9yeMtG2Wg)後在來使用。    
+
+如果想要獲取更新之訊，可以加入這個頻道  https://t.me/TG_link_Line
 
 # 準備
  ##### 需要使用者申請 Telegram_bot跟Line_bot(Developer Trial)
