@@ -22,7 +22,7 @@ function base() {
 //============================================================================
 function doPost(e) {
   var base_json = base();
-  var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
+  var debug = 1; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
   //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
   //模擬Line的話記得把要模擬的東西複製到分頁debug中的B2
 
@@ -906,6 +906,15 @@ function CP() {
   Sheet.getRange(LastRow + 1, 2).setValue(f);
 }
 //=================================================================================
+function sendAudio(id,url) {
+    var payload = {
+        "method": "sendAudio",
+        'chat_id': id,
+        'audio': url
+    }
+    start(payload);
+}
+//=================================================================================
 function TTTTTTTT() {
   var base_json = base()
   var sheet_key = base_json.sheet_key
@@ -916,8 +925,13 @@ function TTTTTTTT() {
   var Line_id = base_json.Line_id
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
 
+  var id = Telegram_id
+  var url = "https://drive.google.com/uc?export=download&confirm=YzWC&id=0B-0JNsk9kL8vTW9DTnc0cEQ4UW8"
+  sendAudio(id,url);
+/*
   var Line_id = ""
   var photo_id = ""
   TG_Send_Photo_To_Line(Line_id, photo_id)
+*/
 }
 //=================================================================================
