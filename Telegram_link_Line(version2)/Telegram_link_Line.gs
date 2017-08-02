@@ -239,12 +239,16 @@ function doPost(e) {
               var SheetM = SpreadSheet.getSheetByName("Line訊息區");
               var col = ALL.FastMatch2[ALL.opposite.RoomId] + 1;
 
-              var Amount = parseInt(SheetM.getRange(1, col).getDisplayValue());
-              for (var i = 2; i <= (Amount + 1); i++) {
+              var Amount = SheetM.getRange(1, col).getDisplayValue();
+              Amount = JSON.parse(Amount)
+              for (var i = (Amount[1]+2); i <= (Amount[0] + 1); i++) {
                 text = SheetM.getRange(i, col).getDisplayValue()
                 var notification = false
                 sendtext(text, notification);
                 SheetM.getRange(i, col).setValue("")
+                Amount[1] = i;
+                Amount = JSON.stringify(Amount);
+                SheetM.getRange(1, col).setValue(Amount);
               }
               ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
               var r = JSON.stringify(ALL);
@@ -456,29 +460,29 @@ function doPost(e) {
 
     if (estringa.events[0].message.text) {
       if (userName) {
-        text = userName + ":" + String(estringa.events[0].message.text); //取得訊息
+        text = userName + "：\n" + String(estringa.events[0].message.text); //取得訊息
       } else {
         text = String(estringa.events[0].message.text); //取得訊息
       }
     } else if (estringa.events[0].message.type == "image") {
-      text = String("照片(" + estringa.events[0].message.id + ")") //取得照片
+      text = String("[照片," + estringa.events[0].message.id + "]") //取得照片
     } else if (estringa.events[0].message.type == "sticker") {
       var id = estringa.events[0].message.id
       var stickerId = estringa.events[0].message.stickerId
       var packageId = estringa.events[0].message.packageId
-      text = "貼圖(" + id + ")\n" + "[" + stickerId + "," + packageId + "]"; //取得貼圖
+      text = "[貼圖," + id + ")\n" + "[" + stickerId + "," + packageId + "]"; //取得貼圖
     } else if (estringa.events[0].message.type == "audio") {
-      text = String("錄音(" + estringa.events[0].message.id + ")") //取得錄音
+      text = String("[錄音," + estringa.events[0].message.id + "]") //取得錄音
     } else if (estringa.events[0].message.type == "location") {
       var id = estringa.events[0].message.id
       var address = estringa.events[0].message.address
       var latitude = estringa.events[0].message.latitude
       var longitude = estringa.events[0].message.longitude
-      text = "ID:" + id + "\n地址：" + address + "\n經度：" + latitude + "\n緯度：" + longitude; //取得位置
+      text = "ID：\n" + id + "\n地址：" + address + "\n經度：" + latitude + "\n緯度：" + longitude; //取得位置
     } else if (estringa.events[0].message.type == "video") {
-      text = String("影片(" + estringa.events[0].message.id + ")") //取得影片
+      text = String("[影片," + estringa.events[0].message.id + "]") //取得影片
     } else if (estringa.events[0].message.type == "file") {
-      text = String("檔案(" + estringa.events[0].message.id + ")") //取得影片
+      text = String("[檔案," + estringa.events[0].message.id + "]") //取得影片
     }
 
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -497,8 +501,9 @@ function doPost(e) {
         //以下處理sheet========================================================
         var col = ALL.FastMatch2[Room_text] + 1; //找欄位
         var LastRowM = parseInt(SheetM.getRange(1, col).getDisplayValue());
+        LastRowM = JSON.parse(LastRowM)
         SheetM.getRange(LastRowM + 2, col).setValue(String(text)) //更新內容
-        SheetM.getRange(1, col).setValue(LastRowM + 1) //更新數量
+        SheetM.getRange(1, col).setValue(LastRowM[0] + 1) //更新數量
         //以下處理doc==========================================================
         ALL.data[col - 1].Amount = ALL.data[col - 1].Amount + 1 //!!!!!!!!!!!!!!!!!!!!!!
         var r = JSON.stringify(ALL);
@@ -553,17 +558,9 @@ function doPost(e) {
       var r = JSON.stringify(ALL);
       doc.setText(r); //寫入
       //以下處理sheetM的數值===================================================
-      SheetM.getRange(1, newcol + 1).setValue(1)
+      SheetM.getRange(1, newcol + 1).setValue("[1,0]")
       //以下處理sheet(寫入訊息)========================================================
       var col = ALL.FastMatch2[Room_text] + 1; //找欄位
-      var LastRowM = parseInt(SheetM.getRange(1, col).getDisplayValue());
-
-      if (userName) { //取得名子
-        text = userName + ":" + String(estringa.events[0].message.text); //取得訊息
-      } else {
-        text = String(estringa.events[0].message.text); //取得訊息
-      }
-
       SheetM.getRange(2, col).setValue(String(text)) //更新內容
       SheetM.getRange(1, col).setValue(1) //更新數量
       //以下處理doc(寫入訊息)==========================================================
@@ -933,5 +930,23 @@ function TTTTTTTT() {
   var photo_id = ""
   TG_Send_Photo_To_Line(Line_id, photo_id)
 */
+}
+//=================================================================================
+function YYYYYYYYY() {
+  var base_json = base()
+  var sheet_key = base_json.sheet_key
+  var doc_key = base_json.doc_key
+  var email = base_json.email
+  var Telegram_bot_key = base_json.Telegram_bot_key
+  var Telegram_id = base_json.Telegram_id
+  var Line_id = base_json.Line_id
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+
+  var sheet_key = base_json.sheet_key
+  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+  var Sheet = SpreadSheet.getSheetByName("Line訊息區");
+  var LastRow = Sheet.getLastRow();
+
+
 }
 //=================================================================================
