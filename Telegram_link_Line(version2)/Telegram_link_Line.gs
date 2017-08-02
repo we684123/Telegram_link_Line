@@ -22,7 +22,7 @@ function base() {
 //============================================================================
 function doPost(e) {
   var base_json = base();
-  var debug = 1; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
+  var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
   //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
   //模擬Line的話記得把要模擬的東西複製到分頁debug中的B2
 
@@ -253,7 +253,7 @@ function doPost(e) {
               ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
               var r = JSON.stringify(ALL);
               doc.setText(r); //寫入
-              SheetM.getRange(1, col).setValue(0)
+              SheetM.getRange(1, col).setValue("[0,0]")
 
               text = "=======讀取完畢======="
               var notification = true
@@ -460,29 +460,29 @@ function doPost(e) {
 
     if (estringa.events[0].message.text) {
       if (userName) {
-        text = userName + "：\n" + String(estringa.events[0].message.text); //取得訊息
+        text = '[\"文字\",\"' + userName + '\",\"' + String(estringa.events[0].message.text) + '\"]'; //取得訊息
       } else {
-        text = String(estringa.events[0].message.text); //取得訊息
+        text = '[\"文字\",\"' + String(estringa.events[0].message.text) + '\"]'; //取得訊息
       }
     } else if (estringa.events[0].message.type == "image") {
-      text = String("[照片," + estringa.events[0].message.id + "]") //取得照片
+      text = String("[\"照片\"," + estringa.events[0].message.id + "]") //取得照片
     } else if (estringa.events[0].message.type == "sticker") {
       var id = estringa.events[0].message.id
       var stickerId = estringa.events[0].message.stickerId
       var packageId = estringa.events[0].message.packageId
-      text = "[貼圖," + id + ")\n" + "[" + stickerId + "," + packageId + "]"; //取得貼圖
+      text = "[\"貼圖\"," + id + "," + "[" + stickerId + "," + packageId + "]]"; //取得貼圖
     } else if (estringa.events[0].message.type == "audio") {
-      text = String("[錄音," + estringa.events[0].message.id + "]") //取得錄音
+      text = String("[\"錄音\"," + estringa.events[0].message.id + "]") //取得錄音
     } else if (estringa.events[0].message.type == "location") {
       var id = estringa.events[0].message.id
       var address = estringa.events[0].message.address
       var latitude = estringa.events[0].message.latitude
       var longitude = estringa.events[0].message.longitude
-      text = "ID：\n" + id + "\n地址：" + address + "\n經度：" + latitude + "\n緯度：" + longitude; //取得位置
+      text = '[\"位置\",' + id + ',' + address + "," + latitude + "," + longitude + "]"; //取得位置
     } else if (estringa.events[0].message.type == "video") {
-      text = String("[影片," + estringa.events[0].message.id + "]") //取得影片
+      text = String("[\"影片\"," + estringa.events[0].message.id + "]") //取得影片
     } else if (estringa.events[0].message.type == "file") {
-      text = String("[檔案," + estringa.events[0].message.id + "]") //取得影片
+      text = String("[\"檔案\"," + estringa.events[0].message.id + "]") //取得影片
     }
 
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -500,10 +500,11 @@ function doPost(e) {
       } else {
         //以下處理sheet========================================================
         var col = ALL.FastMatch2[Room_text] + 1; //找欄位
-        var LastRowM = parseInt(SheetM.getRange(1, col).getDisplayValue());
+        var LastRowM = SheetM.getRange(1, col).getDisplayValue();
         LastRowM = JSON.parse(LastRowM)
-        SheetM.getRange(LastRowM + 2, col).setValue(String(text)) //更新內容
-        SheetM.getRange(1, col).setValue(LastRowM[0] + 1) //更新數量
+        SheetM.getRange(LastRowM[0] + 2, col).setValue(String(text)) //更新內容
+        LastRowM[0] = LastRowM[0] + 1;
+        SheetM.getRange(1, col).setValue(JSON.stringify(LastRowM)) //更新數量
         //以下處理doc==========================================================
         ALL.data[col - 1].Amount = ALL.data[col - 1].Amount + 1 //!!!!!!!!!!!!!!!!!!!!!!
         var r = JSON.stringify(ALL);
@@ -667,6 +668,8 @@ function start(payload) {
     "method": "post",
     "payload": payload
   }
+  UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
+  /*  為了速度和穩定 不必要就算了
   var d = new Date();
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
   var Sheet = SpreadSheet.getSheetByName("紀錄發送的訊息");
@@ -675,6 +678,7 @@ function start(payload) {
   Sheet.getRange(LastRow + 1, 3).setValue(data);
   var returned = UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
   Sheet.getRange(LastRow + 1, 2).setValue(returned); //確認有發成功
+  */
 }
 //=================================================================================
 function In(name) {
@@ -785,7 +789,7 @@ function AllRead() {
   var row1 = []
   for (var i = 0; i < data_len; i++) {
     ALL.data[i].Amount = 0
-    row1.splice(i, 0, 0)
+    row1.splice(i, 0, "[0,0]")
   }
   var LastCol = Sheet.getLastColumn();
   Sheet.clear();
