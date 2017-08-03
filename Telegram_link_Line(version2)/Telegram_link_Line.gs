@@ -52,7 +52,7 @@ function doPost(e) {
   var Line_id = base_json.Line_id
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
 
-  //*/ debug用
+  /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
   var SheetD = SpreadSheet.getSheetByName("Debug");
   var LastRowD = SheetD.getLastRow();
@@ -245,16 +245,11 @@ function doPost(e) {
               var ed = Amount[0] + 1
               for (var i = st; i <= ed; i++) {
                 text = SheetM.getRange(i, col).getDisplayValue()
-                SheetD.getRange(LastRowD + 1, 2).setValue("ggggggggggg Amount[0]= " +Amount[0] );
-                SheetD.getRange(LastRowD + 1, 3).setValue("ggggggggggg Amount[1]= " +Amount[1] );
                 var notification = true
                 sendtext(text, notification);
                 SheetM.getRange(i, col).setValue("")
                 Amount[1] = parseInt(i)-2;
-                SheetD.getRange(LastRowD + 1, 4).setValue("ggggggggggg i = " +i );
                 Amount = JSON.stringify(Amount);
-                SheetD.getRange(LastRowD + 1, 5).setValue("ggggggggggg Amount[0]= " +Amount[0] );
-                SheetD.getRange(LastRowD + 1, 6).setValue("ggggggggggg Amount[1]= " +Amount[1] );
                 SheetM.getRange(1, col).setValue(Amount);
               }
               ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
@@ -266,7 +261,6 @@ function doPost(e) {
               var notification = true
               sendtext(text, notification);
             }
-
             break;
           case '🔖 重新命名':
             ALL.mode = "🔖 重新命名"
