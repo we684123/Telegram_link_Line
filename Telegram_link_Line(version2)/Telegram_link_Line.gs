@@ -659,29 +659,6 @@ function keyboard_main(text, doc_key) {
   ReplyKeyboardMakeup(keyboard_main, resize_keyboard, one_time_keyboard, text)
 }
 //=================================================================================
-function start(payload) {
-  var base_json = base()
-  var sheet_key = base_json.sheet_key
-  var Telegram_bot_key = base_json.Telegram_bot_key
-  var Telegram_id = base_json.Telegram_id
-  payload.chat_id = Telegram_id //補上Telegram_id
-  var data = {
-    "method": "post",
-    "payload": payload
-  }
-  UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
-  /*  為了速度和穩定 不必要就算了
-  var d = new Date();
-  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-  var Sheet = SpreadSheet.getSheetByName("紀錄發送的訊息");
-  var LastRow = Sheet.getLastRow();
-  Sheet.getRange(LastRow + 1, 1).setValue(d);
-  Sheet.getRange(LastRow + 1, 3).setValue(data);
-  var returned = UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
-  Sheet.getRange(LastRow + 1, 2).setValue(returned); //確認有發成功
-  */
-}
-//=================================================================================
 function In(name) {
   var arr = ["/main", "🔙 返回房間", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言",
     "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃  重新整理", "🔥 刪除聊天室", "/delete"
@@ -893,6 +870,58 @@ function TGdownloadURL(path) {
   return TGDurl;
 }
 //=================================================================================
+function list() { //顯示指定資料夾資料
+
+  var Folder =DriveApp.getFolderById("0B-0JNsk9kL8vandtakhDOWZhQms");//暫存
+  var Folder2 =DriveApp.getFolderById("0B-0JNsk9kL8vdjNXc3FSMjdjUWM");//download_from_line
+  var files = Folder2.getFiles();
+
+  var sheet_key = "1ONW2e6kEmyUealjNfkNxK9GFmXCMua9YTZ3zMvu8FlE";
+  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+  var Sheet = SpreadSheet.getSheetByName("1");
+  var LastRow = Sheet.getLastRow();
+
+  Sheet.getRange(LastRow +1, 1).setValue(Folder);
+
+  var i=0;
+  while (files.hasNext()) {
+    var file = files.next();
+    //Sheet.getRange(LastRow +1+i, 5).setValue("Go");
+    Sheet.getRange(LastRow + 1 + i, 2).setValue(file.getName());
+    Sheet.getRange(LastRow + 1 + i, 3).setValue(file.getId());
+    Sheet.getRange(LastRow + 1 + i, 4).setValue("https://drive.google.com/uc?export=download&id="+file.getId());
+    Sheet.getRange(LastRow + 1 + i, 5).setValue(file.getDownloadUrl());
+    //Logger.log(file.getName());
+    i = i + 1;
+  }
+}
+//=================================================================================
+function downloadFromLine() {
+  //讓我們感謝河馬大大!m(_ _)m
+  //https://riverhippo.blogspot.tw/2016/02/google-drive-direct-link.html
+  var Folder2 =DriveApp.getFolderById("0B-0JNsk9kL8vdjNXc3FSMjdjUWM");//download_from_line
+
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+
+  var id = "6477901931257";
+  var url = 'https://api.line.me/v2/bot/message/'+ id +'/content';
+  //--------------------------------------------------
+  var header = {
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN
+  }
+//    'Content-Type': 'application/json; charset=UTF-8',
+  var options = {
+    'headers': header,
+    'method': 'get'
+  }
+  //--------------------------------------------------
+  var blob = UrlFetchApp.fetch(url, options);
+
+  Folder2.createFile(blob)
+}
+//=================================================================================
+//=================================================================================
 function CP() {
   var base_json = base()
   var sheet_key = base_json.sheet_key
@@ -907,14 +936,74 @@ function CP() {
   Sheet.getRange(LastRow + 1, 1).setValue(d);
   Sheet.getRange(LastRow + 1, 2).setValue(f);
 }
+//=================================================================
+function sendPhoto(url) {
+    var payload = {
+        "method": "sendPhoto",
+        'chat_id': "",
+        'photo': url
+    }
+    start(payload);
+}
 //=================================================================================
-function sendAudio(id,url) {
+function sendAudio(url) {
     var payload = {
         "method": "sendAudio",
-        'chat_id': id,
+        'chat_id': "",
         'audio': url
     }
     start(payload);
+}
+//=================================================================
+function sendVoice(url) {
+    var payload = {
+        "method": "sendVoice",
+        'chat_id': id,
+        'voice': url
+    }
+    start(payload);
+}
+//=================================================================
+function senddocument(url) {
+    var payload = {
+        "method": "senddocument",
+        'chat_id': "",
+        'document': url
+    }
+    start(payload);
+}
+//=================================================================
+function sendLocation(latitude,longitude) {
+    var payload = {
+        "method": "sendLocation",
+        "chat_id": "",
+        "latitude": latitude,
+        "longitude": longitude
+    }
+    start(payload);
+}
+//=================================================================================
+function start(payload) {
+  var base_json = base()
+  var sheet_key = base_json.sheet_key
+  var Telegram_bot_key = base_json.Telegram_bot_key
+  var Telegram_id = base_json.Telegram_id
+  payload.chat_id = Telegram_id //補上Telegram_id
+  var data = {
+    "method": "post",
+    "payload": payload
+  }
+  UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
+  /*/  為了速度和穩定 不必要就算了
+  var d = new Date();
+  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+  var Sheet = SpreadSheet.getSheetByName("紀錄發送的訊息");
+  var LastRow = Sheet.getLastRow();
+  Sheet.getRange(LastRow + 1, 1).setValue(d);
+  Sheet.getRange(LastRow + 1, 3).setValue(data);
+  var returned = UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
+  Sheet.getRange(LastRow + 1, 2).setValue(returned); //確認有發成功
+  //*/
 }
 //=================================================================================
 function TTTTTTTT() {
@@ -927,14 +1016,11 @@ function TTTTTTTT() {
   var Line_id = base_json.Line_id
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
 
-  var id = Telegram_id
-  var url = "https://drive.google.com/uc?export=download&confirm=YzWC&id=0B-0JNsk9kL8vTW9DTnc0cEQ4UW8"
-  sendAudio(id,url);
-/*
-  var Line_id = ""
-  var photo_id = ""
-  TG_Send_Photo_To_Line(Line_id, photo_id)
-*/
+//*/
+  var latitude = ""
+  var longitude = ""
+  sendLocation(latitude,longitude)
+//*/
 }
 //=================================================================================
 function YYYYYYYYY() {
