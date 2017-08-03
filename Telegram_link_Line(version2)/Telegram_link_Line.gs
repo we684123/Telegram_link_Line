@@ -241,7 +241,7 @@ function doPost(e) {
 
               var Amount = SheetM.getRange(1, col).getDisplayValue();
               Amount = JSON.parse(Amount)
-              for (var i = (Amount[1]+2); i <= (Amount[0] + 1); i++) {
+              for (var i = (Amount[1]+2); i <= (Amount[0] +1); i++) {
                 text = SheetM.getRange(i, col).getDisplayValue()
                 var notification = false
                 sendtext(text, notification);
