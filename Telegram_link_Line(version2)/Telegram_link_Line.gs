@@ -17,7 +17,7 @@ function base() {
     "Line_id": Line_id,
     "CHANNEL_ACCESS_TOKEN": CHANNEL_ACCESS_TOKEN,
     "email": email,
-    "FolderId":FolderId
+    "FolderId": FolderId
   }
   return base_json
 }
@@ -250,25 +250,67 @@ function doPost(e) {
                 var message = JSON.parse(text);
 
 
-                if(message[0] == "文子"){
+                if (message[0] == "文子") {
+                  var p = message[1] + "：" + message[2]
                   var notification = true
-                  sendtext(text, notification);
+                  sendtext(p, notification);
+                  //["文字","永格天@XXX","text"]
                   SheetM.getRange(i, col).setValue("")
-                  var t = "[" + (ed-1) + "," + (i-1) + "]"
+                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
                   SheetM.getRange(1, col).setValue(t);
                   SheetM.getRange(1, col).setValue(Amount);
-                }else if (message[0] == "照片") {
+                } else if (message[0] == "照片") {
+                  var url = message[0]
+                  var notification = true
+                  sendPhoto(url, notification)
+                  //["照片",64918660963]
+                  SheetM.getRange(i, col).setValue("")
+                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
+                  SheetM.getRange(1, col).setValue(t);
+                  SheetM.getRange(1, col).setValue(Amount);
+                } else if (message[0] == "貼圖") {
+                  var notification = true
+                  sendtext(text, notification);
+                  //["貼圖",64918733069,[502,2]]
+                  SheetM.getRange(i, col).setValue("")
+                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
+                  SheetM.getRange(1, col).setValue(t);
+                  SheetM.getRange(1, col).setValue(Amount);
+                } else if (message[0] == "錄音") {
+                  var notification = true
+                  sendAudio(url, notification)
+                  //["錄音",6491886417992]
+                  SheetM.getRange(i, col).setValue("")
+                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
+                  SheetM.getRange(1, col).setValue(t);
+                  SheetM.getRange(1, col).setValue(Amount);
+                } else if (message[0] == "位置") {
+                  var notification = true
+                  var latitude = message[2]
+                  var longitude = message[3]
+                  sendLocation(latitude, longitude, notification)
+                  //["位置",6491889182736,506台灣彰化縣福興鄉彰45-1鄉道24號
+                  //,24.037687,120.47961]
+                  SheetM.getRange(i, col).setValue("")
+                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
+                  SheetM.getRange(1, col).setValue(t);
+                  SheetM.getRange(1, col).setValue(Amount);
+                } else if (message[0] == "影片") {
+                  var notification = true
+                  sendtext(text, notification);
+                  //["影片",6491895815611]
+                  SheetM.getRange(i, col).setValue("")
+                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
+                  SheetM.getRange(1, col).setValue(t);
+                  SheetM.getRange(1, col).setValue(Amount);
+                } else if (message[0] == "檔案") {
+                  var notification = true
+                  sendtext(text, notification);
 
-                }else if (message[0] == "貼圖") {
-
-                }else if (message[0] == "錄音") {
-
-                }else if (message[0] == "位置") {
-
-                }else if (message[0] == "影片") {
-
-                }else if (message[0] == "檔案") {
-
+                  SheetM.getRange(i, col).setValue("")
+                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
+                  SheetM.getRange(1, col).setValue(t);
+                  SheetM.getRange(1, col).setValue(Amount);
                 }
 
 
@@ -283,48 +325,48 @@ function doPost(e) {
               sendtext(text, notification);
             }
             break;
-        /*case '📬 讀取留言':    //備份個(能用的版本!)
-          if (ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount == 0) {
-            text = "這個房間並沒有未讀的通知喔~ ";
-            var notification = true
-            sendtext(text, notification);
-          } else {
-            var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-            var SheetM = SpreadSheet.getSheetByName("Line訊息區");
-            var col = ALL.FastMatch2[ALL.opposite.RoomId] + 1;
+            /*case '📬 讀取留言':    //備份個(能用的版本!)
+              if (ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount == 0) {
+                text = "這個房間並沒有未讀的通知喔~ ";
+                var notification = true
+                sendtext(text, notification);
+              } else {
+                var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+                var SheetM = SpreadSheet.getSheetByName("Line訊息區");
+                var col = ALL.FastMatch2[ALL.opposite.RoomId] + 1;
 
-            var Amount = SheetM.getRange(1, col).getDisplayValue();
-            var Amount2 = JSON.parse(Amount)
-            var st = Amount2[1] + 2
-            var ed = Amount2[0] + 1
-            for (var i = st; i <= ed; i++) {
-              text = SheetM.getRange(i, col).getDisplayValue()
-              var notification = true
-              sendtext(text, notification);
-              SheetM.getRange(i, col).setValue("")
-              Amount2[1] = parseInt(i)-2;
-              //Amount2 = JSON.stringify(Amount2);
-              var t = "[" + (ed-1) + "," + (i-1) + "]"
-              SheetM.getRange(1, col).setValue(t);
-              var LastRowD = SheetD.getLastRow();
-              SheetD.getRange(LastRowD + 1, 2).setValue(Amount2)
-              SheetD.getRange(LastRowD + 1, 3).setValue(Amount2[0])
-              SheetD.getRange(LastRowD + 1, 4).setValue(Amount2[1])
-              SheetD.getRange(LastRowD + 1, 5).setValue(i)
-              SheetD.getRange(LastRowD + 1, 6).setValue(ed)
-              SheetD.getRange(LastRowD + 1, 7).setValue(t)
-            }
-            ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
-            SheetM.getRange(1, col).setValue("[0,0]")
+                var Amount = SheetM.getRange(1, col).getDisplayValue();
+                var Amount2 = JSON.parse(Amount)
+                var st = Amount2[1] + 2
+                var ed = Amount2[0] + 1
+                for (var i = st; i <= ed; i++) {
+                  text = SheetM.getRange(i, col).getDisplayValue()
+                  var notification = true
+                  sendtext(text, notification);
+                  SheetM.getRange(i, col).setValue("")
+                  Amount2[1] = parseInt(i)-2;
+                  //Amount2 = JSON.stringify(Amount2);
+                  var t = "[" + (ed-1) + "," + (i-1) + "]"
+                  SheetM.getRange(1, col).setValue(t);
+                  var LastRowD = SheetD.getLastRow();
+                  SheetD.getRange(LastRowD + 1, 2).setValue(Amount2)
+                  SheetD.getRange(LastRowD + 1, 3).setValue(Amount2[0])
+                  SheetD.getRange(LastRowD + 1, 4).setValue(Amount2[1])
+                  SheetD.getRange(LastRowD + 1, 5).setValue(i)
+                  SheetD.getRange(LastRowD + 1, 6).setValue(ed)
+                  SheetD.getRange(LastRowD + 1, 7).setValue(t)
+                }
+                ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
+                var r = JSON.stringify(ALL);
+                doc.setText(r); //寫入
+                SheetM.getRange(1, col).setValue("[0,0]")
 
-            text = "=======讀取完畢======="
-            var notification = true
-            sendtext(text, notification);
-          }
-          break;
-          */
+                text = "=======讀取完畢======="
+                var notification = true
+                sendtext(text, notification);
+              }
+              break;
+              */
           case '🔖 重新命名':
             ALL.mode = "🔖 重新命名"
             var r = JSON.stringify(ALL);
@@ -480,7 +522,7 @@ function doPost(e) {
         text = "(圖片已發送!)"
         var notification = false
         sendtext(text, notification);
-      }else {
+      } else {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
         var notification = false
         sendtext(text, notification);
@@ -529,24 +571,24 @@ function doPost(e) {
         text = '[\"文字\",\"' + String(estringa.events[0].message.text) + '\"]'; //取得訊息
       }
     } else if (estringa.events[0].message.type == "image") {
-      text = String("[\"照片\"," + estringa.events[0].message.id + "]") //取得照片
+      text = String("[\"照片\","+ userName + '\",\"' + estringa.events[0].message.id + "]") //取得照片
     } else if (estringa.events[0].message.type == "sticker") {
       var id = estringa.events[0].message.id
       var stickerId = estringa.events[0].message.stickerId
       var packageId = estringa.events[0].message.packageId
-      text = "[\"貼圖\"," + id + "," + "[" + stickerId + "," + packageId + "]]"; //取得貼圖
+      text = "[\"貼圖\","+ userName + '\",\"' + id + "," + "[" + stickerId + "," + packageId + "]]"; //取得貼圖
     } else if (estringa.events[0].message.type == "audio") {
-      text = String("[\"錄音\"," + estringa.events[0].message.id + "]") //取得錄音
+      text = String("[\"錄音\","+ userName + '\",\"' + estringa.events[0].message.id + "]") //取得錄音
     } else if (estringa.events[0].message.type == "location") {
       var id = estringa.events[0].message.id
       var address = estringa.events[0].message.address
       var latitude = estringa.events[0].message.latitude
       var longitude = estringa.events[0].message.longitude
-      text = '[\"位置\",' + id + ',' + address + "," + latitude + "," + longitude + "]"; //取得位置
+      text = '[\"位置\",'+ userName + '\",\"' + id + ',' + address + "," + latitude + "," + longitude + "]"; //取得位置
     } else if (estringa.events[0].message.type == "video") {
-      text = String("[\"影片\"," + estringa.events[0].message.id + "]") //取得影片
+      text = String("[\"影片\","+ userName + '\",\"' + estringa.events[0].message.id + "]") //取得影片
     } else if (estringa.events[0].message.type == "file") {
-      text = String("[\"檔案\"," + estringa.events[0].message.id + "]") //取得影片
+      text = String("[\"檔案\","+ userName + '\",\"' + estringa.events[0].message.id + "]") //取得影片
     }
 
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -925,8 +967,8 @@ function TGdownloadURL(path) {
 //=================================================================================
 function list() { //顯示指定資料夾資料
 
-  var Folder =DriveApp.getFolderById("0B-0JNsk9kL8vandtakhDOWZhQms");//暫存
-  var Folder2 =DriveApp.getFolderById("0B-0JNsk9kL8vdjNXc3FSMjdjUWM");//download_from_line
+  var Folder = DriveApp.getFolderById("0B-0JNsk9kL8vandtakhDOWZhQms"); //暫存
+  var Folder2 = DriveApp.getFolderById("0B-0JNsk9kL8vdjNXc3FSMjdjUWM"); //download_from_line
   var files = Folder2.getFiles();
 
   var sheet_key = "1ONW2e6kEmyUealjNfkNxK9GFmXCMua9YTZ3zMvu8FlE";
@@ -934,15 +976,15 @@ function list() { //顯示指定資料夾資料
   var Sheet = SpreadSheet.getSheetByName("1");
   var LastRow = Sheet.getLastRow();
 
-  Sheet.getRange(LastRow +1, 1).setValue(Folder);
+  Sheet.getRange(LastRow + 1, 1).setValue(Folder);
 
-  var i=0;
+  var i = 0;
   while (files.hasNext()) {
     var file = files.next();
     //Sheet.getRange(LastRow +1+i, 5).setValue("Go");
     Sheet.getRange(LastRow + 1 + i, 2).setValue(file.getName());
     Sheet.getRange(LastRow + 1 + i, 3).setValue(file.getId());
-    Sheet.getRange(LastRow + 1 + i, 4).setValue("https://drive.google.com/uc?export=download&id="+file.getId());
+    Sheet.getRange(LastRow + 1 + i, 4).setValue("https://drive.google.com/uc?export=download&id=" + file.getId());
     Sheet.getRange(LastRow + 1 + i, 5).setValue(file.getDownloadUrl());
     //Logger.log(file.getName());
     i = i + 1;
@@ -958,7 +1000,7 @@ function downloadFromLine() {
   var Folder = DriveApp.getFolderById(FolderId); //download_from_line
 
   var id = "6477901931257";
-  var url = 'https://api.line.me/v2/bot/message/'+ id +'/content';
+  var url = 'https://api.line.me/v2/bot/message/' + id + '/content';
   //--------------------------------------------------
   var header = {
     'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN
@@ -998,54 +1040,54 @@ function sendtext(text, notification) {
 }
 //=================================================================
 function sendPhoto(url, notification) {
-    var payload = {
-        "method": "sendPhoto",
-        'chat_id': "",
-        'photo': url,
-        'disable_notification': notification
-    } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
-    start(payload);
+  var payload = {
+    "method": "sendPhoto",
+    'chat_id': "",
+    'photo': url,
+    'disable_notification': notification
+  } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
+  start(payload);
 }
 //=================================================================================
 function sendAudio(url, notification) {
-    var payload = {
-        "method": "sendAudio",
-        'chat_id': "",
-        'audio': url,
-        'disable_notification': notification
-    } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
-    start(payload);
+  var payload = {
+    "method": "sendAudio",
+    'chat_id': "",
+    'audio': url,
+    'disable_notification': notification
+  } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
+  start(payload);
 }
 //=================================================================
 function sendVoice(url, notification) {
-    var payload = {
-        "method": "sendVoice",
-        'chat_id': id,
-        'voice': url,
-        'disable_notification': notification
-    } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
-    start(payload);
+  var payload = {
+    "method": "sendVoice",
+    'chat_id': id,
+    'voice': url,
+    'disable_notification': notification
+  } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
+  start(payload);
 }
 //=================================================================
 function senddocument(url, notification) {
-    var payload = {
-        "method": "senddocument",
-        'chat_id': "",
-        'document': url,
-        'disable_notification': notification
-    } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
-    start(payload);
+  var payload = {
+    "method": "senddocument",
+    'chat_id': "",
+    'document': url,
+    'disable_notification': notification
+  } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
+  start(payload);
 }
 //=================================================================
-function sendLocation(latitude,longitude, notification) {
-    var payload = {
-        "method": "sendLocation",
-        "chat_id": "",
-        "latitude": latitude,
-        "longitude": longitude,
-        'disable_notification': notification
-    } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
-    start(payload);
+function sendLocation(latitude, longitude, notification) {
+  var payload = {
+    "method": "sendLocation",
+    "chat_id": "",
+    "latitude": latitude,
+    "longitude": longitude,
+    'disable_notification': notification
+  } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
+  start(payload);
 }
 //=================================================================================
 function start(payload) {
@@ -1081,11 +1123,11 @@ function TTTTTTTT() {
   var Line_id = base_json.Line_id
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
 
-//*/
+  //*/
   var latitude = ""
   var longitude = ""
-  sendLocation(latitude,longitude)
-//*/
+  sendLocation(latitude, longitude)
+  //*/
 }
 //=================================================================================
 function YYYYYYYYY() {
