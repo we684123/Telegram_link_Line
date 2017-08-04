@@ -571,24 +571,48 @@ function doPost(e) {
         text = '[\"文字\",\"' + String(estringa.events[0].message.text) + '\"]'; //取得訊息
       }
     } else if (estringa.events[0].message.type == "image") {
-      text = String("[\"照片\","+ userName + '\",\"' + estringa.events[0].message.id + "]") //取得照片
+      if (userName) {
+        text = String("[\"照片\"," + userName  + estringa.events[0].message.id + "]") //取得照片
+      } else {
+        text = String("[\"照片\"," + estringa.events[0].message.id + "]") //取得照片
+      }
     } else if (estringa.events[0].message.type == "sticker") {
       var id = estringa.events[0].message.id
       var stickerId = estringa.events[0].message.stickerId
       var packageId = estringa.events[0].message.packageId
-      text = "[\"貼圖\","+ userName + '\",\"' + id + "," + "[" + stickerId + "," + packageId + "]]"; //取得貼圖
+      if (userName) {
+        text = "[\"貼圖\"," + userName  + id + "," + "[" + stickerId + "," + packageId + "]]"; //取得貼圖
+      } else {
+        text = "[\"貼圖\"," + id + "," + "[" + stickerId + "," + packageId + "]]"; //取得貼圖
+      }
     } else if (estringa.events[0].message.type == "audio") {
-      text = String("[\"錄音\","+ userName + '\",\"' + estringa.events[0].message.id + "]") //取得錄音
+      if (userName) {
+        text = String("[\"錄音\"," + userName  + estringa.events[0].message.id + "]") //取得錄音
+      } else {
+        text = String("[\"錄音\"," + estringa.events[0].message.id + "]") //取得錄音
+      }
     } else if (estringa.events[0].message.type == "location") {
       var id = estringa.events[0].message.id
       var address = estringa.events[0].message.address
       var latitude = estringa.events[0].message.latitude
       var longitude = estringa.events[0].message.longitude
-      text = '[\"位置\",'+ userName + '\",\"' + id + ',' + address + "," + latitude + "," + longitude + "]"; //取得位置
+      if (userName) {
+        text = '[\"位置\",' + userName  + id + ',' + address + "," + latitude + "," + longitude + "]"; //取得位置
+      } else {
+        text = '[\"位置\",' + id + ',' + address + "," + latitude + "," + longitude + "]"; //取得位置
+      }
     } else if (estringa.events[0].message.type == "video") {
-      text = String("[\"影片\","+ userName + '\",\"' + estringa.events[0].message.id + "]") //取得影片
+      if (userName) {
+        text = String("[\"影片\"," + userName  + estringa.events[0].message.id + "]") //取得影片
+      } else {
+        text = String("[\"影片\"," + estringa.events[0].message.id + "]") //取得影片
+      }
     } else if (estringa.events[0].message.type == "file") {
-      text = String("[\"檔案\","+ userName + '\",\"' + estringa.events[0].message.id + "]") //取得影片
+      if (userName) {
+        text = String("[\"檔案\"," + userName  + estringa.events[0].message.id + "]") //取得檔案
+      } else {
+        text = String("[\"檔案\"," + estringa.events[0].message.id + "]") //取得檔案
+      }
     }
 
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
