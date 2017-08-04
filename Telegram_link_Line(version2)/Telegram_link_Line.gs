@@ -245,8 +245,26 @@ function doPost(e) {
               var ed = Amount[0] + 1
               for (var i = st; i <= ed; i++) {
                 text = SheetM.getRange(i, col).getDisplayValue()
-                var notification = true
-                sendtext(text, notification);
+                var message = JSON.parse(text);
+
+
+                if(message[0] == "文子"){
+                  var notification = true
+                  sendtext(text, notification);
+                }else if (message[0] == "照片") {
+
+                }else if (message[0] == "貼圖") {
+
+                }else if (message[0] == "錄音") {
+
+                }else if (message[0] == "位置") {
+
+                }else if (message[0] == "影片") {
+
+                }else if (message[0] == "檔案") {
+
+                }
+
                 SheetM.getRange(i, col).setValue("")
                 Amount[1] = parseInt(i)-2;
                 Amount = JSON.stringify(Amount);
@@ -609,16 +627,6 @@ function Log(estringa, from, sheet_key, email) {
       GmailApp.sendEmail(email, "telegram-line出事啦", d + " " + ee);
   }
 }
-//=================================================================================
-function sendtext(text, notification) {
-  var payload = {
-    "method": "sendMessage",
-    'chat_id': "Telegram_id",
-    'text': text,
-    'disable_notification': notification
-  } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
-  start(payload);
-}
 //=================================================================
 function ReplyKeyboardRemove(text) {
   var ReplyKeyboardRemove = {
@@ -910,17 +918,14 @@ function downloadFromLine() {
   var header = {
     'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN
   }
-//    'Content-Type': 'application/json; charset=UTF-8',
   var options = {
     'headers': header,
     'method': 'get'
   }
   //--------------------------------------------------
   var blob = UrlFetchApp.fetch(url, options);
-
   Folder2.createFile(blob)
 }
-//=================================================================================
 //=================================================================================
 function CP() {
   var base_json = base()
@@ -936,49 +941,64 @@ function CP() {
   Sheet.getRange(LastRow + 1, 1).setValue(d);
   Sheet.getRange(LastRow + 1, 2).setValue(f);
 }
+//=================================================================================
+function sendtext(text, notification) {
+  var payload = {
+    "method": "sendMessage",
+    'chat_id': "Telegram_id",
+    'text': text,
+    'disable_notification': notification
+  } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
+  start(payload);
+}
 //=================================================================
-function sendPhoto(url) {
+function sendPhoto(url, notification) {
     var payload = {
         "method": "sendPhoto",
         'chat_id': "",
-        'photo': url
+        'photo': url,
+        'disable_notification': notification
     }
     start(payload);
 }
 //=================================================================================
-function sendAudio(url) {
+function sendAudio(url, notification) {
     var payload = {
         "method": "sendAudio",
         'chat_id': "",
-        'audio': url
+        'audio': url,
+        'disable_notification': notification
     }
     start(payload);
 }
 //=================================================================
-function sendVoice(url) {
+function sendVoice(url, notification) {
     var payload = {
         "method": "sendVoice",
         'chat_id': id,
-        'voice': url
+        'voice': url,
+        'disable_notification': notification
     }
     start(payload);
 }
 //=================================================================
-function senddocument(url) {
+function senddocument(url, notification) {
     var payload = {
         "method": "senddocument",
         'chat_id': "",
-        'document': url
+        'document': url,
+        'disable_notification': notification
     }
     start(payload);
 }
 //=================================================================
-function sendLocation(latitude,longitude) {
+function sendLocation(latitude,longitude, notification) {
     var payload = {
         "method": "sendLocation",
         "chat_id": "",
         "latitude": latitude,
-        "longitude": longitude
+        "longitude": longitude,
+        'disable_notification': notification
     }
     start(payload);
 }
