@@ -249,41 +249,28 @@ function doPost(e) {
                 text = SheetM.getRange(i, col).getDisplayValue()
                 var message = JSON.parse(text);
 
-
                 if (message[0] == "文子") {
                   var p = message[1] + "：" + message[2]
                   var notification = true
                   sendtext(p, notification);
                   //["文字","永格天@XXX","text"]
-                  SheetM.getRange(i, col).setValue("")
-                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
-                  SheetM.getRange(1, col).setValue(t);
-                  SheetM.getRange(1, col).setValue(Amount);
+                  upMessageData()
                 } else if (message[0] == "照片") {
                   var url = message[0]
                   var notification = true
                   sendPhoto(url, notification)
                   //["照片",64918660963]
-                  SheetM.getRange(i, col).setValue("")
-                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
-                  SheetM.getRange(1, col).setValue(t);
-                  SheetM.getRange(1, col).setValue(Amount);
+                  upMessageData()
                 } else if (message[0] == "貼圖") {
                   var notification = true
                   sendtext(text, notification);
                   //["貼圖",64918733069,[502,2]]
-                  SheetM.getRange(i, col).setValue("")
-                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
-                  SheetM.getRange(1, col).setValue(t);
-                  SheetM.getRange(1, col).setValue(Amount);
+                  upMessageData()
                 } else if (message[0] == "錄音") {
                   var notification = true
                   sendAudio(url, notification)
                   //["錄音",6491886417992]
-                  SheetM.getRange(i, col).setValue("")
-                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
-                  SheetM.getRange(1, col).setValue(t);
-                  SheetM.getRange(1, col).setValue(Amount);
+                  upMessageData()
                 } else if (message[0] == "位置") {
                   var notification = true
                   var latitude = message[2]
@@ -291,30 +278,26 @@ function doPost(e) {
                   sendLocation(latitude, longitude, notification)
                   //["位置",6491889182736,506台灣彰化縣福興鄉彰45-1鄉道24號
                   //,24.037687,120.47961]
-                  SheetM.getRange(i, col).setValue("")
-                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
-                  SheetM.getRange(1, col).setValue(t);
-                  SheetM.getRange(1, col).setValue(Amount);
+                  upMessageData()
                 } else if (message[0] == "影片") {
                   var notification = true
                   sendtext(text, notification);
                   //["影片",6491895815611]
-                  SheetM.getRange(i, col).setValue("")
-                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
-                  SheetM.getRange(1, col).setValue(t);
-                  SheetM.getRange(1, col).setValue(Amount);
+                  upMessageData()
                 } else if (message[0] == "檔案") {
                   var notification = true
                   sendtext(text, notification);
-
-                  SheetM.getRange(i, col).setValue("")
-                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
-                  SheetM.getRange(1, col).setValue(t);
-                  SheetM.getRange(1, col).setValue(Amount);
+                  upMessageData()
                 }
-
-
               }
+
+              function upMessageData() {
+                SheetM.getRange(i, col).setValue("")
+                var t = "[" + (ed - 1) + "," + (i - 1) + "]"
+                SheetM.getRange(1, col).setValue(t);
+                SheetM.getRange(1, col).setValue(Amount);
+              }
+
               ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
               var r = JSON.stringify(ALL);
               doc.setText(r); //寫入
@@ -572,7 +555,7 @@ function doPost(e) {
       }
     } else if (estringa.events[0].message.type == "image") {
       if (userName) {
-        text = String("[\"照片\"," + userName  + estringa.events[0].message.id + "]") //取得照片
+        text = String("[\"照片\"," + userName + estringa.events[0].message.id + "]") //取得照片
       } else {
         text = String("[\"照片\"," + estringa.events[0].message.id + "]") //取得照片
       }
@@ -581,13 +564,13 @@ function doPost(e) {
       var stickerId = estringa.events[0].message.stickerId
       var packageId = estringa.events[0].message.packageId
       if (userName) {
-        text = "[\"貼圖\"," + userName  + id + "," + "[" + stickerId + "," + packageId + "]]"; //取得貼圖
+        text = "[\"貼圖\"," + userName + id + "," + "[" + stickerId + "," + packageId + "]]"; //取得貼圖
       } else {
         text = "[\"貼圖\"," + id + "," + "[" + stickerId + "," + packageId + "]]"; //取得貼圖
       }
     } else if (estringa.events[0].message.type == "audio") {
       if (userName) {
-        text = String("[\"錄音\"," + userName  + estringa.events[0].message.id + "]") //取得錄音
+        text = String("[\"錄音\"," + userName + estringa.events[0].message.id + "]") //取得錄音
       } else {
         text = String("[\"錄音\"," + estringa.events[0].message.id + "]") //取得錄音
       }
@@ -597,19 +580,19 @@ function doPost(e) {
       var latitude = estringa.events[0].message.latitude
       var longitude = estringa.events[0].message.longitude
       if (userName) {
-        text = '[\"位置\",' + userName  + id + ',' + address + "," + latitude + "," + longitude + "]"; //取得位置
+        text = '[\"位置\",' + userName + id + ',' + address + "," + latitude + "," + longitude + "]"; //取得位置
       } else {
         text = '[\"位置\",' + id + ',' + address + "," + latitude + "," + longitude + "]"; //取得位置
       }
     } else if (estringa.events[0].message.type == "video") {
       if (userName) {
-        text = String("[\"影片\"," + userName  + estringa.events[0].message.id + "]") //取得影片
+        text = String("[\"影片\"," + userName + estringa.events[0].message.id + "]") //取得影片
       } else {
         text = String("[\"影片\"," + estringa.events[0].message.id + "]") //取得影片
       }
     } else if (estringa.events[0].message.type == "file") {
       if (userName) {
-        text = String("[\"檔案\"," + userName  + estringa.events[0].message.id + "]") //取得檔案
+        text = String("[\"檔案\"," + userName + estringa.events[0].message.id + "]") //取得檔案
       } else {
         text = String("[\"檔案\"," + estringa.events[0].message.id + "]") //取得檔案
       }
