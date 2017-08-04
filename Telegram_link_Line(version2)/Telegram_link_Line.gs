@@ -249,16 +249,17 @@ function doPost(e) {
                 text = SheetM.getRange(i, col).getDisplayValue()
                 var message = JSON.parse(text);
 
-                if (message[0] == "文子") {
+                if (message[0] == "文字") {
                   var p = message[1] + "：" + message[2]
                   var notification = true
                   sendtext(p, notification);
                   //["文字","永格天@XXX","text"]
                   upMessageData()
                 } else if (message[0] == "照片") {
-                  var url = message[0]
+                  //var url = message[0]
                   var notification = true
-                  sendPhoto(url, notification)
+                  sendtext(p, notification);
+                  //sendPhoto(url, notification)
                   //["照片",64918660963]
                   upMessageData()
                 } else if (message[0] == "貼圖") {
@@ -268,7 +269,8 @@ function doPost(e) {
                   upMessageData()
                 } else if (message[0] == "錄音") {
                   var notification = true
-                  sendAudio(url, notification)
+                  sendtext(p, notification);
+                  //sendAudio(url, notification)
                   //["錄音",6491886417992]
                   upMessageData()
                 } else if (message[0] == "位置") {
@@ -282,11 +284,13 @@ function doPost(e) {
                 } else if (message[0] == "影片") {
                   var notification = true
                   sendtext(text, notification);
+                  //sendVoice(url)
                   //["影片",6491895815611]
                   upMessageData()
                 } else if (message[0] == "檔案") {
                   var notification = true
                   sendtext(text, notification);
+                  //senddocument(url)
                   upMessageData()
                 }
               }
@@ -1136,22 +1140,3 @@ function TTTTTTTT() {
   sendLocation(latitude, longitude)
   //*/
 }
-//=================================================================================
-function YYYYYYYYY() {
-  var base_json = base()
-  var sheet_key = base_json.sheet_key
-  var doc_key = base_json.doc_key
-  var email = base_json.email
-  var Telegram_bot_key = base_json.Telegram_bot_key
-  var Telegram_id = base_json.Telegram_id
-  var Line_id = base_json.Line_id
-  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-
-  var sheet_key = base_json.sheet_key
-  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-  var Sheet = SpreadSheet.getSheetByName("Line訊息區");
-  var LastRow = Sheet.getLastRow();
-
-
-}
-//=================================================================================
