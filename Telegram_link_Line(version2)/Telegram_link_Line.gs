@@ -6,7 +6,8 @@ function base() {
   var Telegram_id = ""; //你的Telegram帳號ID(要通知你)
   var Line_id = ""; //你的line ID
   var CHANNEL_ACCESS_TOKEN = ''; //你的Line token
-  var email = "@gmail.com" //你的email
+  var email = "@gmail.com"; //你的email
+  var FolderId = ""; //google_grive_FolderId
   //前期準備完成!==============================================================
   var base_json = {
     "sheet_key": sheet_key,
@@ -15,7 +16,8 @@ function base() {
     "Telegram_id": Telegram_id,
     "Line_id": Line_id,
     "CHANNEL_ACCESS_TOKEN": CHANNEL_ACCESS_TOKEN,
-    "email": email
+    "email": email,
+    "FolderId":FolderId
   }
   return base_json
 }
@@ -251,6 +253,10 @@ function doPost(e) {
                 if(message[0] == "文子"){
                   var notification = true
                   sendtext(text, notification);
+                  SheetM.getRange(i, col).setValue("")
+                  var t = "[" + (ed-1) + "," + (i-1) + "]"
+                  SheetM.getRange(1, col).setValue(t);
+                  SheetM.getRange(1, col).setValue(Amount);
                 }else if (message[0] == "照片") {
 
                 }else if (message[0] == "貼圖") {
@@ -265,10 +271,7 @@ function doPost(e) {
 
                 }
 
-                SheetM.getRange(i, col).setValue("")
-                Amount[1] = parseInt(i)-2;
-                Amount = JSON.stringify(Amount);
-                SheetM.getRange(1, col).setValue(Amount);
+
               }
               ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
               var r = JSON.stringify(ALL);
@@ -280,6 +283,48 @@ function doPost(e) {
               sendtext(text, notification);
             }
             break;
+        /*case '📬 讀取留言':    //備份個(能用的版本!)
+          if (ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount == 0) {
+            text = "這個房間並沒有未讀的通知喔~ ";
+            var notification = true
+            sendtext(text, notification);
+          } else {
+            var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+            var SheetM = SpreadSheet.getSheetByName("Line訊息區");
+            var col = ALL.FastMatch2[ALL.opposite.RoomId] + 1;
+
+            var Amount = SheetM.getRange(1, col).getDisplayValue();
+            var Amount2 = JSON.parse(Amount)
+            var st = Amount2[1] + 2
+            var ed = Amount2[0] + 1
+            for (var i = st; i <= ed; i++) {
+              text = SheetM.getRange(i, col).getDisplayValue()
+              var notification = true
+              sendtext(text, notification);
+              SheetM.getRange(i, col).setValue("")
+              Amount2[1] = parseInt(i)-2;
+              //Amount2 = JSON.stringify(Amount2);
+              var t = "[" + (ed-1) + "," + (i-1) + "]"
+              SheetM.getRange(1, col).setValue(t);
+              var LastRowD = SheetD.getLastRow();
+              SheetD.getRange(LastRowD + 1, 2).setValue(Amount2)
+              SheetD.getRange(LastRowD + 1, 3).setValue(Amount2[0])
+              SheetD.getRange(LastRowD + 1, 4).setValue(Amount2[1])
+              SheetD.getRange(LastRowD + 1, 5).setValue(i)
+              SheetD.getRange(LastRowD + 1, 6).setValue(ed)
+              SheetD.getRange(LastRowD + 1, 7).setValue(t)
+            }
+            ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
+            var r = JSON.stringify(ALL);
+            doc.setText(r); //寫入
+            SheetM.getRange(1, col).setValue("[0,0]")
+
+            text = "=======讀取完畢======="
+            var notification = true
+            sendtext(text, notification);
+          }
+          break;
+          */
           case '🔖 重新命名':
             ALL.mode = "🔖 重新命名"
             var r = JSON.stringify(ALL);
@@ -907,10 +952,10 @@ function list() { //顯示指定資料夾資料
 function downloadFromLine() {
   //讓我們感謝河馬大大!m(_ _)m
   //https://riverhippo.blogspot.tw/2016/02/google-drive-direct-link.html
-  var Folder2 =DriveApp.getFolderById("0B-0JNsk9kL8vdjNXc3FSMjdjUWM");//download_from_line
-
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+  var FolderId = base_json.FolderId;
+  var Folder = DriveApp.getFolderById(FolderId); //download_from_line
 
   var id = "6477901931257";
   var url = 'https://api.line.me/v2/bot/message/'+ id +'/content';
@@ -958,7 +1003,7 @@ function sendPhoto(url, notification) {
         'chat_id': "",
         'photo': url,
         'disable_notification': notification
-    }
+    } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
     start(payload);
 }
 //=================================================================================
@@ -968,7 +1013,7 @@ function sendAudio(url, notification) {
         'chat_id': "",
         'audio': url,
         'disable_notification': notification
-    }
+    } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
     start(payload);
 }
 //=================================================================
@@ -978,7 +1023,7 @@ function sendVoice(url, notification) {
         'chat_id': id,
         'voice': url,
         'disable_notification': notification
-    }
+    } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
     start(payload);
 }
 //=================================================================
@@ -988,7 +1033,7 @@ function senddocument(url, notification) {
         'chat_id': "",
         'document': url,
         'disable_notification': notification
-    }
+    } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
     start(payload);
 }
 //=================================================================
@@ -999,7 +1044,7 @@ function sendLocation(latitude,longitude, notification) {
         "latitude": latitude,
         "longitude": longitude,
         'disable_notification': notification
-    }
+    } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
     start(payload);
 }
 //=================================================================================
