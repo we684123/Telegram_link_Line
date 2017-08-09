@@ -24,7 +24,7 @@ function base() {
 //============================================================================
 function doPost(e) {
   var base_json = base();
-  var debug = 1; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
+  var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
   //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
   //模擬Line的話記得把要模擬的東西複製到分頁debug中的B2
 
