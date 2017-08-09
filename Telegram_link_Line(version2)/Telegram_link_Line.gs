@@ -24,7 +24,7 @@ function base() {
 //============================================================================
 function doPost(e) {
   var base_json = base();
-  var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
+  var debug = 1; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
   //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
   //模擬Line的話記得把要模擬的東西複製到分頁debug中的B2
 
@@ -237,6 +237,7 @@ function doPost(e) {
               var notification = true
               sendtext(text, notification);
             } else {
+
               var SpreadSheet = SpreadsheetApp.openById(sheet_key);
               var SheetM = SpreadSheet.getSheetByName("Line訊息區");
               var col = ALL.FastMatch2[ALL.opposite.RoomId] + 1;
@@ -248,9 +249,19 @@ function doPost(e) {
               for (var i = st; i <= ed; i++) {
                 text = SheetM.getRange(i, col).getDisplayValue()
                 var message = JSON.parse(text);
+                Logger.log("message = ",message)
+                Logger.log("message[0] = ",message[0])
+
+                function upMessageData() {
+                SheetM.getRange(i, col).setValue("")
+                var t = "[" + (ed - 1) + "," + (i - 1) + "]"
+                SheetM.getRange(1, col).setValue(t);
+                SheetM.getRange(1, col).setValue(Amount);
+              }
 
                 if (message[0] == "文字") {
-                  var p = message[1] + "：" + message[2]
+                  var p = message[1] + "：\n" + message[2]
+                  Logger.log("ppp = ",p)
                   var notification = true
                   sendtext(p, notification);
                   //["文字","永格天@XXX","text"]
@@ -295,12 +306,7 @@ function doPost(e) {
                 }
               }
 
-              function upMessageData() {
-                SheetM.getRange(i, col).setValue("")
-                var t = "[" + (ed - 1) + "," + (i - 1) + "]"
-                SheetM.getRange(1, col).setValue(t);
-                SheetM.getRange(1, col).setValue(Amount);
-              }
+
 
               ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
               var r = JSON.stringify(ALL);
@@ -1135,8 +1141,6 @@ function TTTTTTTT() {
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
 
   //*/
-  var latitude = ""
-  var longitude = ""
-  sendLocation(latitude, longitude)
+  sendtext('["文字","Li","https://rff.ilc.edu.tw/prise/"]', true)
   //*/
 }
