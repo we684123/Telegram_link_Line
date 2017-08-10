@@ -24,7 +24,7 @@ function base() {
 //============================================================================
 function doPost(e) {
   var base_json = base();
-  var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
+  var debug = 1; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
   //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
   //模擬Line的話記得把要模擬的東西複製到分頁debug中的B2
 
@@ -246,18 +246,23 @@ function doPost(e) {
               Amount = JSON.parse(Amount)
               var st = Amount[1] + 2
               var ed = Amount[0] + 1
+              Logger.log("ststst = ",st )
+              Logger.log("ededed = ",ed )
+              function upMessageData(i,col,ed) {
+                SheetM.getRange(i, col).setValue("")
+                var t = "[" + (ed - 1) + "," + (i - 1) + "]"
+                SheetM.getRange(1, col).setValue(t);
+                //SheetM.getRange(1, col).setValue(Amount);
+              }
+
               for (var i = st; i <= ed; i++) {
                 text = SheetM.getRange(i, col).getDisplayValue()
+                Logger.log("text = ", text)
                 var message = JSON.parse(text);
                 Logger.log("message = ", message)
                 Logger.log("message[0] = ", message[0])
 
-                function upMessageData() {
-                  SheetM.getRange(i, col).setValue("")
-                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
-                  SheetM.getRange(1, col).setValue(t);
-                  SheetM.getRange(1, col).setValue(Amount);
-                }
+
 
                 if (message[0] == "文字") {
                   var p = message[1] + "：\n" + message[2]
@@ -265,25 +270,25 @@ function doPost(e) {
                   var notification = true
                   sendtext(p, notification);
                   //["文字","永格天@XXX","text"]
-                  upMessageData()
+                  upMessageData(i,col,ed)
                 } else if (message[0] == "照片") {
                   //var url = message[0]
                   var notification = true
                   sendtext(p, notification);
                   //sendPhoto(url, notification)
                   //["照片",64918660963]
-                  upMessageData()
+                  upMessageData(i,col,ed)
                 } else if (message[0] == "貼圖") {
                   var notification = true
                   sendtext(text, notification);
                   //["貼圖",64918733069,[502,2]]
-                  upMessageData()
+                  upMessageData(i,col,ed)
                 } else if (message[0] == "錄音") {
                   var notification = true
                   sendtext(p, notification);
                   //sendAudio(url, notification)
                   //["錄音",6491886417992]
-                  upMessageData()
+                  upMessageData(i,col,ed)
                 } else if (message[0] == "位置") {
                   var notification = true
                   var latitude = message[2]
@@ -291,20 +296,21 @@ function doPost(e) {
                   sendLocation(latitude, longitude, notification)
                   //["位置",6491889182736,506台灣彰化縣福興鄉彰45-1鄉道24號
                   //,24.037687,120.47961]
-                  upMessageData()
+                  upMessageData(i,col,ed)
                 } else if (message[0] == "影片") {
                   var notification = true
                   sendtext(text, notification);
                   //sendVoice(url)
                   //["影片",6491895815611]
-                  upMessageData()
+                  upMessageData(i,col,ed)
                 } else if (message[0] == "檔案") {
                   var notification = true
                   sendtext(text, notification);
                   //senddocument(url)
-                  upMessageData()
+                  upMessageData(i,col,ed)
                 }
               }
+
 
               ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
               var r = JSON.stringify(ALL);
