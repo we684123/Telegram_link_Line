@@ -249,19 +249,19 @@ function doPost(e) {
               for (var i = st; i <= ed; i++) {
                 text = SheetM.getRange(i, col).getDisplayValue()
                 var message = JSON.parse(text);
-                Logger.log("message = ",message)
-                Logger.log("message[0] = ",message[0])
+                Logger.log("message = ", message)
+                Logger.log("message[0] = ", message[0])
 
                 function upMessageData() {
-                SheetM.getRange(i, col).setValue("")
-                var t = "[" + (ed - 1) + "," + (i - 1) + "]"
-                SheetM.getRange(1, col).setValue(t);
-                SheetM.getRange(1, col).setValue(Amount);
-              }
+                  SheetM.getRange(i, col).setValue("")
+                  var t = "[" + (ed - 1) + "," + (i - 1) + "]"
+                  SheetM.getRange(1, col).setValue(t);
+                  SheetM.getRange(1, col).setValue(Amount);
+                }
 
                 if (message[0] == "文字") {
                   var p = message[1] + "：\n" + message[2]
-                  Logger.log("ppp = ",p)
+                  Logger.log("ppp = ", p)
                   var notification = true
                   sendtext(p, notification);
                   //["文字","永格天@XXX","text"]
@@ -305,8 +305,6 @@ function doPost(e) {
                   upMessageData()
                 }
               }
-
-
 
               ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
               var r = JSON.stringify(ALL);
