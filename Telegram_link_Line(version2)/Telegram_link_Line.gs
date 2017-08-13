@@ -246,9 +246,10 @@ function doPost(e) {
               Amount = JSON.parse(Amount)
               var st = Amount[1] + 2
               var ed = Amount[0] + 1
-              Logger.log("ststst = ",st )
-              Logger.log("ededed = ",ed )
-              function upMessageData(i,col,ed) {
+              Logger.log("ststst = ", st)
+              Logger.log("ededed = ", ed)
+
+              function upMessageData(i, col, ed) {
                 SheetM.getRange(i, col).setValue("")
                 var t = "[" + (ed - 1) + "," + (i - 1) + "]"
                 SheetM.getRange(1, col).setValue(t);
@@ -270,25 +271,25 @@ function doPost(e) {
                   var notification = true
                   sendtext(p, notification);
                   //["文字","永格天@XXX","text"]
-                  upMessageData(i,col,ed)
+                  upMessageData(i, col, ed)
                 } else if (message[0] == "照片") {
                   //var url = message[0]
                   var notification = true
                   sendtext(p, notification);
                   //sendPhoto(url, notification)
                   //["照片",64918660963]
-                  upMessageData(i,col,ed)
+                  upMessageData(i, col, ed)
                 } else if (message[0] == "貼圖") {
                   var notification = true
                   sendtext(text, notification);
                   //["貼圖",64918733069,[502,2]]
-                  upMessageData(i,col,ed)
+                  upMessageData(i, col, ed)
                 } else if (message[0] == "錄音") {
                   var notification = true
                   sendtext(p, notification);
                   //sendAudio(url, notification)
                   //["錄音",6491886417992]
-                  upMessageData(i,col,ed)
+                  upMessageData(i, col, ed)
                 } else if (message[0] == "位置") {
                   var notification = true
                   var latitude = message[2]
@@ -296,18 +297,18 @@ function doPost(e) {
                   sendLocation(latitude, longitude, notification)
                   //["位置",6491889182736,506台灣彰化縣福興鄉彰45-1鄉道24號
                   //,24.037687,120.47961]
-                  upMessageData(i,col,ed)
+                  upMessageData(i, col, ed)
                 } else if (message[0] == "影片") {
                   var notification = true
                   sendtext(text, notification);
                   //sendVoice(url)
                   //["影片",6491895815611]
-                  upMessageData(i,col,ed)
+                  upMessageData(i, col, ed)
                 } else if (message[0] == "檔案") {
                   var notification = true
                   sendtext(text, notification);
                   //senddocument(url)
-                  upMessageData(i,col,ed)
+                  upMessageData(i, col, ed)
                 }
               }
 
@@ -533,13 +534,13 @@ function doPost(e) {
     Log(estringa, from, sheet_key, email); //log
 
     var cutSource = estringa.events[0].source; //好長 看的我都花了 縮減個
-    if (cutSource.type == "user") {
+    if (cutSource.type == "user") { //整理舊格式
       var Room_text = cutSource.userId; //Room_text = 要發送的地址
       var userId = cutSource.userId
     } else if (cutSource.type == "room") {
       var Room_text = cutSource.roomId;
       if (cutSource.userId) {
-        var userId = ecutSource.userId
+        var userId = cutSource.userId
       }
     } else {
       var Room_text = cutSource.groupId;
@@ -548,72 +549,50 @@ function doPost(e) {
       }
     } //強制轉ID
 
-    if (estringa.events[0].source.userId) {
-      var u = estringa.events[0].source.userId
-      if (estringa.events[0].source.groupId) { //看是group or room 再取出對應數值
-        var g = estringa.events[0].source.groupId
+    if (cutSource.userId) { //嘗試取得發話人名稱
+      var u = cutSource.userId
+      if (cutSource.groupId) { //看是group or room 再取出對應數值
+        var g = cutSource.groupId
       } else {
-        var g = estringa.events[0].source.roomId
+        var g = cutSource.roomId
       }
-      if (estringa.events[0].source.type == "user") {
+      if (cutSource.type == "user") {
         var userName = getUserName(u); //如果有則用
       } else {
         var userName = newGetUserName(u, g);
       }
     }
 
-    if(!userName)
+    if (!userName)
       userName = "";
     var cutMessage = estringa.events[0].message; //好長 看的我都花了 縮減個
-    if (cutMessage.type == "text") {
-      var message_json = {
-        "type":cutMessage.type,
-        "message_id":cutMessage.id,
-        "userName":userName,
-        "text":String(cutMessage.text)
-      }
-    } else if (cutMessage.type == "image") {
-      var message_json = {
-        "type":cutMessage.type,
-        "message_id":cutMessage.id,
-        "userName":userName
-      }
-    } else if (cutMessage.type == "sticker") {
-      var message_json = {
-        "type":cutMessage.type,
-        "message_id":cutMessage.id,
-        "userName":userName,
-        "stickerId":cutMessage.stickerId,
-        "packageId":cutMessage.packageId
-      }
-    } else if (cutMessage.type == "audio") {
-      if (userName) {
-        text = String("[\"錄音\"," + userName + cutMessage.id + "]") //取得錄音
-      } else {
-        text = String("[\"錄音\"," + cutMessage.id + "]") //取得錄音
-      }
-    } else if (estringa.events[0].message.type == "location") {
-      var id = estringa.events[0].message.id
-      var address = estringa.events[0].message.address
-      var latitude = estringa.events[0].message.latitude
-      var longitude = estringa.events[0].message.longitude
-      if (userName) {
-        text = '[\"位置\",' + userName + id + ',' + address + "," + latitude + "," + longitude + "]"; //取得位置
-      } else {
-        text = '[\"位置\",' + id + ',' + address + "," + latitude + "," + longitude + "]"; //取得位置
-      }
-    } else if (estringa.events[0].message.type == "video") {
-      if (userName) {
-        text = String("[\"影片\"," + userName + estringa.events[0].message.id + "]") //取得影片
-      } else {
-        text = String("[\"影片\"," + estringa.events[0].message.id + "]") //取得影片
-      }
-    } else if (estringa.events[0].message.type == "file") {
-      if (userName) {
-        text = String("[\"檔案\"," + userName + estringa.events[0].message.id + "]") //取得檔案
-      } else {
-        text = String("[\"檔案\"," + estringa.events[0].message.id + "]") //取得檔案
-      }
+
+    var message_json = { //前面先寫 後面補充
+      "type": "type",
+      "message_id": cutMessage.id,
+      "userName": userName
+    }
+
+    if (cutMessage.type == "text") { //文字
+      message_json.type = "text"
+      message_json.text = String(cutMessage.text)
+    } else if (cutMessage.type == "image") { //圖片
+      message_json.type = "image"
+    } else if (cutMessage.type == "sticker") { //貼圖
+      message_json.type = "sticker"
+      message_json.stickerId = cutMessage.stickerId
+      message_json.packageId = cutMessage.packageId
+    } else if (cutMessage.type == "audio") { //錄音
+      message_json.type = "audio"
+    } else if (cutMessage.type == "location") { //位置
+      message_json.type = "location"
+      message_json.address = cutMessage.address
+      message_json.latitude = cutMessage.latitude
+      message_json.longitude = cutMessage.longitude
+    } else if (cutMessage.type == "video") { //影片
+      message_json.type = "video"
+    } else if (cutMessage.type == "file") { //Line現在居然不能傳送文件 這應該沒用了(?
+      message_json.type = "file"
     }
 
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
