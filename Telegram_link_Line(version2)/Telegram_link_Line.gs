@@ -532,18 +532,19 @@ function doPost(e) {
     var from = 'line';
     Log(estringa, from, sheet_key, email); //log
 
-    if (estringa.events[0].source.type == "user") {
-      var Room_text = estringa.events[0].source.userId; //Room_text = 要發送的地址
-      var userId = estringa.events[0].source.userId
-    } else if (estringa.events[0].source.type == "room") {
-      var Room_text = estringa.events[0].source.roomId;
-      if (estringa.events[0].source.userId) {
-        var userId = estringa.events[0].source.userId
+    var cutSource = estringa.events[0].source; //好長 看的我都花了 縮減個
+    if (cutSource.type == "user") {
+      var Room_text = cutSource.userId; //Room_text = 要發送的地址
+      var userId = cutSource.userId
+    } else if (cutSource.type == "room") {
+      var Room_text = cutSource.roomId;
+      if (cutSource.userId) {
+        var userId = ecutSource.userId
       }
     } else {
-      var Room_text = estringa.events[0].source.groupId;
-      if (estringa.events[0].source.userId) {
-        var userId = estringa.events[0].source.userId
+      var Room_text = cutSource.groupId;
+      if (cutSource.userId) {
+        var userId = cutSource.userId
       }
     } //強制轉ID
 
@@ -561,32 +562,35 @@ function doPost(e) {
       }
     }
 
-    if (estringa.events[0].message.text) {
-      if (userName) {
-        text = '[\"文字\",\"' + userName + '\",\"' + String(estringa.events[0].message.text) + '\"]'; //取得訊息
-      } else {
-        text = '[\"文字\",\"' + String(estringa.events[0].message.text) + '\"]'; //取得訊息
+    if(!userName)
+      userName = "";
+    var cutMessage = estringa.events[0].message; //好長 看的我都花了 縮減個
+    if (cutMessage.type == "text") {
+      var message_json = {
+        "type":cutMessage.type,
+        "message_id":cutMessage.id,
+        "userName":userName,
+        "text":String(cutMessage.text)
       }
-    } else if (estringa.events[0].message.type == "image") {
-      if (userName) {
-        text = String("[\"照片\"," + userName + estringa.events[0].message.id + "]") //取得照片
-      } else {
-        text = String("[\"照片\"," + estringa.events[0].message.id + "]") //取得照片
+    } else if (cutMessage.type == "image") {
+      var message_json = {
+        "type":cutMessage.type,
+        "message_id":cutMessage.id,
+        "userName":userName
       }
-    } else if (estringa.events[0].message.type == "sticker") {
-      var id = estringa.events[0].message.id
-      var stickerId = estringa.events[0].message.stickerId
-      var packageId = estringa.events[0].message.packageId
-      if (userName) {
-        text = "[\"貼圖\"," + userName + id + "," + "[" + stickerId + "," + packageId + "]]"; //取得貼圖
-      } else {
-        text = "[\"貼圖\"," + id + "," + "[" + stickerId + "," + packageId + "]]"; //取得貼圖
+    } else if (cutMessage.type == "sticker") {
+      var message_json = {
+        "type":cutMessage.type,
+        "message_id":cutMessage.id,
+        "userName":userName,
+        "stickerId":cutMessage.stickerId,
+        "packageId":cutMessage.packageId
       }
-    } else if (estringa.events[0].message.type == "audio") {
+    } else if (cutMessage.type == "audio") {
       if (userName) {
-        text = String("[\"錄音\"," + userName + estringa.events[0].message.id + "]") //取得錄音
+        text = String("[\"錄音\"," + userName + cutMessage.id + "]") //取得錄音
       } else {
-        text = String("[\"錄音\"," + estringa.events[0].message.id + "]") //取得錄音
+        text = String("[\"錄音\"," + cutMessage.id + "]") //取得錄音
       }
     } else if (estringa.events[0].message.type == "location") {
       var id = estringa.events[0].message.id
