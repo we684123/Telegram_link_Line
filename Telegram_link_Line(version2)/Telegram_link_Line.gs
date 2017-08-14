@@ -53,6 +53,7 @@ function doPost(e) {
   var Telegram_id = base_json.Telegram_id
   var Line_id = base_json.Line_id
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+  var FolderId = base_json.FolderId
 
   /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -259,38 +260,38 @@ function doPost(e) {
               for (var i = st; i <= ed; i++) {
                 text = SheetM.getRange(i, col).getDisplayValue()
                 Logger.log("text = ", text)
-                var message = JSON.parse(text);
+                var message_json = JSON.parse(text);
                 Logger.log("message = ", message)
                 Logger.log("message[0] = ", message[0])
 
 
 
-                if (message[0] == "文字") {
-                  var p = message[1] + "：\n" + message[2]
+                if (message_json.type = "text") {
+                  var p = message_json.userName + "：\n" + message_json.text
                   Logger.log("ppp = ", p)
                   var notification = true
                   sendtext(p, notification);
-                  //["文字","永格天@XXX","text"]
+                  //--["文字","永格天@XXX","text"]--
                   upMessageData(i, col, ed)
-                } else if (message[0] == "照片") {
+                } else if (cutMessage.type == "image") {
                   //var url = message[0]
                   var notification = true
                   sendtext(p, notification);
                   //sendPhoto(url, notification)
                   //["照片",64918660963]
                   upMessageData(i, col, ed)
-                } else if (message[0] == "貼圖") {
+                } else if (cutMessage.type == "sticker") {
                   var notification = true
                   sendtext(text, notification);
                   //["貼圖",64918733069,[502,2]]
                   upMessageData(i, col, ed)
-                } else if (message[0] == "錄音") {
+                } else if (cutMessage.type == "audio") {
                   var notification = true
                   sendtext(p, notification);
                   //sendAudio(url, notification)
                   //["錄音",6491886417992]
                   upMessageData(i, col, ed)
-                } else if (message[0] == "位置") {
+                } else if (cutMessage.type == "location") {
                   var notification = true
                   var latitude = message[2]
                   var longitude = message[3]
@@ -298,13 +299,13 @@ function doPost(e) {
                   //["位置",6491889182736,506台灣彰化縣福興鄉彰45-1鄉道24號
                   //,24.037687,120.47961]
                   upMessageData(i, col, ed)
-                } else if (message[0] == "影片") {
+                } else if (cutMessage.type == "video") {
                   var notification = true
                   sendtext(text, notification);
                   //sendVoice(url)
                   //["影片",6491895815611]
                   upMessageData(i, col, ed)
-                } else if (message[0] == "檔案") {
+                } else if (cutMessage.type == "file") {
                   var notification = true
                   sendtext(text, notification);
                   //senddocument(url)
@@ -323,48 +324,6 @@ function doPost(e) {
               sendtext(text, notification);
             }
             break;
-            /*case '📬 讀取留言':    //備份個(能用的版本!)
-              if (ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount == 0) {
-                text = "這個房間並沒有未讀的通知喔~ ";
-                var notification = true
-                sendtext(text, notification);
-              } else {
-                var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-                var SheetM = SpreadSheet.getSheetByName("Line訊息區");
-                var col = ALL.FastMatch2[ALL.opposite.RoomId] + 1;
-
-                var Amount = SheetM.getRange(1, col).getDisplayValue();
-                var Amount2 = JSON.parse(Amount)
-                var st = Amount2[1] + 2
-                var ed = Amount2[0] + 1
-                for (var i = st; i <= ed; i++) {
-                  text = SheetM.getRange(i, col).getDisplayValue()
-                  var notification = true
-                  sendtext(text, notification);
-                  SheetM.getRange(i, col).setValue("")
-                  Amount2[1] = parseInt(i)-2;
-                  //Amount2 = JSON.stringify(Amount2);
-                  var t = "[" + (ed-1) + "," + (i-1) + "]"
-                  SheetM.getRange(1, col).setValue(t);
-                  var LastRowD = SheetD.getLastRow();
-                  SheetD.getRange(LastRowD + 1, 2).setValue(Amount2)
-                  SheetD.getRange(LastRowD + 1, 3).setValue(Amount2[0])
-                  SheetD.getRange(LastRowD + 1, 4).setValue(Amount2[1])
-                  SheetD.getRange(LastRowD + 1, 5).setValue(i)
-                  SheetD.getRange(LastRowD + 1, 6).setValue(ed)
-                  SheetD.getRange(LastRowD + 1, 7).setValue(t)
-                }
-                ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
-                var r = JSON.stringify(ALL);
-                doc.setText(r); //寫入
-                SheetM.getRange(1, col).setValue("[0,0]")
-
-                text = "=======讀取完畢======="
-                var notification = true
-                sendtext(text, notification);
-              }
-              break;
-              */
           case '🔖 重新命名':
             ALL.mode = "🔖 重新命名"
             var r = JSON.stringify(ALL);
@@ -534,7 +493,7 @@ function doPost(e) {
     Log(estringa, from, sheet_key, email); //log
 
     var cutSource = estringa.events[0].source; //好長 看的我都花了 縮減個
-    if (cutSource.type == "user") { //整理舊格式
+    if (cutSource.type == "user") { //舊格式整理
       var Room_text = cutSource.userId; //Room_text = 要發送的地址
       var userId = cutSource.userId
     } else if (cutSource.type == "room") {
@@ -578,6 +537,9 @@ function doPost(e) {
       message_json.text = String(cutMessage.text)
     } else if (cutMessage.type == "image") { //圖片
       message_json.type = "image"
+      downloadFromLine(cutMessage.id)
+
+
     } else if (cutMessage.type == "sticker") { //貼圖
       message_json.type = "sticker"
       message_json.stickerId = cutMessage.stickerId
@@ -594,17 +556,17 @@ function doPost(e) {
     } else if (cutMessage.type == "file") { //Line現在居然不能傳送文件 這應該沒用了(?
       message_json.type = "file"
     }
+    var text = JSON.stringify(message_json)
 
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
     var SheetM = SpreadSheet.getSheetByName("Line訊息區");
-
     var doc = DocumentApp.openById(doc_key)
     var f = doc.getText();
     var ALL = JSON.parse(f);
     //================================================================
     if (ALL.FastMatch2[Room_text] != undefined) { //以下處理已登記的
       if (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId) {
-        text = text; //雖然沒意義但還是寫一下
+        text = message_json.text; //雖然沒意義但還是寫一下
         var notification = false
         sendtext(text, notification);
       } else {
@@ -970,10 +932,11 @@ function TGdownloadURL(path) {
 }
 //=================================================================================
 function list() { //顯示指定資料夾資料
+  var base_json = base()
+  var FolderId = base_json.FolderId
 
-  var Folder = DriveApp.getFolderById("0B-0JNsk9kL8vandtakhDOWZhQms"); //暫存
-  var Folder2 = DriveApp.getFolderById("0B-0JNsk9kL8vdjNXc3FSMjdjUWM"); //download_from_line
-  var files = Folder2.getFiles();
+  var Folder = DriveApp.getFolderById("FolderId"); //download_from_line
+  var files = Folder.getFiles();
 
   var sheet_key = "1ONW2e6kEmyUealjNfkNxK9GFmXCMua9YTZ3zMvu8FlE";
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -995,7 +958,7 @@ function list() { //顯示指定資料夾資料
   }
 }
 //=================================================================================
-function downloadFromLine() {
+function downloadFromLine(linkId) {
   //讓我們感謝河馬大大!m(_ _)m
   //https://riverhippo.blogspot.tw/2016/02/google-drive-direct-link.html
   var base_json = base()
@@ -1003,7 +966,7 @@ function downloadFromLine() {
   var FolderId = base_json.FolderId;
   var Folder = DriveApp.getFolderById(FolderId); //download_from_line
 
-  var id = "6477901931257";
+  var id = linkId;
   var url = 'https://api.line.me/v2/bot/message/' + id + '/content';
   //--------------------------------------------------
   var header = {
@@ -1015,7 +978,7 @@ function downloadFromLine() {
   }
   //--------------------------------------------------
   var blob = UrlFetchApp.fetch(url, options);
-  Folder2.createFile(blob)
+  Folder.createFile(blob)
 }
 //=================================================================================
 function CP() {
