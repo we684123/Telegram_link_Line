@@ -937,20 +937,33 @@ function list() { //顯示指定資料夾資料
   var base_json = base()
   var FolderId = base_json.FolderId
 
-  var Folder = DriveApp.getFolderById("FolderId"); //download_from_line
+  var sheet_key = "1ONW2e6kEmyUealjNfkNxK9GFmXCMua9YTZ3zMvu8FlE";
+  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+  var Sheet = SpreadSheet.getSheetByName("1");
+
+  var Folder = DriveApp.getFolderById(FolderId); //download_from_line
   var files = Folder.getFiles();
-  var file_array = [];
+  var file_array = "[]";
+  var file_array_json =  JSON.parse(file_array)
   while (files.hasNext()) {
     var file = files.next();
-    var file_data_json = {
+    var file_data = {
       "fileName":file.getName(),
       "fileId":file.getId(),
       "fileDownloadURL":("https://drive.google.com/uc?export=download&id=" + file.getId()),
-      "fileSize":file.getSize()
-      "fileLastUpdated":file.getLastUpdated()
+      "fileSize":file.getSize(),
+      "fileDateCreated":file.getDateCreated(),
+      "fileTimeStamp":file.getDescription()
     }
-    file_array.splice(file_array.length,0,file_data_json)
+    var i = file_array_json.length;
+    file_array_json.splice(i,0,file_data)
+    //var LastRow = Sheet.getLastRow();
+    //Sheet.getRange(LastRow + 1, 1).setValue(file_data);
   }
+  var k = JSON.stringify(file_array_json)
+  //Logger.log("AAAAA = ",file_array)
+  //var LastRow = Sheet.getLastRow();
+  //Sheet.getRange(LastRow + 1, 2).setValue(k);
   return file_array;
 }
 //=================================================================================
@@ -977,9 +990,10 @@ function downloadFromLine(linkId) {
   Folder.createFile(blob)
 }
 //=================================================================================
-function chName() {
-  var Folder2 = DriveApp.getFolderById("0B-0JNsk9kL8vdjNXc3FSMjdjUWM"); //download_from_line
-  var files = Folder2.getFiles();
+function ch_Name_and_Description() {
+  var base_json = base()
+  var FolderId = base_json.FolderId
+  var files = Folder.getFiles();
 
   while (files.hasNext()) {
     var file = files.next();
@@ -993,7 +1007,9 @@ function chName() {
       var getSeconds = d.getSeconds(); // 17 秒
       var getMilliseconds = d.getMilliseconds(); // 234 毫秒
       file.setName(getFullYear+"_"+getMonth+"_"+getDate+"_"+getHours+"_"+getMinutes+"_"+getSeconds+"_"+getMilliseconds)
-      Logger.log("NNNNNNN = ", file.getName())
+      file.setDescription(d.getTime());
+      //Logger.log("NNNNNNN = ", file.getName())
+      break;
     }
   }
 }
