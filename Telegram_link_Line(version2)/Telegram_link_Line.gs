@@ -538,16 +538,15 @@ function doPost(e) {
     } else if (cutMessage.type == "image") { //圖片
       message_json.type = "image"
       downloadFromLine(cutMessage.id)
-      var fileURL = getGdriveFileDownloadURL()
-
-
-
+      message_json.DURL = getGdriveFileDownloadURL()
     } else if (cutMessage.type == "sticker") { //貼圖
       message_json.type = "sticker"
       message_json.stickerId = cutMessage.stickerId
       message_json.packageId = cutMessage.packageId
     } else if (cutMessage.type == "audio") { //錄音
       message_json.type = "audio"
+      downloadFromLine(cutMessage.id)
+      message_json.DURL = getGdriveFileDownloadURL()
     } else if (cutMessage.type == "location") { //位置
       message_json.type = "location"
       message_json.address = cutMessage.address
@@ -555,8 +554,12 @@ function doPost(e) {
       message_json.longitude = cutMessage.longitude
     } else if (cutMessage.type == "video") { //影片
       message_json.type = "video"
+      downloadFromLine(cutMessage.id)
+      message_json.DURL = getGdriveFileDownloadURL()
     } else if (cutMessage.type == "file") { //Line現在居然不能傳送文件 這應該沒用了(?
       message_json.type = "file"
+      downloadFromLine(cutMessage.id)
+      message_json.DURL = getGdriveFileDownloadURL()
     }
     var text = JSON.stringify(message_json)
 
@@ -940,19 +943,19 @@ function list() { //顯示指定資料夾資料
   var Folder = DriveApp.getFolderById(FolderId); //download_from_line
   var files = Folder.getFiles();
   var file_array = "[]";
-  var file_array_json =  JSON.parse(file_array)
+  var file_array_json = JSON.parse(file_array)
   while (files.hasNext()) {
     var file = files.next();
     var file_data = {
-      "fileName":file.getName(),
-      "fileId":file.getId(),
-      "fileDownloadURL":("https://drive.google.com/uc?export=download&id=" + file.getId()),
-      "fileSize":file.getSize(),
-      "fileDateCreated":file.getDateCreated(),
-      "fileTimeStamp":file.getDescription()
+      "fileName": file.getName(),
+      "fileId": file.getId(),
+      "fileDownloadURL": ("https://drive.google.com/uc?export=download&id=" + file.getId()),
+      "fileSize": file.getSize(),
+      "fileDateCreated": file.getDateCreated(),
+      "fileTimeStamp": file.getDescription()
     }
     var i = file_array_json.length;
-    file_array_json.splice(i,0,file_data)
+    file_array_json.splice(i, 0, file_data)
 
   }
   var k = JSON.stringify(file_array_json)
@@ -962,16 +965,16 @@ function list() { //顯示指定資料夾資料
 function getGdriveFileDownloadURL() {
   var y = list()
   var list = JSON.parse(y)
-  var g = list.sort(function (a, b) {
-  if (parseInt(a.fileTimeStamp) > parseInt(b.fileTimeStamp)) {
-    return 1;
-  }
-  if (parseInt(a.fileTimeStamp) < parseInt(b.fileTimeStamp)) {
-    return -1;
-  }
+  var g = list.sort(function(a, b) {
+    if (parseInt(a.fileTimeStamp) > parseInt(b.fileTimeStamp)) {
+      return 1;
+    }
+    if (parseInt(a.fileTimeStamp) < parseInt(b.fileTimeStamp)) {
+      return -1;
+    }
     return 0;
   });
-  var g_len = g.length -1
+  var g_len = g.length - 1
   //Logger.log("len = ",g_len)
   //Logger.log("FDDDDD = ",g[g_len].fileDownloadURL)
   return g[g_len].fileDownloadURL
@@ -1016,7 +1019,7 @@ function ch_Name_and_Description() {
       var getMinutes = d.getMinutes(); // 29 分
       var getSeconds = d.getSeconds(); // 17 秒
       var getMilliseconds = d.getMilliseconds(); // 234 毫秒
-      file.setName(getFullYear+"_"+getMonth+"_"+getDate+"_"+getHours+"_"+getMinutes+"_"+getSeconds+"_"+getMilliseconds)
+      file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds)
       file.setDescription(d.getTime());
       //Logger.log("NNNNNNN = ", file.getName())
       break;
