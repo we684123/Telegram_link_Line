@@ -537,9 +537,9 @@ function doPost(e) {
       message_json.text = String(cutMessage.text)
     } else if (cutMessage.type == "image") { //圖片
       message_json.type = "image"
-      var list_before = list()
       downloadFromLine(cutMessage.id)
-      var list_after = list()
+      var list = list();
+      var list.fileLastUpdated.sort()
 
 
     } else if (cutMessage.type == "sticker") { //貼圖
