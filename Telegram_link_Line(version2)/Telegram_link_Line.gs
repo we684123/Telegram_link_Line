@@ -24,7 +24,7 @@ function base() {
 //============================================================================
 function doPost(e) {
   var base_json = base();
-  var debug = 1; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
+  var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
   //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
   //模擬Line的話記得把要模擬的東西複製到分頁debug中的B2
 
@@ -261,51 +261,58 @@ function doPost(e) {
                 text = SheetM.getRange(i, col).getDisplayValue()
                 Logger.log("text = ", text)
                 var message_json = JSON.parse(text);
-                Logger.log("message = ", message)
-                Logger.log("message[0] = ", message[0])
-
-
 
                 if (message_json.type = "text") {
                   var p = message_json.userName + "：\n" + message_json.text
                   Logger.log("ppp = ", p)
                   var notification = true
                   sendtext(p, notification);
-                  //--["文字","永格天@XXX","text"]--
+                  //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
+                  //"text":"51"}
                   upMessageData(i, col, ed)
                 } else if (cutMessage.type == "image") {
-                  //var url = message[0]
+                  var url = message_json.DURL
                   var notification = true
-                  sendtext(p, notification);
+                  sendPhoto(url, notification)
                   //sendPhoto(url, notification)
-                  //["照片",64918660963]
+                  //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
+                  //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
                   upMessageData(i, col, ed)
                 } else if (cutMessage.type == "sticker") {
                   var notification = true
                   sendtext(text, notification);
-                  //["貼圖",64918733069,[502,2]]
+                  //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
+                  //"stickerId":"502","packageId":"2"}
                   upMessageData(i, col, ed)
                 } else if (cutMessage.type == "audio") {
+                  var url = message_json.DURL
                   var notification = true
-                  sendtext(p, notification);
-                  //sendAudio(url, notification)
-                  //["錄音",6491886417992]
+                  sendAudio(url, notification)
+                  //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
+                  //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
                   upMessageData(i, col, ed)
                 } else if (cutMessage.type == "location") {
                   var notification = true
+                  if(message_json.address){
+                    var text = message_json.address
+                    sendtext(text, notification);
+                  }
                   var latitude = message[2]
                   var longitude = message[3]
                   sendLocation(latitude, longitude, notification)
-                  //["位置",6491889182736,506台灣彰化縣福興鄉彰45-1鄉道24號
-                  //,24.037687,120.47961]
+                  //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
+                  //"address":"260台灣宜蘭縣宜蘭市舊城西路107號",
+                  //"latitude":24.759711,"longitude":121.750114}
                   upMessageData(i, col, ed)
                 } else if (cutMessage.type == "video") {
+                  var url = message_json.DURL
                   var notification = true
-                  sendtext(text, notification);
-                  //sendVoice(url)
-                  //["影片",6491895815611]
+                  sendVoice(url, notification)
+                  //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
+                  //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
                   upMessageData(i, col, ed)
                 } else if (cutMessage.type == "file") {
+                  var url = message_json.DURL
                   var notification = true
                   sendtext(text, notification);
                   //senddocument(url)
