@@ -943,7 +943,7 @@ function TGdownloadURL(path) {
   return TGDurl;
 }
 //=================================================================================
-function list() { //顯示指定資料夾資料
+function list2() { //顯示指定資料夾資料
   var base_json = base()
   var FolderId = base_json.FolderId
 
@@ -970,7 +970,7 @@ function list() { //顯示指定資料夾資料
 }
 //==========================================================================
 function getGdriveFileDownloadURL() {
-  var y = list()
+  var y = list2()
   var list = JSON.parse(y)
   var g = list.sort(function(a, b) {
     if (parseInt(a.fileTimeStamp) > parseInt(b.fileTimeStamp)) {
