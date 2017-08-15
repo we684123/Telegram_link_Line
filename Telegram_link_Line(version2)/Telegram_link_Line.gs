@@ -538,8 +538,8 @@ function doPost(e) {
     } else if (cutMessage.type == "image") { //圖片
       message_json.type = "image"
       downloadFromLine(cutMessage.id)
-      var list = list();
-      var list.fileLastUpdated.sort()
+      var fileURL = getGdriveFileDownloadURL()
+
 
 
     } else if (cutMessage.type == "sticker") { //貼圖
@@ -937,10 +937,6 @@ function list() { //顯示指定資料夾資料
   var base_json = base()
   var FolderId = base_json.FolderId
 
-  var sheet_key = "1ONW2e6kEmyUealjNfkNxK9GFmXCMua9YTZ3zMvu8FlE";
-  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-  var Sheet = SpreadSheet.getSheetByName("1");
-
   var Folder = DriveApp.getFolderById(FolderId); //download_from_line
   var files = Folder.getFiles();
   var file_array = "[]";
@@ -957,14 +953,28 @@ function list() { //顯示指定資料夾資料
     }
     var i = file_array_json.length;
     file_array_json.splice(i,0,file_data)
-    //var LastRow = Sheet.getLastRow();
-    //Sheet.getRange(LastRow + 1, 1).setValue(file_data);
+
   }
   var k = JSON.stringify(file_array_json)
-  //Logger.log("AAAAA = ",file_array)
-  //var LastRow = Sheet.getLastRow();
-  //Sheet.getRange(LastRow + 1, 2).setValue(k);
-  return file_array;
+  return k
+}
+//==========================================================================
+function getGdriveFileDownloadURL() {
+  var y = list()
+  var list = JSON.parse(y)
+  var g = list.sort(function (a, b) {
+  if (parseInt(a.fileTimeStamp) > parseInt(b.fileTimeStamp)) {
+    return 1;
+  }
+  if (parseInt(a.fileTimeStamp) < parseInt(b.fileTimeStamp)) {
+    return -1;
+  }
+    return 0;
+  });
+  var g_len = g.length -1
+  //Logger.log("len = ",g_len)
+  //Logger.log("FDDDDD = ",g[g_len].fileDownloadURL)
+  return g[g_len].fileDownloadURL
 }
 //=================================================================================
 function downloadFromLine(linkId) {
