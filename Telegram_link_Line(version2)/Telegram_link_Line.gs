@@ -537,7 +537,9 @@ function doPost(e) {
       message_json.text = String(cutMessage.text)
     } else if (cutMessage.type == "image") { //圖片
       message_json.type = "image"
+      var list_before = list()
       downloadFromLine(cutMessage.id)
+      var list_after = list()
 
 
     } else if (cutMessage.type == "sticker") { //貼圖
@@ -937,25 +939,19 @@ function list() { //顯示指定資料夾資料
 
   var Folder = DriveApp.getFolderById("FolderId"); //download_from_line
   var files = Folder.getFiles();
-
-  var sheet_key = "1ONW2e6kEmyUealjNfkNxK9GFmXCMua9YTZ3zMvu8FlE";
-  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-  var Sheet = SpreadSheet.getSheetByName("1");
-  var LastRow = Sheet.getLastRow();
-
-  Sheet.getRange(LastRow + 1, 1).setValue(Folder);
-
-  var i = 0;
+  var file_array = [];
   while (files.hasNext()) {
     var file = files.next();
-    //Sheet.getRange(LastRow +1+i, 5).setValue("Go");
-    Sheet.getRange(LastRow + 1 + i, 2).setValue(file.getName());
-    Sheet.getRange(LastRow + 1 + i, 3).setValue(file.getId());
-    Sheet.getRange(LastRow + 1 + i, 4).setValue("https://drive.google.com/uc?export=download&id=" + file.getId());
-    Sheet.getRange(LastRow + 1 + i, 5).setValue(file.getDownloadUrl());
-    //Logger.log(file.getName());
-    i = i + 1;
+    var file_data_json = {
+      "fileName":file.getName(),
+      "fileId":file.getId(),
+      "fileDownloadURL":("https://drive.google.com/uc?export=download&id=" + file.getId()),
+      "fileSize":file.getSize()
+      "fileLastUpdated":file.getLastUpdated()
+    }
+    file_array.splice(file_array.length,0,file_data_json)
   }
+  return file_array;
 }
 //=================================================================================
 function downloadFromLine(linkId) {
@@ -979,6 +975,27 @@ function downloadFromLine(linkId) {
   //--------------------------------------------------
   var blob = UrlFetchApp.fetch(url, options);
   Folder.createFile(blob)
+}
+//=================================================================================
+function chName() {
+  var Folder2 = DriveApp.getFolderById("0B-0JNsk9kL8vdjNXc3FSMjdjUWM"); //download_from_line
+  var files = Folder2.getFiles();
+
+  while (files.hasNext()) {
+    var file = files.next();
+    if (file.getName() == 'content.jpg') {
+      var d = new Date();
+      var getFullYear = d.getFullYear(); // 2016 年
+      var getMonth = d.getMonth(); // 12 月
+      var getDate = d.getDate(); // 22 日(號)
+      var getHours = d.getHours(); // 16 時(0~23.0)
+      var getMinutes = d.getMinutes(); // 29 分
+      var getSeconds = d.getSeconds(); // 17 秒
+      var getMilliseconds = d.getMilliseconds(); // 234 毫秒
+      file.setName(getFullYear+"_"+getMonth+"_"+getDate+"_"+getHours+"_"+getMinutes+"_"+getSeconds+"_"+getMilliseconds)
+      Logger.log("NNNNNNN = ", file.getName())
+    }
+  }
 }
 //=================================================================================
 function CP() {
