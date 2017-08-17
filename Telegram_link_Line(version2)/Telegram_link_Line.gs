@@ -261,9 +261,9 @@ function doPost(e) {
                   //"stickerId":"502","packageId":"2"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "audio") {
-                  var url = message_json.DURL
+                  var url = "抱歉!請至該連結下載!\n" + message_json.DURL
                   var notification = true
-                  sendAudio(url, notification)
+                  sendtext(url, notification)
                   //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
                   upMessageData(i, col, ed)
@@ -1004,7 +1004,7 @@ function ch_Name_and_Description() {
 
   while (files.hasNext()) {
     var file = files.next();
-    if (file.getName() == 'content.jpg'||file.getName() == 'content.mp4'||file.getName() == 'content') {
+    if (file.getName() == 'content.jpg'||file.getName() == 'content.mp4') {
       var d = new Date();
       var getFullYear = d.getFullYear(); // 2016 年
       var getMonth = d.getMonth(); // 12 月
@@ -1014,6 +1014,20 @@ function ch_Name_and_Description() {
       var getSeconds = d.getSeconds(); // 17 秒
       var getMilliseconds = d.getMilliseconds(); // 234 毫秒
       file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds)
+      file.setDescription(d.getTime());
+      //Logger.log("NNNNNNN = ", file.getName())
+      break;
+    }
+    if (file.getName() == 'content') {
+      var d = new Date();
+      var getFullYear = d.getFullYear(); // 2016 年
+      var getMonth = d.getMonth(); // 12 月
+      var getDate = d.getDate(); // 22 日(號)
+      var getHours = d.getHours(); // 16 時(0~23.0)
+      var getMinutes = d.getMinutes(); // 29 分
+      var getSeconds = d.getSeconds(); // 17 秒
+      var getMilliseconds = d.getMilliseconds(); // 234 毫秒
+      file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds + ".mp3")
       file.setDescription(d.getTime());
       //Logger.log("NNNNNNN = ", file.getName())
       break;
@@ -1069,7 +1083,7 @@ function sendAudio(url, notification) {
 function sendVoice(url, notification) {
   var payload = {
     "method": "sendVoice",
-    'chat_id': id,
+    'chat_id': "",
     'voice': url,
     'disable_notification': notification
   } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
