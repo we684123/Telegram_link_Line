@@ -238,7 +238,7 @@ function doPost(e) {
                 Logger.log("text = ", text)
                 var message_json = JSON.parse(text);
 
-                if (message_json.type = "text") {
+                if (message_json.type == "text") {
                   var p = message_json.userName + "：\n" + message_json.text
                   Logger.log("ppp = ", p)
                   var notification = true
@@ -273,8 +273,8 @@ function doPost(e) {
                     var text = message_json.address
                     sendtext(text, notification);
                   }
-                  var latitude = message[2]
-                  var longitude = message[3]
+                  var latitude = message_json.latitude
+                  var longitude = message_json.longitude
                   sendLocation(latitude, longitude, notification)
                   //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
                   //"address":"260台灣宜蘭縣宜蘭市舊城西路107號",
@@ -521,6 +521,7 @@ function doPost(e) {
     } else if (cutMessage.type == "image") { //圖片
       message_json.type = "image"
       downloadFromLine(cutMessage.id)
+
       message_json.DURL = getGdriveFileDownloadURL()
     } else if (cutMessage.type == "sticker") { //貼圖
       message_json.type = "sticker"
@@ -992,6 +993,7 @@ function downloadFromLine(linkId) {
   //--------------------------------------------------
   var blob = UrlFetchApp.fetch(url, options);
   Folder.createFile(blob)
+  ch_Name_and_Description()
 }
 //=================================================================================
 function ch_Name_and_Description() {
@@ -1002,7 +1004,7 @@ function ch_Name_and_Description() {
 
   while (files.hasNext()) {
     var file = files.next();
-    if (file.getName() == 'content.jpg') {
+    if (file.getName() == 'content.jpg'||file.getName() == 'content.mp4'||file.getName() == 'content') {
       var d = new Date();
       var getFullYear = d.getFullYear(); // 2016 年
       var getMonth = d.getMonth(); // 12 月
