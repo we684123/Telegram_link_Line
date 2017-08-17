@@ -1,27 +1,3 @@
-function base() {
-  //前期準備，不懂看README
-  var sheet_key = ""; //你的sheet ID
-  var doc_key = ""; //你的doc ID
-  var Telegram_bot_key = ""; //Telegram bot的token
-  var Telegram_id = ""; //你的Telegram帳號ID(要通知你)
-  var Line_id = ""; //你的line ID
-  var CHANNEL_ACCESS_TOKEN = ''; //你的Line token
-  var email = "@gmail.com"; //你的email
-  var FolderId = ""; //google_grive_FolderId
-  //前期準備完成!==============================================================
-  var base_json = {
-    "sheet_key": sheet_key,
-    "doc_key": doc_key,
-    "Telegram_bot_key": Telegram_bot_key,
-    "Telegram_id": Telegram_id,
-    "Line_id": Line_id,
-    "CHANNEL_ACCESS_TOKEN": CHANNEL_ACCESS_TOKEN,
-    "email": email,
-    "FolderId": FolderId
-  }
-  return base_json
-}
-//============================================================================
 function doPost(e) {
   var base_json = base();
   var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
@@ -270,7 +246,7 @@ function doPost(e) {
                   //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
                   //"text":"51"}
                   upMessageData(i, col, ed)
-                } else if (cutMessage.type == "image") {
+                } else if (message_json.type == "image") {
                   var url = message_json.DURL
                   var notification = true
                   sendPhoto(url, notification)
@@ -278,20 +254,20 @@ function doPost(e) {
                   //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
                   upMessageData(i, col, ed)
-                } else if (cutMessage.type == "sticker") {
+                } else if (message_json.type == "sticker") {
                   var notification = true
                   sendtext(text, notification);
                   //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
                   //"stickerId":"502","packageId":"2"}
                   upMessageData(i, col, ed)
-                } else if (cutMessage.type == "audio") {
+                } else if (message_json.type == "audio") {
                   var url = message_json.DURL
                   var notification = true
                   sendAudio(url, notification)
                   //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
                   upMessageData(i, col, ed)
-                } else if (cutMessage.type == "location") {
+                } else if (message_json.type == "location") {
                   var notification = true
                   if(message_json.address){
                     var text = message_json.address
@@ -304,14 +280,14 @@ function doPost(e) {
                   //"address":"260台灣宜蘭縣宜蘭市舊城西路107號",
                   //"latitude":24.759711,"longitude":121.750114}
                   upMessageData(i, col, ed)
-                } else if (cutMessage.type == "video") {
+                } else if (message_json.type == "video") {
                   var url = message_json.DURL
                   var notification = true
                   sendVoice(url, notification)
                   //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
                   upMessageData(i, col, ed)
-                } else if (cutMessage.type == "file") {
+                } else if (message_json.type == "file") {
                   var url = message_json.DURL
                   var notification = true
                   sendtext(text, notification);
@@ -829,9 +805,11 @@ function AllRead() {
   var base_json = base()
   var sheet_key = base_json.sheet_key
   var doc_key = base_json.doc_key
+  var FolderId = base_json.FolderId
   var doc = DocumentApp.openById(doc_key)
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
   var Sheet = SpreadSheet.getSheetByName("Line訊息區");
+  var Folder = DriveApp.getFolderById(FolderId); //download_from_line
 
   var doc = DocumentApp.openById(doc_key)
   var f = doc.getText();
@@ -848,6 +826,12 @@ function AllRead() {
 
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
+
+  var files = Folder.getFiles();
+  while (files.hasNext()) {
+    var file = files.next();
+    file.setTrashed(true)
+  }
 }
 //=================================================================================
 function getUserName(userId) {
@@ -1013,6 +997,7 @@ function downloadFromLine(linkId) {
 function ch_Name_and_Description() {
   var base_json = base()
   var FolderId = base_json.FolderId
+  var Folder = DriveApp.getFolderById(FolderId); //download_from_line
   var files = Folder.getFiles();
 
   while (files.hasNext()) {
@@ -1133,17 +1118,3 @@ function start(payload) {
   //*/
 }
 //=================================================================================
-function TTTTTTTT() {
-  var base_json = base()
-  var sheet_key = base_json.sheet_key
-  var doc_key = base_json.doc_key
-  var email = base_json.email
-  var Telegram_bot_key = base_json.Telegram_bot_key
-  var Telegram_id = base_json.Telegram_id
-  var Line_id = base_json.Line_id
-  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-
-  //*/
-  sendtext('["文字","Li","https://rff.ilc.edu.tw/prise/"]', true)
-  //*/
-}
