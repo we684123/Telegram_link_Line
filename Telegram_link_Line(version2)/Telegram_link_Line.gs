@@ -467,9 +467,63 @@ function doPost(e) {
         var notification = false
         sendtext(text, notification);
       }
+    }else if (estringa.message.video) {
+      if (mode == "🚀 發送訊息") {
+        //以下選擇telegram video並發到line
+        var video_id = estringa.message.video.file_id
+        var Line_id = ALL.opposite.RoomId;
+        TG_Send_video_To_Line(Line_id, video_id)
+        text = "(影片已發送!)"
+        var notification = false
+        sendtext(text, notification);
+      } else {
+        text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        var notification = false
+        sendtext(text, notification);
+      }
+    }else if (estringa.message.sticker) {
+      if (mode == "🚀 發送訊息") {
+        text = "(暫時不支援貼圖傳送喔!)"
+        var notification = false
+        sendtext(text, notification);
+      } else {
+        text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        var notification = false
+        sendtext(text, notification);
+      }
+    }else if (estringa.message.audio) {
+      if (mode == "🚀 發送訊息") {
+        text = "(暫時不支援貼圖傳送喔!)"
+        var duration = estringa.message.audio.duration
+        TG_Send_audio_To_Line(Line_id, audio_id, duration)
+      } else {
+        text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        var notification = false
+        sendtext(text, notification);
+      }
+    }else if (estringa.message.voice) {
+      if (mode == "🚀 發送訊息") {
+        text = "(暫時不支援貼圖傳送喔!)"
+        var duration = estringa.message.voice.duration
+        TG_Send_audio_To_Line(Line_id, audio_id, duration)
+      } else {
+        text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        var notification = false
+        sendtext(text, notification);
+      }
+    }else if (estringa.message.location) {
+      if (mode == "🚀 發送訊息") {
+        var latitude = estringa.message.location.latitude
+        var longitude = estringa.message.location.longitude
+        TG_Send_location_To_Line(latitude,longitude)
+      } else {
+        text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        var notification = false
+        sendtext(text, notification);
+      }
     }
 
-    //=====================================================================================================
+//=====================================================================================================
   } else if (estringa.events[0].timestamp) {
     //以下來自line
     var from = 'line';
@@ -935,6 +989,95 @@ function TG_Send_Photo_To_Line(Line_id, photo_id) {
     "originalContentUrl": G,
     "previewImageUrl": G
   }];
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var payload = {
+    'to': Line_id,
+    'messages': retMsg
+  }
+  var options = {
+    'headers': header,
+    'method': 'post',
+    'payload': JSON.stringify(payload)
+  }
+  //--------------------------------------------------
+  UrlFetchApp.fetch(url, options);
+}
+//=================================================================================
+function TG_Send_video_To_Line(Line_id, video_id) {
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+  var G = TGdownloadURL(getpath(video_id))
+
+  var url = 'https://api.line.me/v2/bot/message/push';
+  //--------------------------------------------------
+  var retMsg = [{
+    "type": "video",
+    "originalContentUrl": G,
+    "previewImageUrl": G
+  }];
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var payload = {
+    'to': Line_id,
+    'messages': retMsg
+  }
+  var options = {
+    'headers': header,
+    'method': 'post',
+    'payload': JSON.stringify(payload)
+  }
+  //--------------------------------------------------
+  UrlFetchApp.fetch(url, options);
+}
+//=================================================================================
+function TG_Send_audio_To_Line(Line_id, audio_id, duration) {
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+  var G = TGdownloadURL(getpath(photo_id))
+
+  var url = 'https://api.line.me/v2/bot/message/push';
+  //--------------------------------------------------
+  var retMsg = [{
+    "type": "audio",
+    "originalContentUrl": G,
+    "duration": duration
+  }];
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var payload = {
+    'to': Line_id,
+    'messages': retMsg
+  }
+  var options = {
+    'headers': header,
+    'method': 'post',
+    'payload': JSON.stringify(payload)
+  }
+  //--------------------------------------------------
+  UrlFetchApp.fetch(url, options);
+}
+//=================================================================================
+function TG_Send_location_To_Line(latitude,longitude) {
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+  var G = TGdownloadURL(getpath(video_id))
+
+  var url = 'https://api.line.me/v2/bot/message/push';
+  //--------------------------------------------------
+  var retMsg = [{
+    "type": "location",
+    "title": "my location",
+    "address": "",
+    "latitude": latitude,
+    "longitude": longitude
+}];
   var header = {
     'Content-Type': 'application/json; charset=UTF-8',
     'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
