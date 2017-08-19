@@ -1,6 +1,6 @@
 function doPost(e) {
   var base_json = base();
-  var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
+  var debug = 1; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
   //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
   //模擬Line的話記得把要模擬的東西複製到分頁debug中的B2
 
@@ -255,7 +255,7 @@ function doPost(e) {
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "sticker") {
-                  text = message_json.type+"\nstickerId:"+message_json.stickerId+"\npackageId"+message_json.packageId
+                  text = "["+message_json.type+"]\nstickerId:"+message_json.stickerId+"\npackageId:"+message_json.packageId
                   var notification = true
                   sendtext(text, notification);
                   //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
@@ -495,6 +495,7 @@ function doPost(e) {
       if (mode == "🚀 發送訊息") {
         text = "(暫時不支援貼圖傳送喔!)"
         var duration = estringa.message.audio.duration
+        var audio_id = estringa.message.audio.file_id
         TG_Send_audio_To_Line(Line_id, audio_id, duration)
       } else {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
@@ -1038,7 +1039,7 @@ function TG_Send_video_To_Line(Line_id, video_id) {
 function TG_Send_audio_To_Line(Line_id, audio_id, duration) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-  var G = TGdownloadURL(getpath(photo_id))
+  var G = TGdownloadURL(getpath(audio_id))
 
   var url = 'https://api.line.me/v2/bot/message/push';
   //--------------------------------------------------
@@ -1064,35 +1065,54 @@ function TG_Send_audio_To_Line(Line_id, audio_id, duration) {
   UrlFetchApp.fetch(url, options);
 }
 //=================================================================================
-function TG_Send_location_To_Line(latitude,longitude) {
+function TG_Send_location_To_Line(Line_id,latitude,longitude) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-  var G = TGdownloadURL(getpath(video_id))
+  //var G = TGdownloadURL(getpath(video_id))
 
   var url = 'https://api.line.me/v2/bot/message/push';
   //--------------------------------------------------
   var retMsg = [{
     "type": "location",
     "title": "my location",
-    "address": "",
-    "latitude": latitude,
-    "longitude": longitude
+    "address": "....",
+    "latitude":20.683396,
+    "longitude": 79.434604
 }];
   var header = {
     'Content-Type': 'application/json; charset=UTF-8',
     'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
   }
   var payload = {
-    'to': Line_id,
+    'to': "U9d16309b78be9a02acf3bcfb06b28df3",
     'messages': retMsg
   }
   var options = {
     'headers': header,
     'method': 'post',
-    'payload': JSON.stringify(payload)
+    'payload': JSON.stringify(payload),
+    'muteHttpExceptions':true
   }
   //--------------------------------------------------
-  UrlFetchApp.fetch(url, options);
+  try{
+    var f = UrlFetchApp.fetch(url, options);
+    var e=f
+    var base_json = base()
+  var sheet_key = base_json.sheet_key
+    var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+  var SheetD = SpreadSheet.getSheetByName("Debug");
+  var LastRowD = SheetD.getLastRow();
+  SheetD.getRange(LastRowD + 1, 2).setValue(e);
+    Logger.log("FFFFFFFFFFFF = ",e)
+  }catch(e){
+  var base_json = base()
+  var sheet_key = base_json.sheet_key
+    var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+  var SheetD = SpreadSheet.getSheetByName("Debug");
+  var LastRowD = SheetD.getLastRow();
+  SheetD.getRange(LastRowD + 1, 2).setValue(e);
+    Logger.log("FFFFFFFFFFFF = ",e)
+  }
 }
 //=================================================================================
 function getpath(id) {
