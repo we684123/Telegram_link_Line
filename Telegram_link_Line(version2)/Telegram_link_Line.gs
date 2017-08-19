@@ -240,7 +240,7 @@ function doPost(e) {
 
                 if (message_json.type == "text") {
                   var p = message_json.userName + "：\n" + message_json.text
-                  Logger.log("ppp = ", p)
+                  //Logger.log("ppp = ", p)
                   var notification = true
                   sendtext(p, notification);
                   //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
@@ -255,13 +255,14 @@ function doPost(e) {
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "sticker") {
+                  text = message_json.type+"\nstickerId:"+message_json.stickerId+"\npackageId"+message_json.packageId
                   var notification = true
                   sendtext(text, notification);
                   //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
                   //"stickerId":"502","packageId":"2"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "audio") {
-                  var url = "抱歉!請至該連結下載!\n" + message_json.DURL
+                  var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL
                   var notification = true
                   sendtext(url, notification)
                   //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
@@ -295,7 +296,6 @@ function doPost(e) {
                   upMessageData(i, col, ed)
                 }
               }
-
 
               ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
               var r = JSON.stringify(ALL);
@@ -521,7 +521,6 @@ function doPost(e) {
     } else if (cutMessage.type == "image") { //圖片
       message_json.type = "image"
       downloadFromLine(cutMessage.id)
-
       message_json.DURL = getGdriveFileDownloadURL()
     } else if (cutMessage.type == "sticker") { //貼圖
       message_json.type = "sticker"
@@ -555,9 +554,52 @@ function doPost(e) {
     //================================================================
     if (ALL.FastMatch2[Room_text] != undefined) { //以下處理已登記的
       if (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId) {
-        text = message_json.text; //雖然沒意義但還是寫一下
-        var notification = false
-        sendtext(text, notification);
+        if (message_json.type == "text") { //文字
+          text = message_json.text; //雖然沒意義但還是寫一下
+          var notification = false
+          sendtext(text, notification);
+        } else if (message_json.type == "image") { //圖片
+          downloadFromLine(cutMessage.id)
+          message_json.DURL = getGdriveFileDownloadURL()
+          var url = message_json.DURL
+          var notification = true
+          sendPhoto(url, notification)
+        } else if (message_json.type == "sticker") { //貼圖
+          message_json.stickerId = cutMessage.stickerId
+          message_json.packageId = cutMessage.packageId
+          text = message_json.type+"\nstickerId:"+message_json.stickerId+"\npackageId"+message_json.packageId
+          var notification = true
+          sendtext(text, notification);
+        } else if (message_json.type == "audio") { //錄音
+          downloadFromLine(cutMessage.id)
+          message_json.DURL = getGdriveFileDownloadURL()
+          var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL
+          var notification = true
+          sendtext(url, notification)
+        } else if (message_json.type == "location") { //位置
+          message_json.address = cutMessage.address
+          message_json.latitude = cutMessage.latitude
+          message_json.longitude = cutMessage.longitude
+          if(message_json.address){
+            var text = message_json.address
+            sendtext(text, notification);
+          }
+          var latitude = message_json.latitude
+          var longitude = message_json.longitude
+          sendLocation(latitude, longitude, notification)
+        } else if (message_json.type == "video") { //影片
+          downloadFromLine(cutMessage.id)
+          message_json.DURL = getGdriveFileDownloadURL()
+          var url = message_json.DURL
+          var notification = true
+          sendVoice(url, notification)
+        } else if (message_json.type == "file") { //Line現在居然不能傳送文件 這應該沒用了(?
+          downloadFromLine(cutMessage.id)
+          message_json.DURL = getGdriveFileDownloadURL()
+          var url = message_json.DURL
+          var notification = true
+          sendtext(text, notification);
+        }
       } else {
         //以下處理sheet========================================================
         var col = ALL.FastMatch2[Room_text] + 1; //找欄位
