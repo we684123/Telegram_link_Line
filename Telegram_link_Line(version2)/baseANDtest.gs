@@ -33,7 +33,7 @@ function TTTTTTTT() {
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
 
   //*/
-  sendtext('["文字","Li","https://rff.ilc.edu.tw/prise/"]', true)
+  
   //*/
 }
 //============================================================================
