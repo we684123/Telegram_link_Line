@@ -255,7 +255,7 @@ function doPost(e) {
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "sticker") {
-                  text = "["+message_json.type+"]\nstickerId:"+message_json.stickerId+"\npackageId:"+message_json.packageId
+                  text = "[" + message_json.type + "]\nstickerId:" + message_json.stickerId + "\npackageId:" + message_json.packageId
                   var notification = true
                   sendtext(text, notification);
                   //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
@@ -270,7 +270,7 @@ function doPost(e) {
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "location") {
                   var notification = true
-                  if(message_json.address){
+                  if (message_json.address) {
                     var text = message_json.address
                     sendtext(text, notification);
                   }
@@ -467,7 +467,7 @@ function doPost(e) {
         var notification = false
         sendtext(text, notification);
       }
-    }else if (estringa.message.video) {
+    } else if (estringa.message.video) {
       if (mode == "🚀 發送訊息") {
         //以下選擇telegram video並發到line
         var video_id = estringa.message.video.file_id
@@ -481,7 +481,7 @@ function doPost(e) {
         var notification = false
         sendtext(text, notification);
       }
-    }else if (estringa.message.sticker) {
+    } else if (estringa.message.sticker) {
       if (mode == "🚀 發送訊息") {
         text = "(暫時不支援貼圖傳送喔!)"
         var notification = false
@@ -491,7 +491,7 @@ function doPost(e) {
         var notification = false
         sendtext(text, notification);
       }
-    }else if (estringa.message.audio) {
+    } else if (estringa.message.audio) {
       if (mode == "🚀 發送訊息") {
         text = "(暫時不支援貼圖傳送喔!)"
         var duration = estringa.message.audio.duration
@@ -502,7 +502,7 @@ function doPost(e) {
         var notification = false
         sendtext(text, notification);
       }
-    }else if (estringa.message.voice) {
+    } else if (estringa.message.voice) {
       if (mode == "🚀 發送訊息") {
         text = "(暫時不支援貼圖傳送喔!)"
         var duration = estringa.message.voice.duration
@@ -512,11 +512,19 @@ function doPost(e) {
         var notification = false
         sendtext(text, notification);
       }
-    }else if (estringa.message.location) {
+    } else if (estringa.message.location) {
       if (mode == "🚀 發送訊息") {
         var latitude = estringa.message.location.latitude
         var longitude = estringa.message.location.longitude
-        TG_Send_location_To_Line(Line_id,latitude,longitude)
+        var key = ""
+        var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=" + key + "&language=zh-tw"
+        var t = UrlFetchApp.fetch(url)
+        var t2 = JSON.parse(t)
+        var t3 = JSON.stringify(t2.results)
+        var t4 = JSON.parse(t3) //這麼多t我也很無奈...
+        var formatted_address = t4[0]["formatted_address"]
+        //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
+        TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
       } else {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
         var notification = false
@@ -524,7 +532,7 @@ function doPost(e) {
       }
     }
 
-//=====================================================================================================
+    //=====================================================================================================
   } else if (estringa.events[0].timestamp) {
     //以下來自line
     var from = 'line';
@@ -622,7 +630,7 @@ function doPost(e) {
         } else if (message_json.type == "sticker") { //貼圖
           message_json.stickerId = cutMessage.stickerId
           message_json.packageId = cutMessage.packageId
-          text = message_json.type+"\nstickerId:"+message_json.stickerId+"\npackageId"+message_json.packageId
+          text = message_json.type + "\nstickerId:" + message_json.stickerId + "\npackageId" + message_json.packageId
           var notification = true
           sendtext(text, notification);
         } else if (message_json.type == "audio") { //錄音
@@ -635,7 +643,7 @@ function doPost(e) {
           message_json.address = cutMessage.address
           message_json.latitude = cutMessage.latitude
           message_json.longitude = cutMessage.longitude
-          if(message_json.address){
+          if (message_json.address) {
             var text = message_json.address
             sendtext(text, notification);
           }
@@ -1065,7 +1073,7 @@ function TG_Send_audio_To_Line(Line_id, audio_id, duration) {
   UrlFetchApp.fetch(url, options);
 }
 //=================================================================================
-function TG_Send_location_To_Line(Line_id,latitude,longitude) {
+function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
   //var G = TGdownloadURL(getpath(video_id))
@@ -1074,11 +1082,11 @@ function TG_Send_location_To_Line(Line_id,latitude,longitude) {
   //--------------------------------------------------
   var retMsg = [{
     "type": "location",
-    "title": "my location",
-    "address": "....",
+    "title": "位置訊息",
+    "address": formatted_address,
     "latitude": latitude,
     "longitude": longitude
-}];
+  }];
   var header = {
     'Content-Type': 'application/json; charset=UTF-8',
     'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
@@ -1091,27 +1099,27 @@ function TG_Send_location_To_Line(Line_id,latitude,longitude) {
     'headers': header,
     'method': 'post',
     'payload': JSON.stringify(payload),
-    'muteHttpExceptions':true
+    'muteHttpExceptions': true
   }
   //--------------------------------------------------
-  try{
+  try {
     var f = UrlFetchApp.fetch(url, options);
-    var e=f
+    var e = f
     var base_json = base()
-  var sheet_key = base_json.sheet_key
+    var sheet_key = base_json.sheet_key
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-  var SheetD = SpreadSheet.getSheetByName("Debug");
-  var LastRowD = SheetD.getLastRow();
-  SheetD.getRange(LastRowD + 1, 2).setValue(e);
-    Logger.log("FFFFFFFFFFFF = ",e)
-  }catch(e){
-  var base_json = base()
-  var sheet_key = base_json.sheet_key
+    var SheetD = SpreadSheet.getSheetByName("Debug");
+    var LastRowD = SheetD.getLastRow();
+    SheetD.getRange(LastRowD + 1, 2).setValue(e);
+    Logger.log("FFFFFFFFFFFF = ", e)
+  } catch (e) {
+    var base_json = base()
+    var sheet_key = base_json.sheet_key
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-  var SheetD = SpreadSheet.getSheetByName("Debug");
-  var LastRowD = SheetD.getLastRow();
-  SheetD.getRange(LastRowD + 1, 2).setValue(e);
-    Logger.log("FFFFFFFFFFFF = ",e)
+    var SheetD = SpreadSheet.getSheetByName("Debug");
+    var LastRowD = SheetD.getLastRow();
+    SheetD.getRange(LastRowD + 1, 2).setValue(e);
+    Logger.log("FFFFFFFFFFFF = ", e)
   }
 }
 //=================================================================================
@@ -1209,7 +1217,7 @@ function ch_Name_and_Description() {
 
   while (files.hasNext()) {
     var file = files.next();
-    if (file.getName() == 'content.jpg'||file.getName() == 'content.mp4') {
+    if (file.getName() == 'content.jpg' || file.getName() == 'content.mp4') {
       var d = new Date();
       var getFullYear = d.getFullYear(); // 2016 年
       var getMonth = d.getMonth(); // 12 月
