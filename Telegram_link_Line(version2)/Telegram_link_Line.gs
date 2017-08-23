@@ -516,7 +516,7 @@ function doPost(e) {
       if (mode == "🚀 發送訊息") {
         var latitude = estringa.message.location.latitude
         var longitude = estringa.message.location.longitude
-        TG_Send_location_To_Line(latitude,longitude)
+        TG_Send_location_To_Line(Line_id,latitude,longitude)
       } else {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
         var notification = false
@@ -1076,15 +1076,15 @@ function TG_Send_location_To_Line(Line_id,latitude,longitude) {
     "type": "location",
     "title": "my location",
     "address": "....",
-    "latitude":20.683396,
-    "longitude": 79.434604
+    "latitude": latitude,
+    "longitude": longitude
 }];
   var header = {
     'Content-Type': 'application/json; charset=UTF-8',
     'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
   }
   var payload = {
-    'to': "U9d16309b78be9a02acf3bcfb06b28df3",
+    'to': Line_id,
     'messages': retMsg
   }
   var options = {
