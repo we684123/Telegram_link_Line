@@ -915,6 +915,6 @@ function TTTTTTTT() {
   var Telegram_id = base_json.Telegram_id
   var Line_id = base_json.Line_id
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-//WTF????
+
 }
 //=================================================================================
