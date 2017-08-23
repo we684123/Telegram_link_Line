@@ -916,8 +916,6 @@ function TTTTTTTT() {
   var Line_id = base_json.Line_id
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
 
-  var Line_id = ""
-  var photo_id = ""
-  TG_Send_Photo_To_Line(Line_id, photo_id)
+
 }
 //=================================================================================
