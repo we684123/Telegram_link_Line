@@ -137,7 +137,7 @@ function doPost(e) {
           keyboard_main(text, doc_key)
         }
         //================================================================
-      } else if (mode == "🔥 刪除聊天室" & Stext == "/delete") {
+      } else if (mode == "🔥 刪除房間" & Stext == "/delete") {
         REST_FastMatch1and2();
         var aims = ALL.opposite.RoomId
         var number = ALL.FastMatch2[aims]
@@ -314,8 +314,8 @@ function doPost(e) {
             text = "將對 " + ALL.opposite.Name + " 重新命名!!!\n" + "請輸入新名子："
             ReplyKeyboardRemove(text)
             break;
-          case '🔥 刪除聊天室':
-            ALL.mode = "🔥 刪除聊天室"
+          case '🔥 刪除房間':
+            ALL.mode = "🔥 刪除房間"
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
             text = "你確定要刪除 " + ALL.opposite.Name + " 嗎?\n" + "若是請按一下 /delete\n" +
@@ -357,6 +357,21 @@ function doPost(e) {
             //以下處理RoomKeyboard==================================================
             REST_keyboard(doc_key) //重新編排keyborad
             break;
+          case '⭐ 升級房間':
+            ALL.mode = "⭐ 升級房間"
+            var r = JSON.stringify(ALL);
+            doc.setText(r); //寫入
+
+            text = "⭐ 升級房間功能介紹：\n升級房間後，以後來自該對象(Line)的訊息皆會及時傳到新\
+            的bot聊天室，而不會傳到這個bot聊天室中，這個功能是可以回來這裡取消的，"
+            var notification = false
+            sendtext(text, notification);
+
+            text = "您確定要升級 " + ALL.opposite.Name + " 嗎?\n若是請按一下 /uproom \n" +
+              "若沒按下則不會升級!!!"
+            var notification = false
+            sendtext(text, notification);
+            break;
           case '/debug':
             REST_FastMatch1and2();
             REST_keyboard();
@@ -393,12 +408,14 @@ function doPost(e) {
                   'text': '🔖 重新命名'
                 }],
                 [{
+                  'text': '⭐ 升級房間'
+                }, {
                   'text': '🐳 開啟通知'
                 }, {
                   'text': '🔰 暫停通知'
                 }],
                 [{
-                  'text': "🔥 刪除聊天室"
+                  'text': "🔥 刪除房間"
                 }, {
                   'text': "🔙 返回房間"
                 }]
@@ -430,12 +447,14 @@ function doPost(e) {
                   'text': '🔖 重新命名'
                 }],
                 [{
+                  'text': '⭐ 升級房間'
+                }, {
                   'text': '🐳 開啟通知'
                 }, {
                   'text': '🔰 暫停通知'
                 }],
                 [{
-                  'text': "🔥 刪除聊天室"
+                  'text': "🔥 刪除房間"
                 }, {
                   'text': "🔙 返回房間"
                 }]
@@ -816,8 +835,8 @@ function keyboard_main(text, doc_key) {
 //=================================================================================
 function In(name) {
   var arr = ["/main", "🔙 返回房間", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言",
-    "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃  重新整理", "🔥 刪除聊天室", "/delete","/debug",
-    "/AllRead","/allread"
+    "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃  重新整理", "🔥 刪除房間", "/delete", "/debug",
+    "/AllRead", "/allread"
   ];
 
   var flag = arr.some(function(value, index, array) {
