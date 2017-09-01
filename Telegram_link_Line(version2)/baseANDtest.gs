@@ -6,8 +6,8 @@ function base() {
   var Telegram_id = ""; //你的Telegram帳號ID(要通知你)
   var Line_id = ""; //你的line ID
   var CHANNEL_ACCESS_TOKEN = ''; //你的Line token
-  var email = "@gmail.com"; //你的email
-  var FolderId = ""; //google_grive_FolderId
+  var email = "@gmail.com"; //你的email(祈禱永遠別收到此訊息)
+  var FolderId = ""; //你的選擇要存的資料夾(google_grive_FolderId)
   //前期準備完成!==============================================================
   var base_json = {
     "sheet_key": sheet_key,
@@ -31,9 +31,10 @@ function TTTTTTTT() {
   var Telegram_id = base_json.Telegram_id
   var Line_id = base_json.Line_id
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+  var FolderId = base_json.FolderId
 
   //*/
-  
+
   //*/
 }
 //============================================================================

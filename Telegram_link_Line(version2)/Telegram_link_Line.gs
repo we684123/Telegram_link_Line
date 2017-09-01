@@ -51,9 +51,8 @@ function doPost(e) {
     doc.setText(r); //寫入
   }
   //以下檢查是否為群組================================================================
-  if (estringa.message.chat.id < 0) {
+  if (estringa.message.chat.id < 0)
     return 0;
-  }
   //以下正式開始================================================================
   if (estringa.update_id) { //利用兩方json不同來判別
     //以下來自telegram
@@ -163,6 +162,9 @@ function doPost(e) {
         text = "已刪除此聊天室";
         keyboard_main(text, doc_key)
         return 0;
+      } else if(mode == "⭐ 升級房間" & Stext == "/uproom") {
+        var aims = ALL.opposite.RoomId
+        var number = ALL.FastMatch2[aims]
       } else {
         //以下指令分流
         switch (Stext) {
