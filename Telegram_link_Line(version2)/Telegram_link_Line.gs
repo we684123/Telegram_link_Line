@@ -51,9 +51,7 @@ function doPost(e) {
     var r = ff;
     doc.setText(r); //寫入
   }
-  //以下檢查是否為群組================================================================
-  if (estringa.message.chat.id < 0)
-    return 0;
+
   //以下正式開始================================================================
   if (estringa.update_id) { //利用兩方json不同來判別
     //以下來自telegram
@@ -65,6 +63,9 @@ function doPost(e) {
     var mode = ALL.mode;
     var Stext = estringa.message.text; //前期準備完成
 
+    //以下檢查是否為群組================================================================
+    if (estringa.message.chat.id < 0)
+      return 0;
     //所有人檢查==================================================================
     if (Telegram_id != estringa.message.chat.id) { //如果不是 發一段話即結束
       var text = "您好!這是私人用的bot，不對他人開放\
