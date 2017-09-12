@@ -1,4 +1,8 @@
 function doPost(e) {
+  // Get a script lock, because we're about to modify a shared resource.
+  var lock = LockService.getScriptLock();
+  // Wait for up to 30 seconds for other processes to finish.
+  lock.waitLock(30000);
   var base_json = base();
   var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
   //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
@@ -873,6 +877,7 @@ function doPost(e) {
   } else {
     GmailApp.sendEmail("email", "telegram-line出事啦", d + "\n" + ee);
   }
+  lock.releaseLock();
 }
 
 //以下各類函式支援
