@@ -1063,6 +1063,9 @@ function AllRead() {
     var file = files.next();
     file.setTrashed(true)
   }
+  var notification = true
+  text = "已全已讀!"
+  sendtext(text, notification);
 }
 //=================================================================================
 function getUserName(userId) {

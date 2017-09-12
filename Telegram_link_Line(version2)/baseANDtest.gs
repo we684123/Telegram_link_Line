@@ -35,7 +35,8 @@ function TTTTTTTT() {
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
   var FolderId = base_json.FolderId
 
-  //*/
+  //*//
+  //123
   var gsURL = ""
   var Stext = ""
   var response = UrlFetchApp.fetch("https://api.telegram.org/bot"+Stext+"/setWebhook?"+gsURL)
