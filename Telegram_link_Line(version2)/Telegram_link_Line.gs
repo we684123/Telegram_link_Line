@@ -697,7 +697,7 @@ function doPost(e) {
     var ALL = JSON.parse(f);
     //================================================================
     if (ALL.FastMatch2[Room_text] != undefined) { //以下處理已登記的
-      if (ALL.data[ALL.FastMatch2[Room_text]].status = "已升級房間") {
+      if (ALL.data[ALL.FastMatch2[Room_text]].status == "已升級房間") {
         if (message_json.type == "text") { //文字
           text = message_json.text; //雖然沒意義但還是寫一下
           var notification = false
