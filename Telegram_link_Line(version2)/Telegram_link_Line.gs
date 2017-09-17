@@ -574,7 +574,7 @@ function doPost(e) {
       }
     } else if (estringa.message.audio) {
       if (mode == "🚀 發送訊息") {
-        text = "(暫時不支援貼圖傳送喔!)"
+        text = "(暫時不支援聲音傳送喔!)"
         var duration = estringa.message.audio.duration
         var audio_id = estringa.message.audio.file_id
         TG_Send_audio_To_Line(Line_id, audio_id, duration)
@@ -1453,12 +1453,36 @@ function sendLocation(latitude, longitude, notification) {
   } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
   start(payload);
 }
+//=================================================================
+function chid(number) {
+  number = number || 0
+  if(number){
+    var base_json = base()
+    var sheet_key = base_json.sheet_key
+    var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+    var SheetD = SpreadSheet.getSheetByName("Debug");
+    SheetD,getRange(3,2).setValue(number)
+    Logger.log("chid完成!")
+  }else {
+    var base_json = base()
+    var sheet_key = base_json.sheet_key
+    var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+    var SheetD = SpreadSheet.getSheetByName("Debug");
+    var id = SheetD.getRange(3,2).getDisplayValue();
+    return id
+  }
+
+}
 //=================================================================================
 function start(payload) {
   var base_json = base()
-  var sheet_key = base_json.sheet_key
+  //var sheet_key = base_json.sheet_key
   var Telegram_bot_key = base_json.Telegram_bot_key
-  var Telegram_id = base_json.Telegram_id
+  if(chid()){
+    var Telegram_id = chid()
+  }else {
+    var Telegram_id = base_json.Telegram_id
+  }
   payload.chat_id = Telegram_id //補上Telegram_id
   var data = {
     "method": "post",
