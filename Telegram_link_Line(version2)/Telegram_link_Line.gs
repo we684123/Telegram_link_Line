@@ -119,11 +119,11 @@ function doPost(e) {
         sendtext(text, notification);
         //================================================================
       } else if (mode == "🔖 重新命名") {
-        if (ALL.FastMatch[Stext] != undefined) {
+        if (ALL.FastMatch[Stext] != undefined) { //排除重名
           text = "名子不可重複，請重新輸入一個!";
           var notification = true
           sendtext(text, notification);
-        } else if (In(Stext)) {
+        } else if (In(Stext)) { //排除與指令重複
           text = "名子不可跟命令重複，請重新輸入一個!";
           var notification = true
           sendtext(text, notification);
@@ -133,6 +133,7 @@ function doPost(e) {
           ALL.data[FM].Name = Stext + "✅"
           var y = JSON.parse((String(JSON.stringify(ALL.FastMatch)).replace(OName, Stext)).replace(Stext, Stext + "✅"));
           //var yy = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace(Stext, Stext + "✅"));
+          //上面是取代  看了頭暈  當初怎麼寫出來的
           ALL.FastMatch = y;
 
           ALL.mode = 0
@@ -179,13 +180,13 @@ function doPost(e) {
       } else if (mode == "/uproom") {
         CP();
         try {
-          var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + Stext + "/setWebhook?" + gsURL)
+          var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + Stext + "/setWebhook?url=" + gsURL)
           var responseCode = response.getResponseCode()
           var responseBody = response.getContentText()
           var responseCode_json = JSON.parse(responseBody)
           var n = 0; //嘗試用類似chmod的方式判斷狀況
 
-          if (ResponseCode === 200)
+          if (responseCode === 200)
             n = n + 1
           if (responseCode_json.description == "Webhook was set")
             n = n + 2
@@ -196,7 +197,7 @@ function doPost(e) {
             var number = ALL.FastMatch2[aims]
             ALL.data[number].botToken = Stext
             ALL.data[number].status = "已升級房間"
-            ALL.mode = 0
+            ALL.mode = 0  //讓mode回復正常
 
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
@@ -205,7 +206,7 @@ function doPost(e) {
             text = "已升級成功(๑•̀ㅂ•́)و✧"
             sendtext(text, notification);
             var notification = true
-            text = "房間狀態:\n" + ALL.data[number]
+            text = "房間狀態:\n" + JSON.stringify(ALL.data[number])
             sendtext(text, notification);
           } else {
             var notification = false
@@ -219,7 +220,8 @@ function doPost(e) {
           text = e
           sendtext(text, notification);
         } finally {
-          GmailApp.sendEmail("email", "telegram-line出事啦", d + "\n\n" + ee + "\n\n" + e);
+          var d = new Date();
+          GmailApp.sendEmail(email, "telegram-line出事啦", d + "\n\n" + ee + "\n\n" + e);
         }
       } else {
         //以下指令分流
@@ -424,8 +426,7 @@ function doPost(e) {
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
 
-            text = "⭐ 升級房間功能介紹：\n升級房間後，以後來自該對象(Line)的訊息皆會及時傳到新\
-            的bot聊天室，而不會傳到這個bot聊天室中，這個功能是可以回來這裡取消的，"
+            text = "⭐ 升級房間功能介紹：\n升級房間後，以後來自該對象(Line)的訊息皆會及時傳到新的bot聊天室，而不會傳到這個bot聊天室中，這個功能是可以回來這裡取消的。"
             var notification = false
             sendtext(text, notification);
 
@@ -442,6 +443,8 @@ function doPost(e) {
             sendtext(text, notification);
             break;
           case '/AllRead':
+          case '/Allread':
+          case '/allRead':
           case '/allread':
             AllRead();
             text = "已全已讀"
