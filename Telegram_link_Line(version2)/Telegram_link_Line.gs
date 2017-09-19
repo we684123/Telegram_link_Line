@@ -1,8 +1,8 @@
 function doPost(e) {
   // Get a script lock, because we're about to modify a shared resource.
-  var lock = LockService.getScriptLock();
+  //var lock = LockService.getScriptLock();
   // Wait for up to 30 seconds for other processes to finish.
-  lock.waitLock(30000);
+  //lock.waitLock(30000);
   var base_json = base();
   var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
   //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
@@ -701,6 +701,7 @@ function doPost(e) {
     //================================================================
     if (ALL.FastMatch2[Room_text] != undefined) { //以下處理已登記的
       if (ALL.data[ALL.FastMatch2[Room_text]].status == "已升級房間") {
+        chid(ALL.data[ALL.FastMatch2[Room_text]].botToken)
         if (message_json.type == "text") { //文字
           text = message_json.text; //雖然沒意義但還是寫一下
           var notification = false
@@ -880,7 +881,7 @@ function doPost(e) {
   } else {
     GmailApp.sendEmail("email", "telegram-line出事啦", d + "\n" + ee);
   }
-  lock.releaseLock();
+  //lock.releaseLock();
 }
 
 //以下各類函式支援
@@ -1464,14 +1465,16 @@ function chid(number) {
     var sheet_key = base_json.sheet_key
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
     var SheetD = SpreadSheet.getSheetByName("Debug");
-    SheetD,getRange(3,2).setValue(number)
+    SheetD.getRange(3,2).setValue(number)
     Logger.log("chid完成!")
+    return 0
   }else {
     var base_json = base()
     var sheet_key = base_json.sheet_key
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
     var SheetD = SpreadSheet.getSheetByName("Debug");
     var id = SheetD.getRange(3,2).getDisplayValue();
+    SheetD.getRange(3,2).setValue("") //清空
     return id
   }
 
@@ -1481,8 +1484,9 @@ function start(payload) {
   var base_json = base()
   //var sheet_key = base_json.sheet_key
   var Telegram_bot_key = base_json.Telegram_bot_key
-  if(chid()){
-    var Telegram_id = chid()
+  var ch = chid()
+  if(ch!==""){
+    var Telegram_id = ch
   }else {
     var Telegram_id = base_json.Telegram_id
   }
