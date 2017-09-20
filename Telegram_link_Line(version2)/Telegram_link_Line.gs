@@ -177,7 +177,7 @@ function doPost(e) {
         text = "請輸入botToken"
         var notification = true
         sendtext(text, notification);
-      } else if (mode == "/uproom") {
+      } else if (mode == "/uproom" && !In(Stext)) { //--可能會有脫離不出去的問題-- 已修正
         CP();
         try {
           var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + Stext + "/setWebhook?url=" + gsURL)
@@ -197,7 +197,7 @@ function doPost(e) {
             var number = ALL.FastMatch2[aims]
             ALL.data[number].botToken = Stext
             ALL.data[number].status = "已升級房間"
-            ALL.mode = 0  //讓mode回復正常
+            ALL.mode = 0 //讓mode回復正常
 
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
@@ -223,6 +223,19 @@ function doPost(e) {
           var d = new Date();
           GmailApp.sendEmail(email, "telegram-line出事啦", d + "\n\n" + ee + "\n\n" + e);
         }
+      } else if (mode == "💫 降級房間" & Stext == "/droproom") {
+        var aims = ALL.opposite.RoomId
+        var number = ALL.FastMatch2[aims]
+        delete ALL.data[number].botToken
+        ALL.data[number].status = "normal"
+        ALL.mode = 0 //讓mode回復正常
+
+        var r = JSON.stringify(ALL);
+        doc.setText(r); //寫入
+
+        var notification = false
+        text = "已降級成功 (・∀・)"
+        sendtext(text, notification);
       } else {
         //以下指令分流
         switch (Stext) {
@@ -435,9 +448,23 @@ function doPost(e) {
             var notification = false
             sendtext(text, notification);
             break;
+          case '💫 降級房間':
+            ALL.mode = "💫 降級房間"
+            var r = JSON.stringify(ALL);
+            doc.setText(r); //寫入
+
+            text = "您確定要降級 " + ALL.opposite.Name + " 嗎?\n若是請按一下 /droproom \n" +
+              "若沒按下則不會降級!!!"
+            var notification = false
+            sendtext(text, notification);
+            break;
           case '/debug':
             REST_FastMatch1and2();
             REST_keyboard();
+            //還有sheet那邊的訊息區處理還未 (Amount)
+            ALL.mode = 0
+            var r = JSON.stringify(ALL);
+            doc.setText(r); //寫入
             text = "已debug"
             var notification = false
             sendtext(text, notification);
@@ -464,7 +491,7 @@ function doPost(e) {
               var Notice = ALL.data[FM].Notice
 
               text = "您選擇了 " + OName + " 聊天室\n" + "未讀數量：" + OAmount + "\n聊天室通知：" + Notice + "\n請問你要?"
-              keyboard = [
+              var keyboard = [
                 [{
                   'text': '🚀 發送訊息'
                 }, {
@@ -485,6 +512,31 @@ function doPost(e) {
                   'text': "🔙 返回房間"
                 }]
               ]
+              var keyboard2 = [
+                [{
+                  'text': '🚀 發送訊息'
+                }, {
+                  'text': '📬 讀取留言'
+                }, {
+                  'text': '🔖 重新命名'
+                }],
+                [{
+                  'text': '💫 降級房間'
+                }, {
+                  'text': '🐳 開啟通知'
+                }, {
+                  'text': '🔰 暫停通知'
+                }],
+                [{
+                  'text': "🔥 刪除房間"
+                }, {
+                  'text': "🔙 返回房間"
+                }]
+              ]
+
+              if (ALL.data[FM].botToken) { //如果遇到已升級的則改"降級"
+                keyboard = keyboard2
+              }
               var resize_keyboard = false
               var one_time_keyboard = false
               ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, text)
@@ -524,6 +576,31 @@ function doPost(e) {
                   'text': "🔙 返回房間"
                 }]
               ]
+              var keyboard2 = [
+                [{
+                  'text': '🚀 發送訊息'
+                }, {
+                  'text': '📬 讀取留言'
+                }, {
+                  'text': '🔖 重新命名'
+                }],
+                [{
+                  'text': '💫 降級房間'
+                }, {
+                  'text': '🐳 開啟通知'
+                }, {
+                  'text': '🔰 暫停通知'
+                }],
+                [{
+                  'text': "🔥 刪除房間"
+                }, {
+                  'text': "🔙 返回房間"
+                }]
+              ]
+
+              if (ALL.data[FM].botToken) { //如果遇到已升級的則改"降級"
+                keyboard = keyboard2
+              }
               var resize_keyboard = false
               var one_time_keyboard = false
               ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, text)
@@ -701,52 +778,64 @@ function doPost(e) {
     //================================================================
     if (ALL.FastMatch2[Room_text] != undefined) { //以下處理已登記的
       if (ALL.data[ALL.FastMatch2[Room_text]].status == "已升級房間") {
-        chid(ALL.data[ALL.FastMatch2[Room_text]].botToken)
-        if (message_json.type == "text") { //文字
-          text = message_json.text; //雖然沒意義但還是寫一下
-          var notification = false
-          sendtext(text, notification);
-        } else if (message_json.type == "image") { //圖片
-          downloadFromLine(cutMessage.id)
-          message_json.DURL = getGdriveFileDownloadURL()
-          var url = message_json.DURL
-          var notification = true
-          sendPhoto(url, notification)
-        } else if (message_json.type == "sticker") { //貼圖
-          message_json.stickerId = cutMessage.stickerId
-          message_json.packageId = cutMessage.packageId
-          text = message_json.type + "\nstickerId:" + message_json.stickerId + "\npackageId" + message_json.packageId
-          var notification = true
-          sendtext(text, notification);
-        } else if (message_json.type == "audio") { //錄音
-          downloadFromLine(cutMessage.id)
-          message_json.DURL = getGdriveFileDownloadURL()
-          var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL
-          var notification = true
-          sendtext(url, notification)
-        } else if (message_json.type == "location") { //位置
-          message_json.address = cutMessage.address
-          message_json.latitude = cutMessage.latitude
-          message_json.longitude = cutMessage.longitude
-          if (message_json.address) {
-            var text = message_json.address
+        chkey(ALL.data[ALL.FastMatch2[Room_text]].botToken)
+        try {
+          if (message_json.type == "text") { //文字
+            text = message_json.text; //雖然沒意義但還是寫一下
+            var notification = false
+            sendtext(text, notification);
+          } else if (message_json.type == "image") { //圖片
+            downloadFromLine(cutMessage.id)
+            message_json.DURL = getGdriveFileDownloadURL()
+            var url = message_json.DURL
+            var notification = true
+            sendPhoto(url, notification)
+          } else if (message_json.type == "sticker") { //貼圖
+            message_json.stickerId = cutMessage.stickerId
+            message_json.packageId = cutMessage.packageId
+            text = message_json.type + "\nstickerId:" + message_json.stickerId + "\npackageId" + message_json.packageId
+            var notification = true
+            sendtext(text, notification);
+          } else if (message_json.type == "audio") { //錄音
+            downloadFromLine(cutMessage.id)
+            message_json.DURL = getGdriveFileDownloadURL()
+            var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL
+            var notification = true
+            sendtext(url, notification)
+          } else if (message_json.type == "location") { //位置
+            message_json.address = cutMessage.address
+            message_json.latitude = cutMessage.latitude
+            message_json.longitude = cutMessage.longitude
+            if (message_json.address) {
+              var text = message_json.address
+              sendtext(text, notification);
+            }
+            var latitude = message_json.latitude
+            var longitude = message_json.longitude
+            sendLocation(latitude, longitude, notification)
+          } else if (message_json.type == "video") { //影片
+            downloadFromLine(cutMessage.id)
+            message_json.DURL = getGdriveFileDownloadURL()
+            var url = message_json.DURL
+            var notification = true
+            sendVoice(url, notification)
+          } else if (message_json.type == "file") { //Line現在居然不能傳送文件 這應該沒用了(?
+            downloadFromLine(cutMessage.id)
+            message_json.DURL = getGdriveFileDownloadURL()
+            var url = message_json.DURL
+            var notification = true
             sendtext(text, notification);
           }
-          var latitude = message_json.latitude
-          var longitude = message_json.longitude
-          sendLocation(latitude, longitude, notification)
-        } else if (message_json.type == "video") { //影片
-          downloadFromLine(cutMessage.id)
-          message_json.DURL = getGdriveFileDownloadURL()
-          var url = message_json.DURL
-          var notification = true
-          sendVoice(url, notification)
-        } else if (message_json.type == "file") { //Line現在居然不能傳送文件 這應該沒用了(?
-          downloadFromLine(cutMessage.id)
-          message_json.DURL = getGdriveFileDownloadURL()
-          var url = message_json.DURL
-          var notification = true
+        } catch (e) {
+          chkey(Telegram_bot_key)
+          var notification = false
+          text = "030....你是否忘記先跟新辦的bot說過話呢?\n請看下列錯誤回報以debug!"
           sendtext(text, notification);
+          text = e;
+          sendtext(text, notification);
+        } finally {
+          var d = new Date();
+          GmailApp.sendEmail(email, "telegram-line出事啦", d + "\n\n" + ee + "\n\n" + e);
         }
       } else if (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId) {
         if (message_json.type == "text") { //文字
@@ -950,13 +1039,11 @@ function keyboard_main(text, doc_key) {
 function In(name) {
   var arr = ["/main", "🔙 返回房間", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言",
     "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃  重新整理", "🔥 刪除房間", "/delete", "/debug",
-    "/AllRead", "/allread"
+    "/AllRead", "/allread", "Allread", "allRead", "⭐️ 升級房間", "💫 降級房間", "/uproom", "droproom"
   ];
 
   var flag = arr.some(function(value, index, array) {
-
     return value == name ? true : false;
-
   });
   return flag
 }
@@ -1458,23 +1545,23 @@ function sendLocation(latitude, longitude, notification) {
   start(payload);
 }
 //=================================================================
-function chid(number) {
+function chkey(number) {
   number = number || 0
-  if(number){
+  if (number) {
     var base_json = base()
     var sheet_key = base_json.sheet_key
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
     var SheetD = SpreadSheet.getSheetByName("Debug");
-    SheetD.getRange(3,2).setValue(number)
+    SheetD.getRange(3, 2).setValue(number)
     Logger.log("chid完成!")
     return 0
-  }else {
+  } else {
     var base_json = base()
     var sheet_key = base_json.sheet_key
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
     var SheetD = SpreadSheet.getSheetByName("Debug");
-    var id = SheetD.getRange(3,2).getDisplayValue();
-    SheetD.getRange(3,2).setValue("") //清空
+    var id = SheetD.getRange(3, 2).getDisplayValue();
+    SheetD.getRange(3, 2).setValue("") //清空
     return id
   }
 
@@ -1482,13 +1569,13 @@ function chid(number) {
 //=================================================================================
 function start(payload) {
   var base_json = base()
-  //var sheet_key = base_json.sheet_key
   var Telegram_bot_key = base_json.Telegram_bot_key
-  var ch = chid()
-  if(ch!==""){
-    var Telegram_id = ch
-  }else {
-    var Telegram_id = base_json.Telegram_id
+  var Telegram_id = base_json.Telegram_id
+  var ch = chkey()
+  if (ch !== "") {
+    var Telegram_bot_key = ch
+  } else {
+    var Telegram_bot_key = base_json.Telegram_bot_key
   }
   payload.chat_id = Telegram_id //補上Telegram_id
   var data = {
@@ -1497,6 +1584,7 @@ function start(payload) {
   }
   UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
   /*/  為了速度和穩定 不必要就算了
+  var sheet_key = base_json.sheet_key
   var d = new Date();
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
   var Sheet = SpreadSheet.getSheetByName("紀錄發送的訊息");
