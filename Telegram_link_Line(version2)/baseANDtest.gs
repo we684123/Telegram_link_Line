@@ -6,9 +6,9 @@ function base() {
   var Telegram_id = ""; //你的Telegram帳號ID(要通知你)
   var Line_id = ""; //你的line ID
   var CHANNEL_ACCESS_TOKEN = ''; //你的Line token
-  var email = "@gmail.com"; //你的email(祈禱永遠別收到此訊息)
-  var FolderId = ""; //你的選擇要存的資料夾(google_grive_FolderId)
-  var gsURL = "";  //該gs檔的發布網址
+  var email = "@gmail.com"; //你的email(祈禱永遠別收到來自此的e-mail)
+  var FolderId = ""; //你的選擇要存的資料夾(google_grive_FolderId)，必須獨立不能共用!
+  var gsURL = "";  //該gs檔的發佈網址
   //前期準備完成!==============================================================
   var base_json = {
     "sheet_key": sheet_key,
