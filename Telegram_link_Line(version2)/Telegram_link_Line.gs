@@ -332,9 +332,15 @@ function doPost(e) {
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "sticker") {
+                  var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/"++"/android/sticker.png;compress=true"
+                  //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
+                  /*
+                  //下面是舊的方式 現在最近去爬line發現line的東西很好爬，異常好爬(怕.png
+                  //是有方法可以直接發貼圖啦，但這樣速度會變慢 乾脆直接發圖。
                   text = "[" + message_json.type + "]\nstickerId:" + message_json.stickerId + "\npackageId:" + message_json.packageId
                   var notification = true
                   sendtext(text, notification);
+                  */
                   //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
                   //"stickerId":"502","packageId":"2"}
                   upMessageData(i, col, ed)
@@ -1494,42 +1500,50 @@ function sendtext(text, notification) {
   start(payload);
 }
 //=================================================================
-function sendPhoto(url, notification) {
+function sendPhoto(url, notification, caption) {
+  caption = caption || ""
   var payload = {
     "method": "sendPhoto",
     'chat_id': "",
     'photo': url,
-    'disable_notification': notification
+    'disable_notification': notification,
+    'caption':caption
   } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
   start(payload);
 }
 //=================================================================================
-function sendAudio(url, notification) {
+function sendAudio(url, notification, caption) {
+  caption = caption || ""
   var payload = {
     "method": "sendAudio",
     'chat_id': "",
     'audio': url,
-    'disable_notification': notification
+    'disable_notification': notification,
+    'caption':caption
   } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
   start(payload);
 }
 //=================================================================
-function sendVoice(url, notification) {
+function sendVoice(url, notification, caption) {
+  caption = caption || ""
   var payload = {
     "method": "sendVoice",
     'chat_id': "",
     'voice': url,
-    'disable_notification': notification
+    'disable_notification': notification,
+    'caption':caption
   } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
   start(payload);
 }
 //=================================================================
-function senddocument(url, notification) {
+function senddocument(url, notification, caption) {
+  caption = caption || ""
   var payload = {
     "method": "senddocument",
     'chat_id': "",
     'document': url,
-    'disable_notification': notification
+    'disable_notification': notification,
+    'caption':caption
   } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
   start(payload);
 }
