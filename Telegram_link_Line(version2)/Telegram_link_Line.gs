@@ -87,36 +87,28 @@ function doPost(e) {
       UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
       return 0;
     }
+    //來源bot檢查==================================================================
+    var TG_bot_updateID_array = JSON.parse(ALL.telegram_bot_updateID_array)
+    var now_updateID = estringa.update_id
+    var opposite_RoomId = ""
+    for (var i = 0; i < TG_bot_updateID_array.length, i++) {
+      var value = abs(now_updateID - TG_bot_updateID_array[i].update_id)
+      if (value < 100) {
+        opposite_RoomId = i //找到指定bot了
+
+
+        var r = JSON.stringify(ALL);
+        doc.setText(r); //寫入
+      }
+    }
+    //============================================================================
     if (estringa.message.text) { //如果是文字訊息
       if (mode == "🚀 發送訊息" && Stext != "/exit") {
         //以下準備接收telegram資訊並發到line
         text = Stext;
         var Line_id = ALL.opposite.RoomId;
-        var url = 'https://api.line.me/v2/bot/message/push';
-        //--------------------------------------------------
-        var retMsg = [{
-          'type': 'text',
-          'text': text
-        }];
-        var header = {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
-        }
-        var payload = {
-          'to': Line_id,
-          'messages': retMsg
-        }
-        var options = {
-          'headers': header,
-          'method': 'post',
-          'payload': JSON.stringify(payload)
-        }
-        //--------------------------------------------------
-        UrlFetchApp.fetch(url, options);
-        ALL.mode = 0;
-        text = "已傳送至 " + date.opposite.Name;
-        var notification = true
-        sendtext(text, notification);
+        TG_Send_text_To_Line(Line_id, text)
+
         //================================================================
       } else if (mode == "🔖 重新命名") {
         if (ALL.FastMatch[Stext] != undefined) { //排除重名
@@ -180,7 +172,7 @@ function doPost(e) {
       } else if (mode == "/uproom" && !In(Stext)) { //--可能會有脫離不出去的問題-- 已修正
         CP();
         try {
-          var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + Stext + "/setWebhook?url=" + gsURL)
+          var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + Stext + "/setWebhook?url=" + gsURL + "&max_connections=1")
           var responseCode = response.getResponseCode()
           var responseBody = response.getContentText()
           var responseCode_json = JSON.parse(responseBody)
@@ -1252,6 +1244,33 @@ function newGetUserName(userId, groupId) {
   //sendtext(userName, notification);
 
   return userName
+}
+//=================================================================================
+function TG_Send_text_To_Line(Line_id, text) {
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+
+  var url = 'https://api.line.me/v2/bot/message/push';
+  //--------------------------------------------------
+  var retMsg = [{
+    'type': 'text',
+    'text': text
+  }];
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var payload = {
+    'to': Line_id,
+    'messages': retMsg
+  }
+  var options = {
+    'headers': header,
+    'method': 'post',
+    'payload': JSON.stringify(payload)
+  }
+  //--------------------------------------------------
+  UrlFetchApp.fetch(url, options);
 }
 //=================================================================================
 function TG_Send_Photo_To_Line(Line_id, photo_id) {
