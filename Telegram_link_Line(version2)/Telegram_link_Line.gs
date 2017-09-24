@@ -326,13 +326,17 @@ function doPost(e) {
                 } else if (message_json.type == "image") {
                   var url = message_json.DURL
                   var notification = true
-                  sendPhoto(url, notification)
+                  var caption = "來自: " + message_json.userName
+                  sendPhoto(url, notification, caption)
                   //sendPhoto(url, notification)
                   //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "sticker") {
-                  var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/"++"/android/sticker.png;compress=true"
+                  var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
+                  var notification = true
+                  var caption = "來自: " + message_json.userName
+                  sendPhoto(sticker_png_url, notification, caption)
                   //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
                   /*
                   //下面是舊的方式 現在最近去爬line發現line的東西很好爬，異常好爬(怕.png
@@ -345,7 +349,7 @@ function doPost(e) {
                   //"stickerId":"502","packageId":"2"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "audio") {
-                  var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL
+                  var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
                   var notification = true
                   sendtext(url, notification)
                   //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
@@ -360,6 +364,8 @@ function doPost(e) {
                   var latitude = message_json.latitude
                   var longitude = message_json.longitude
                   sendLocation(latitude, longitude, notification)
+                  var text = "以上來自: " + message_json.userName
+                  sendtext(text, notification);
                   //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
                   //"address":"260台灣宜蘭縣宜蘭市舊城西路107號",
                   //"latitude":24.759711,"longitude":121.750114}
@@ -367,12 +373,13 @@ function doPost(e) {
                 } else if (message_json.type == "video") {
                   var url = message_json.DURL
                   var notification = true
-                  sendVoice(url, notification)
+                  var caption = "來自: " + message_json.userName
+                  sendVoice(url, notification, caption)
                   //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "file") {
-                  var url = message_json.DURL
+                  var url = message_json.DURL + "\n\n來自:  " + message_json.userName
                   var notification = true
                   sendtext(text, notification);
                   //senddocument(url)
@@ -786,32 +793,44 @@ function doPost(e) {
       if (ALL.data[ALL.FastMatch2[Room_text]].status == "已升級房間") {
         chkey(ALL.data[ALL.FastMatch2[Room_text]].botToken)
         try {
-          if (message_json.type == "text") { //文字
-            text = message_json.text; //雖然沒意義但還是寫一下
-            var notification = false
-            sendtext(text, notification);
-          } else if (message_json.type == "image") { //圖片
-            downloadFromLine(cutMessage.id)
-            message_json.DURL = getGdriveFileDownloadURL()
+          if (message_json.type == "text") {
+            var p = message_json.userName + "：\n" + message_json.text
+            //Logger.log("ppp = ", p)
+            var notification = true
+            sendtext(p, notification);
+            //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
+            //"text":"51"}
+          } else if (message_json.type == "image") {
             var url = message_json.DURL
             var notification = true
-            sendPhoto(url, notification)
-          } else if (message_json.type == "sticker") { //貼圖
-            message_json.stickerId = cutMessage.stickerId
-            message_json.packageId = cutMessage.packageId
-            text = message_json.type + "\nstickerId:" + message_json.stickerId + "\npackageId" + message_json.packageId
+            var caption = "來自: " + message_json.userName
+            sendPhoto(url, notification, caption)
+            //sendPhoto(url, notification)
+            //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
+            //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
+          } else if (message_json.type == "sticker") {
+            var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
+            var notification = true
+            var caption = "來自: " + message_json.userName
+            sendPhoto(sticker_png_url, notification, caption)
+            //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
+            /*
+            //下面是舊的方式 現在最近去爬line發現line的東西很好爬，異常好爬(怕.png
+            //是有方法可以直接發貼圖啦，但這樣速度會變慢 乾脆直接發圖。
+            text = "[" + message_json.type + "]\nstickerId:" + message_json.stickerId + "\npackageId:" + message_json.packageId
             var notification = true
             sendtext(text, notification);
-          } else if (message_json.type == "audio") { //錄音
-            downloadFromLine(cutMessage.id)
-            message_json.DURL = getGdriveFileDownloadURL()
-            var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL
+            */
+            //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
+            //"stickerId":"502","packageId":"2"}
+          } else if (message_json.type == "audio") {
+            var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
             var notification = true
             sendtext(url, notification)
-          } else if (message_json.type == "location") { //位置
-            message_json.address = cutMessage.address
-            message_json.latitude = cutMessage.latitude
-            message_json.longitude = cutMessage.longitude
+            //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
+            //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
+          } else if (message_json.type == "location") {
+            var notification = true
             if (message_json.address) {
               var text = message_json.address
               sendtext(text, notification);
@@ -819,18 +838,23 @@ function doPost(e) {
             var latitude = message_json.latitude
             var longitude = message_json.longitude
             sendLocation(latitude, longitude, notification)
-          } else if (message_json.type == "video") { //影片
-            downloadFromLine(cutMessage.id)
-            message_json.DURL = getGdriveFileDownloadURL()
+            var text = "以上來自: " + message_json.userName
+            sendtext(text, notification);
+            //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
+            //"address":"260台灣宜蘭縣宜蘭市舊城西路107號",
+            //"latitude":24.759711,"longitude":121.750114}
+          } else if (message_json.type == "video") {
             var url = message_json.DURL
             var notification = true
-            sendVoice(url, notification)
-          } else if (message_json.type == "file") { //Line現在居然不能傳送文件 這應該沒用了(?
-            downloadFromLine(cutMessage.id)
-            message_json.DURL = getGdriveFileDownloadURL()
-            var url = message_json.DURL
+            var caption = "來自: " + message_json.userName
+            sendVoice(url, notification, caption)
+            //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
+            //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
+          } else if (message_json.type == "file") {
+            var url = message_json.DURL + "\n\n來自:  " + message_json.userName
             var notification = true
             sendtext(text, notification);
+            //senddocument(url)
           }
         } catch (e) {
           chkey(Telegram_bot_key)
@@ -844,32 +868,44 @@ function doPost(e) {
           GmailApp.sendEmail(email, "telegram-line出事啦", d + "\n\n" + ee + "\n\n" + e);
         }
       } else if (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId) {
-        if (message_json.type == "text") { //文字
-          text = message_json.text; //雖然沒意義但還是寫一下
-          var notification = false
-          sendtext(text, notification);
-        } else if (message_json.type == "image") { //圖片
-          downloadFromLine(cutMessage.id)
-          message_json.DURL = getGdriveFileDownloadURL()
+        if (message_json.type == "text") {
+          var p = message_json.userName + "：\n" + message_json.text
+          //Logger.log("ppp = ", p)
+          var notification = true
+          sendtext(p, notification);
+          //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
+          //"text":"51"}
+        } else if (message_json.type == "image") {
           var url = message_json.DURL
           var notification = true
-          sendPhoto(url, notification)
-        } else if (message_json.type == "sticker") { //貼圖
-          message_json.stickerId = cutMessage.stickerId
-          message_json.packageId = cutMessage.packageId
-          text = message_json.type + "\nstickerId:" + message_json.stickerId + "\npackageId" + message_json.packageId
+          var caption = "來自: " + message_json.userName
+          sendPhoto(url, notification, caption)
+          //sendPhoto(url, notification)
+          //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
+          //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
+        } else if (message_json.type == "sticker") {
+          var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
+          var notification = true
+          var caption = "來自: " + message_json.userName
+          sendPhoto(sticker_png_url, notification, caption)
+          //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
+          /*
+          //下面是舊的方式 現在最近去爬line發現line的東西很好爬，異常好爬(怕.png
+          //是有方法可以直接發貼圖啦，但這樣速度會變慢 乾脆直接發圖。
+          text = "[" + message_json.type + "]\nstickerId:" + message_json.stickerId + "\npackageId:" + message_json.packageId
           var notification = true
           sendtext(text, notification);
-        } else if (message_json.type == "audio") { //錄音
-          downloadFromLine(cutMessage.id)
-          message_json.DURL = getGdriveFileDownloadURL()
-          var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL
+          */
+          //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
+          //"stickerId":"502","packageId":"2"}
+        } else if (message_json.type == "audio") {
+          var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
           var notification = true
           sendtext(url, notification)
-        } else if (message_json.type == "location") { //位置
-          message_json.address = cutMessage.address
-          message_json.latitude = cutMessage.latitude
-          message_json.longitude = cutMessage.longitude
+          //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
+          //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
+        } else if (message_json.type == "location") {
+          var notification = true
           if (message_json.address) {
             var text = message_json.address
             sendtext(text, notification);
@@ -877,18 +913,23 @@ function doPost(e) {
           var latitude = message_json.latitude
           var longitude = message_json.longitude
           sendLocation(latitude, longitude, notification)
-        } else if (message_json.type == "video") { //影片
-          downloadFromLine(cutMessage.id)
-          message_json.DURL = getGdriveFileDownloadURL()
+          var text = "以上來自: " + message_json.userName
+          sendtext(text, notification);
+          //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
+          //"address":"260台灣宜蘭縣宜蘭市舊城西路107號",
+          //"latitude":24.759711,"longitude":121.750114}
+        } else if (message_json.type == "video") {
           var url = message_json.DURL
           var notification = true
-          sendVoice(url, notification)
-        } else if (message_json.type == "file") { //Line現在居然不能傳送文件 這應該沒用了(?
-          downloadFromLine(cutMessage.id)
-          message_json.DURL = getGdriveFileDownloadURL()
-          var url = message_json.DURL
+          var caption = "來自: " + message_json.userName
+          sendVoice(url, notification, caption)
+          //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
+          //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
+        } else if (message_json.type == "file") {
+          var url = message_json.DURL + "\n\n來自:  " + message_json.userName
           var notification = true
           sendtext(text, notification);
+          //senddocument(url)
         }
       } else {
         //以下處理sheet========================================================
@@ -1507,7 +1548,7 @@ function sendPhoto(url, notification, caption) {
     'chat_id': "",
     'photo': url,
     'disable_notification': notification,
-    'caption':caption
+    'caption': caption
   } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
   start(payload);
 }
@@ -1519,7 +1560,7 @@ function sendAudio(url, notification, caption) {
     'chat_id': "",
     'audio': url,
     'disable_notification': notification,
-    'caption':caption
+    'caption': caption
   } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
   start(payload);
 }
@@ -1531,7 +1572,7 @@ function sendVoice(url, notification, caption) {
     'chat_id': "",
     'voice': url,
     'disable_notification': notification,
-    'caption':caption
+    'caption': caption
   } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
   start(payload);
 }
@@ -1543,7 +1584,7 @@ function senddocument(url, notification, caption) {
     'chat_id': "",
     'document': url,
     'disable_notification': notification,
-    'caption':caption
+    'caption': caption
   } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
   start(payload);
 }
