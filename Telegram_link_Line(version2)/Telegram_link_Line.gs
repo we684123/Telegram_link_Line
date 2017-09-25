@@ -88,13 +88,41 @@ function doPost(e) {
       return 0;
     }
     //來源bot檢查==================================================================
-    var TG_bot_updateID_array = ALL.telegram_bot_updateID_array
+    try {
+      var confirm1 = ALL.TG_bot_updateID_array.length
+      var TG_bot_updateID_array = JSON.stringify(ALL.TG_bot_updateID_array)
+      var confirm2 = JSON.parse(TG_bot_updateID_array);
+      Logger.log("RRRRRRRRRRRRRRR = ",TG_bot_updateID_array)
+    } catch (e) {
+      var doc = DocumentApp.openById(doc_key)
+      var f = doc.getText()
+      var ALL = JSON.parse(f);
+      ALL.TG_bot_updateID_array = []
+      var r = JSON.stringify(ALL);
+      doc.setText(r); //寫入
+      var TG_bot_updateID_array = ALL.TG_bot_updateID_array //再次轉型態
+      /*
+      var doc = DocumentApp.openById(doc_key)
+      var f = doc.getText()
+      var ALL = JSON.parse(f);
+      var TG_bot_updateID_array = ALL.TG_bot_updateID_array //再次轉型態
+      //*/
+      Logger.log("已新增 TG_bot_updateID_array = ",TG_bot_updateID_array)
+    }
     var now_updateID = estringa.update_id
+    var TG_bot_updateID_array = JSON.parse(TG_bot_updateID_array)
+    Logger.log("龜龜龜龜龜龜龜 now_updateID = ",now_updateID)
+    Logger.log("龜龜龜龜龜龜龜 TG_bot_updateID_array.update_id = ",TG_bot_updateID_array[0].update_id)
+    Logger.log("嘜嘜嘜嘜嘜嘜嘜嘜嘜 TG_bot_updateID_array = ",TG_bot_updateID_array[0])
+    Logger.log("嘜嘜嘜嘜嘜嘜嘜嘜嘜 TG_bot_updateID_array.length = ",TG_bot_updateID_array.length)
     var opposite_RoomId = "主控bot"
-    for (var i = 0; i < TG_bot_updateID_array.length, i++) {
-      var value = abs(now_updateID - TG_bot_updateID_array[i].update_id)
+    for (var i = 0; i < TG_bot_updateID_array.length; i++) {
+      var value = Math.abs(now_updateID - TG_bot_updateID_array[i].update_id)
+      Logger.log("龜龜龜龜龜龜龜 TG_bot_updateID_array[i].update_id ",TG_bot_updateID_array[i].update_id)
+
       if (value < 100) { //治標不治本我也很絕望阿 (T口T)
         opposite_RoomId = TG_bot_updateID_array[i].line_roomID //找到指定bot了
+        Logger.log("龜龜龜龜龜龜龜 opposite_RoomId = ",opposite_RoomId)
         TG_bot_updateID_array[i].update_id = now_updateID
 
         var r = JSON.stringify(ALL);
@@ -102,10 +130,13 @@ function doPost(e) {
         break;
       }
     }
+    //來源bot檢查完成!================================================================
     if (opposite_RoomId != "主控bot") { //找到opposite_RoomID的話才會進來直接發
-      var Line_id = opposite_RoomId.line_roomID
+      var Line_id = opposite_RoomId
       if (estringa.message.text) {
         text = Stext;
+        Logger.log("朱朱朱朱朱朱朱 Line_id = ",Line_id)
+        Logger.log("朱朱朱朱朱朱朱 text = ",text)
         TG_Send_text_To_Line(Line_id, text)
       } else if (estringa.message.photo) { //如果是照片
         //以下選擇telegram照片並發到line
@@ -152,6 +183,7 @@ function doPost(e) {
         //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
         TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
       }
+      return 0;
     }
     //============================================================================
     if (estringa.message.text) { //如果是文字訊息
@@ -251,18 +283,16 @@ function doPost(e) {
 
             var line_roomID = ALL.data[number].RoomId
             var Room_Name = ALL.data[number].Name
-            var array = ["update_id": now_updateID, "TG_token": Stext, "line_roomID": line_roomID, "Room_Name": Room_Name]
+            var array = {"update_id": now_updateID, "TG_token": Stext, "line_roomID": line_roomID, "Room_Name": Room_Name}
+
             ALL.TG_bot_updateID_array.splice(ALL.TG_bot_updateID_array.length,0,array)
 
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
 
             var notification = false
-            text = "已升級成功(๑•̀ㅂ•́)و✧"
-            sendtext(text, notification);
-            var notification = true
-            text = "房間狀態:\n" + JSON.stringify(ALL.data[number])
-            sendtext(text, notification);
+            text = "已升級成功(๑•̀ㅂ•́)و✧\n\n"+"房間狀態:\n" + JSON.stringify(ALL.data[number])
+            keyboard_main(text, doc_key)
           } else {
             var notification = false
             text = "看來發生了一點錯誤.....\n請稍候再試....."
@@ -287,7 +317,7 @@ function doPost(e) {
 
         var k = "沒有找到"
         for(var j=0;j<ALL.TG_bot_updateID_array.length;j++){
-          if(TG_bot_updateID_array[j].line_roomID == ALL.data[number].RoomId){
+          if(TG_bot_updateID_array[j].line_roomID == ALL.opposite.RoomId){
             k = j
             break
           }
@@ -303,8 +333,8 @@ function doPost(e) {
         doc.setText(r); //寫入
 
         var notification = false
-        text = "已降級成功 (・∀・)"
-        sendtext(text, notification);
+        text = "已升級成功(๑•̀ㅂ•́)و✧\n\n"+"房間狀態:\n" + JSON.stringify(ALL.data[number])
+        keyboard_main(text, doc_key)
       } else {
         //以下指令分流
         switch (Stext) {
