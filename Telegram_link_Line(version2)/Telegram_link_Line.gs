@@ -88,17 +88,69 @@ function doPost(e) {
       return 0;
     }
     //來源bot檢查==================================================================
-    var TG_bot_updateID_array = JSON.parse(ALL.telegram_bot_updateID_array)
+    var TG_bot_updateID_array = ALL.telegram_bot_updateID_array
     var now_updateID = estringa.update_id
-    var opposite_RoomId = ""
+    var opposite_RoomId = "主控bot"
     for (var i = 0; i < TG_bot_updateID_array.length, i++) {
       var value = abs(now_updateID - TG_bot_updateID_array[i].update_id)
-      if (value < 100) {
-        opposite_RoomId = i //找到指定bot了
-
+      if (value < 100) { //治標不治本我也很絕望阿 (T口T)
+        opposite_RoomId = TG_bot_updateID_array[i].line_roomID //找到指定bot了
+        TG_bot_updateID_array[i].update_id = now_updateID
 
         var r = JSON.stringify(ALL);
         doc.setText(r); //寫入
+        break;
+      }
+    }
+    if (opposite_RoomId != "主控bot") { //找到opposite_RoomID的話才會進來直接發
+      var Line_id = opposite_RoomId.line_roomID
+      if (estringa.message.text) {
+        text = Stext;
+        TG_Send_text_To_Line(Line_id, text)
+      } else if (estringa.message.photo) { //如果是照片
+        //以下選擇telegram照片並發到line
+        var p = estringa.message.photo
+        var max = p.length - 1;
+        var photo_id = p[max].file_id
+        TG_Send_Photo_To_Line(Line_id, photo_id)
+
+        text = "(圖片已發送!)"
+        var notification = false
+        sendtext(text, notification);
+      } else if (estringa.message.video) {
+        //以下選擇telegram video並發到line
+        var video_id = estringa.message.video.file_id
+        TG_Send_video_To_Line(Line_id, video_id)
+
+        text = "(影片已發送!)"
+        var notification = false
+        sendtext(text, notification);
+      } else if (estringa.message.sticker) {
+        text = "(暫時不支援貼圖傳送喔!)"
+        var notification = false
+        sendtext(text, notification);
+      } else if (estringa.message.audio) {
+        text = "(暫時不支援audio傳送喔!)"
+        var duration = estringa.message.audio.duration
+        var audio_id = estringa.message.audio.file_id
+        TG_Send_audio_To_Line(Line_id, audio_id, duration)
+      } else if (estringa.message.voice) {
+        text = "(暫時不支援voice傳送喔!)"
+        var duration = estringa.message.voice.duration
+        TG_Send_audio_To_Line(Line_id, audio_id, duration)
+      } else if (estringa.message.location) {
+
+        var latitude = estringa.message.location.latitude
+        var longitude = estringa.message.location.longitude
+        var key = ""
+        var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=" + key + "&language=zh-tw"
+        var t = UrlFetchApp.fetch(url)
+        var t2 = JSON.parse(t)
+        var t3 = JSON.stringify(t2.results)
+        var t4 = JSON.parse(t3) //這麼多t我也很無奈...
+        var formatted_address = t4[0]["formatted_address"]
+        //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
+        TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
       }
     }
     //============================================================================
@@ -169,7 +221,13 @@ function doPost(e) {
         text = "請輸入botToken"
         var notification = true
         sendtext(text, notification);
-      } else if (mode == "/uproom" && !In(Stext)) { //--可能會有脫離不出去的問題-- 已修正
+      } else if (mode == "/uproom") {
+        if (In(Stext)) { //先檢查不會跟指令重複後再在下一步
+          text = "請輸入token 而非指令!"
+          var notification = true
+          sendtext(text, notification);
+          return 0;
+        }
         CP();
         try {
           var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + Stext + "/setWebhook?url=" + gsURL + "&max_connections=1")
@@ -190,6 +248,11 @@ function doPost(e) {
             ALL.data[number].botToken = Stext
             ALL.data[number].status = "已升級房間"
             ALL.mode = 0 //讓mode回復正常
+
+            var line_roomID = ALL.data[number].RoomId
+            var Room_Name = ALL.data[number].Name
+            var array = ["update_id": now_updateID, "TG_token": Stext, "line_roomID": line_roomID, "Room_Name": Room_Name]
+            ALL.TG_bot_updateID_array.splice(ALL.TG_bot_updateID_array.length,0,array)
 
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
@@ -221,6 +284,20 @@ function doPost(e) {
         delete ALL.data[number].botToken
         ALL.data[number].status = "normal"
         ALL.mode = 0 //讓mode回復正常
+
+        var k = "沒有找到"
+        for(var j=0;j<ALL.TG_bot_updateID_array.length;j++){
+          if(TG_bot_updateID_array[j].line_roomID == ALL.data[number].RoomId){
+            k = j
+            break
+          }
+        }
+        if(k = "沒有找到"){
+          var d = new Date();
+          GmailApp.sendEmail(email, "telegram-line出事啦(沒有找到)", d + "\n\n" + ee + "\n\n" + e + "\n\n"+k);
+        }else {
+          ALL.TG_bot_updateID_array.splice(k,1)
+        }
 
         var r = JSON.stringify(ALL);
         doc.setText(r); //寫入
@@ -1363,7 +1440,6 @@ function TG_Send_audio_To_Line(Line_id, audio_id, duration) {
 function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-  //var G = TGdownloadURL(getpath(video_id))
 
   var url = 'https://api.line.me/v2/bot/message/push';
   //--------------------------------------------------
