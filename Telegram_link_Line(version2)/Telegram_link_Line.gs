@@ -92,7 +92,6 @@ function doPost(e) {
       var confirm1 = ALL.TG_bot_updateID_array.length
       var TG_bot_updateID_array = JSON.stringify(ALL.TG_bot_updateID_array)
       var confirm2 = JSON.parse(TG_bot_updateID_array);
-      Logger.log("RRRRRRRRRRRRRRR = ",TG_bot_updateID_array)
     } catch (e) {
       var doc = DocumentApp.openById(doc_key)
       var f = doc.getText()
@@ -107,7 +106,6 @@ function doPost(e) {
       var ALL = JSON.parse(f);
       var TG_bot_updateID_array = ALL.TG_bot_updateID_array //再次轉型態
       //*/
-      Logger.log("已新增 TG_bot_updateID_array = ",TG_bot_updateID_array)
     }
     var now_updateID = estringa.update_id
     var TG_bot_updateID_array = JSON.parse(TG_bot_updateID_array)
@@ -117,7 +115,6 @@ function doPost(e) {
       if (value < 100) { //治標不治本我也很絕望阿 (T口T)
         opposite_RoomId = TG_bot_updateID_array[i].line_roomID //找到指定bot了
         var TG_token = TG_bot_updateID_array[i].TG_token
-        Logger.log("龜龜龜龜龜龜龜 opposite_RoomId = ",opposite_RoomId)
         TG_bot_updateID_array[i].update_id = now_updateID
 
         var r = JSON.stringify(ALL);
@@ -145,7 +142,7 @@ function doPost(e) {
       } else if (estringa.message.video) {
         //以下選擇telegram video並發到line
         var video_id = estringa.message.video.file_id
-        TG_Send_video_To_Line(Line_id, video_id)
+        TG_Send_video_To_Line(Line_id, video_id,TG_token)  //就你最特別,多吃一個TGtoken
 
         text = "(影片已發送!)"
         var notification = false
@@ -248,8 +245,18 @@ function doPost(e) {
         var notification = true
         sendtext(text, notification);
       } else if (mode == "/uproom") {
+        if (Stext == "/unsetbot") {
+          ALL.mode = 0
+          var r = JSON.stringify(ALL);
+          doc.setText(r); //寫入
+
+          text = "已取消設定bot"
+          var notification = false
+          sendtext(text, notification);
+          return 0
+        }
         if (In(Stext)) { //先檢查不會跟指令重複後再在下一步
-          text = "請輸入token 而非指令!"
+          text = "請輸入token 而非指令!\n若要取消升級步驟請 /unsetbot"
           var notification = true
           sendtext(text, notification);
           return 0;
@@ -294,7 +301,7 @@ function doPost(e) {
           }
         } catch (e) {
           var notification = false
-          text = "看來發生了一點錯誤>_<\n請稍候再試!"
+          text = "看來發生了一點錯誤>_<\n請輸入正確token，並稍候再試!"
           sendtext(text, notification);
           text = e
           sendtext(text, notification);
