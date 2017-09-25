@@ -111,17 +111,12 @@ function doPost(e) {
     }
     var now_updateID = estringa.update_id
     var TG_bot_updateID_array = JSON.parse(TG_bot_updateID_array)
-    Logger.log("龜龜龜龜龜龜龜 now_updateID = ",now_updateID)
-    Logger.log("龜龜龜龜龜龜龜 TG_bot_updateID_array.update_id = ",TG_bot_updateID_array[0].update_id)
-    Logger.log("嘜嘜嘜嘜嘜嘜嘜嘜嘜 TG_bot_updateID_array = ",TG_bot_updateID_array[0])
-    Logger.log("嘜嘜嘜嘜嘜嘜嘜嘜嘜 TG_bot_updateID_array.length = ",TG_bot_updateID_array.length)
     var opposite_RoomId = "主控bot"
     for (var i = 0; i < TG_bot_updateID_array.length; i++) {
       var value = Math.abs(now_updateID - TG_bot_updateID_array[i].update_id)
-      Logger.log("龜龜龜龜龜龜龜 TG_bot_updateID_array[i].update_id ",TG_bot_updateID_array[i].update_id)
-
       if (value < 100) { //治標不治本我也很絕望阿 (T口T)
         opposite_RoomId = TG_bot_updateID_array[i].line_roomID //找到指定bot了
+        var TG_token = TG_bot_updateID_array[i].TG_token
         Logger.log("龜龜龜龜龜龜龜 opposite_RoomId = ",opposite_RoomId)
         TG_bot_updateID_array[i].update_id = now_updateID
 
@@ -133,10 +128,9 @@ function doPost(e) {
     //來源bot檢查完成!================================================================
     if (opposite_RoomId != "主控bot") { //找到opposite_RoomID的話才會進來直接發
       var Line_id = opposite_RoomId
+      chkey(TG_token);
       if (estringa.message.text) {
         text = Stext;
-        Logger.log("朱朱朱朱朱朱朱 Line_id = ",Line_id)
-        Logger.log("朱朱朱朱朱朱朱 text = ",text)
         TG_Send_text_To_Line(Line_id, text)
       } else if (estringa.message.photo) { //如果是照片
         //以下選擇telegram照片並發到line
@@ -1409,10 +1403,11 @@ function TG_Send_Photo_To_Line(Line_id, photo_id) {
   UrlFetchApp.fetch(url, options);
 }
 //=================================================================================
-function TG_Send_video_To_Line(Line_id, video_id) {
+function TG_Send_video_To_Line(Line_id, video_id,Telegram_bot_key) {
+  //為什麼就跟錄音跟影片要原本的TG_token?? 是說不用原本的就是TG出bug了吧?
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-  var G = TGdownloadURL(getpath(video_id))
+  var G = TGdownloadURL(getpath(video_id,Telegram_bot_key),Telegram_bot_key)
 
   var url = 'https://api.line.me/v2/bot/message/push';
   //--------------------------------------------------
@@ -1438,10 +1433,11 @@ function TG_Send_video_To_Line(Line_id, video_id) {
   UrlFetchApp.fetch(url, options);
 }
 //=================================================================================
-function TG_Send_audio_To_Line(Line_id, audio_id, duration) {
+function TG_Send_audio_To_Line(Line_id, audio_id, duration,Telegram_bot_key) {
+  //為什麼就跟錄音跟影片要原本的TG_token?? 是說不用原本的就是TG出bug了吧?
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-  var G = TGdownloadURL(getpath(audio_id))
+  var G = TGdownloadURL(getpath(audio_id,Telegram_bot_key),Telegram_bot_key)
 
   var url = 'https://api.line.me/v2/bot/message/push';
   //--------------------------------------------------
@@ -1516,9 +1512,9 @@ function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_addres
   }
 }
 //=================================================================================
-function getpath(id) {
+function getpath(id,Telegram_bot_key) {
   var base_json = base()
-  var Telegram_bot_key = base_json.Telegram_bot_key
+  var Telegram_bot_key = Telegram_bot_key || base_json.Telegram_bot_key
   url = "https://api.telegram.org/bot" + Telegram_bot_key + "/getFile?file_id=" + id
   var html = UrlFetchApp.fetch(url);
   html = JSON.parse(html);
@@ -1527,9 +1523,9 @@ function getpath(id) {
   return path;
 }
 //=================================================================================
-function TGdownloadURL(path) {
+function TGdownloadURL(path,Telegram_bot_key) {
   var base_json = base()
-  var Telegram_bot_key = base_json.Telegram_bot_key
+  var Telegram_bot_key = Telegram_bot_key || base_json.Telegram_bot_key
   var TGDurl = "https://api.telegram.org/file/bot" + Telegram_bot_key + "/" + path
   return TGDurl;
 }
