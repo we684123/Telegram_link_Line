@@ -91,43 +91,60 @@ function doPost(e) {
     try {
       var confirm1 = ALL.TG_bot_updateID_array.length
       var TG_bot_updateID_array = JSON.stringify(ALL.TG_bot_updateID_array)
-      var confirm2 = JSON.parse(TG_bot_updateID_array);
-    } catch (e) {
+      var confirm2 = JSON.parse(TG_bot_updateID_array); //如果非json則會error 代表沒有
+    } catch (e) { //新增 TG_bot_updateID_array
+      CP();
+      var notification = false
+      text = "已備份舊資料，更新doc資料庫中..."
+      sendtext(text, notification);
       var doc = DocumentApp.openById(doc_key)
       var f = doc.getText()
       var ALL = JSON.parse(f);
-      ALL.TG_bot_updateID_array = []
+      ALL.TG_control_bot_updateID = estringa.update_id //存放主控bot的updateID
+      ALL.TG_bot_updateID_array = [] //新增存放處
       var r = JSON.stringify(ALL);
       doc.setText(r); //寫入
       var TG_bot_updateID_array = ALL.TG_bot_updateID_array //再次轉型態
-      /*
-      var doc = DocumentApp.openById(doc_key)
-      var f = doc.getText()
-      var ALL = JSON.parse(f);
-      var TG_bot_updateID_array = ALL.TG_bot_updateID_array //再次轉型態
-      //*/
+      text = "doc資料庫更新完畢!，如之後有問題可以手動還原\n#doc備份點"
+      sendtext(text, notification);
     }
     var now_updateID = estringa.update_id
+    var TG_control_bot_updateID = ALL.TG_control_bot_updateID
     var TG_bot_updateID_array = JSON.parse(TG_bot_updateID_array)
     var opposite_RoomId = "主控bot"
-    for (var i = 0; i < TG_bot_updateID_array.length; i++) {
-      var value = Math.abs(now_updateID - TG_bot_updateID_array[i].update_id)
-      if (value < 100) { //治標不治本我也很絕望阿 (T口T)
-        opposite_RoomId = TG_bot_updateID_array[i].line_roomID //找到指定bot了
-        var TG_token = TG_bot_updateID_array[i].TG_token
-        TG_bot_updateID_array[i].update_id = now_updateID
 
-        var r = JSON.stringify(ALL);
-        doc.setText(r); //寫入
-        break;
+    if (Math.abs(TG_control_bot_updateID - now_updateID) > 100) {
+      for (var i = 0; i < TG_bot_updateID_array.length; i++) {
+        var value = Math.abs(now_updateID - TG_bot_updateID_array[i].update_id)
+        if (value < 100) { //治標不治本我也很絕望阿 (T口T)
+          opposite_RoomId = TG_bot_updateID_array[i].line_roomID //找到指定bot了
+          var TG_token = TG_bot_updateID_array[i].TG_token
+          ALL.TG_bot_updateID_array[i].update_id = now_updateID
+
+          var r = JSON.stringify(ALL);
+          doc.setText(r); //寫入
+          break;
+        }
       }
+    } else {
+      ALL.TG_control_bot_updateID = now_updateID
+      var r = JSON.stringify(ALL);
+      doc.setText(r); //寫入
     }
     //來源bot檢查完成!================================================================
     if (opposite_RoomId != "主控bot") { //找到opposite_RoomID的話才會進來直接發
       var Line_id = opposite_RoomId
-      chkey(TG_token);
       if (estringa.message.text) {
-        text = Stext;
+        try {
+          if (estringa.message.reply_to_message.text) {
+            var rt = estringa.message.reply_to_message.text
+            text = rt + "\n^針對此回復^\n" + Stext
+          } else {
+            text = Stext;
+          }
+        } catch (e) {
+          text = Stext;
+        }
         TG_Send_text_To_Line(Line_id, text)
       } else if (estringa.message.photo) { //如果是照片
         //以下選擇telegram照片並發到line
@@ -138,18 +155,21 @@ function doPost(e) {
 
         text = "(圖片已發送!)"
         var notification = false
+        chkey(TG_token);
         sendtext(text, notification);
       } else if (estringa.message.video) {
         //以下選擇telegram video並發到line
         var video_id = estringa.message.video.file_id
-        TG_Send_video_To_Line(Line_id, video_id,TG_token)  //就你最特別,多吃一個TGtoken
+        TG_Send_video_To_Line(Line_id, video_id, TG_token) //就你最特別,多吃一個TGtoken
 
         text = "(影片已發送!)"
         var notification = false
+        chkey(TG_token);
         sendtext(text, notification);
       } else if (estringa.message.sticker) {
         text = "(暫時不支援貼圖傳送喔!)"
         var notification = false
+        chkey(TG_token);
         sendtext(text, notification);
       } else if (estringa.message.audio) {
         text = "(暫時不支援audio傳送喔!)"
@@ -180,7 +200,22 @@ function doPost(e) {
     if (estringa.message.text) { //如果是文字訊息
       if (mode == "🚀 發送訊息" && Stext != "/exit") {
         //以下準備接收telegram資訊並發到line
-        text = Stext;
+        if (In(Stext) || Stext.substr(0, 2) == "/d") {
+          text = "請先按下 /exit 離開後再下指令喔!"
+          var notification = false
+          sendtext(text, notification);
+          return 0;
+        }
+        try {
+          if (estringa.message.reply_to_message.text) {
+            var rt = estringa.message.reply_to_message.text
+            text = rt + "\n^針對此回復^\n" + Stext
+          } else {
+            text = Stext;
+          }
+        } catch (e) {
+          text = Stext;
+        }
         var Line_id = ALL.opposite.RoomId;
         TG_Send_text_To_Line(Line_id, text)
 
@@ -255,7 +290,7 @@ function doPost(e) {
           sendtext(text, notification);
           return 0
         }
-        if (In(Stext)) { //先檢查不會跟指令重複後再在下一步
+        if (In(Stext) || Stext.substr(0, 2) == "/d") { //先檢查不會跟指令重複後再在下一步
           text = "請輸入token 而非指令!\n若要取消升級步驟請 /unsetbot"
           var notification = true
           sendtext(text, notification);
@@ -280,20 +315,26 @@ function doPost(e) {
             var number = ALL.FastMatch2[aims]
             ALL.data[number].botToken = Stext
             ALL.data[number].status = "已升級房間"
-            ALL.mode = 0 //讓mode回復正常
+            ALL.mode = "/uproom_2" //切mode
 
             var line_roomID = ALL.data[number].RoomId
             var Room_Name = ALL.data[number].Name
-            var array = {"update_id": now_updateID, "TG_token": Stext, "line_roomID": line_roomID, "Room_Name": Room_Name}
+            var array = {
+              "update_id": 0, //下一個步驟補
+              "TG_token": Stext,
+              "line_roomID": line_roomID,
+              "Room_Name": Room_Name
+            }
 
-            ALL.TG_bot_updateID_array.splice(ALL.TG_bot_updateID_array.length,0,array)
+            ALL.TG_bot_updateID_array.splice(ALL.TG_bot_updateID_array.length, 0, array)
 
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
 
             var notification = false
-            text = "已升級成功(๑•̀ㅂ•́)و✧\n\n"+"房間狀態:\n" + JSON.stringify(ALL.data[number])
-            keyboard_main(text, doc_key)
+            text = "Webhook已連結!\n進入最後一個步驟了! \n請至新機器人聊天室那任意輸入文字以進行綁定。"
+            sendtext(text, notification);
+
           } else {
             var notification = false
             text = "看來發生了一點錯誤.....\n請稍候再試....."
@@ -305,9 +346,44 @@ function doPost(e) {
           sendtext(text, notification);
           text = e
           sendtext(text, notification);
-        } finally {
-          var d = new Date();
-          GmailApp.sendEmail(email, "telegram-line出事啦", d + "\n\n" + ee + "\n\n" + e);
+        }
+      } else if (mode == "/uproom_2") {
+        if (Math.abs(ALL.TG_control_bot_updateID - now_updateID) > 100) {
+          var opposite_RoomId = "沒找到"
+          var mais_i = "X"
+            for (var i = 0; i < ALL.TG_bot_updateID_array.length; i++) {
+              var value = Math.abs(ALL.now_updateID - ALL.TG_bot_updateID_array[i].update_id)
+              if (value < 100) {
+                opposite_RoomId = TG_bot_updateID_array[i].line_roomID //找到指定bot了
+                ALL.TG_bot_updateID_array[i].update_id = now_updateID
+
+                var r = JSON.stringify(ALL);
+                doc.setText(r); //寫入
+                break;
+              }
+              if (ALL.TG_bot_updateID_array[i].update_id == 0)
+                aims_i = i
+            }
+          if (opposite_RoomId != "沒找到") {
+            text = "這個 '聊天室' 已被其他bot佔用了!\n請至新的bot聊天室留言。"
+            var notification = false
+            sendtext(text, notification);
+            return 0;
+          }
+          ALL.mode = 0
+          ALL.TG_bot_updateID_array[aims_i].update_id = now_updateID //寫入id
+          var r = JSON.stringify(ALL);
+          doc.setText(r); //寫入
+
+          var aims = ALL.opposite.RoomId
+          var number = ALL.FastMatch2[aims]
+          var notification = false
+          text = "已升級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
+          keyboard_main(text, doc_key)
+        } else {
+          text = "請至__新機器人聊天室__!!!那任意輸入文字以進行綁定。\n不是這裡喔!"
+          var notification = false
+          sendtext(text, notification);
         }
       } else if (mode == "💫 降級房間" & Stext == "/droproom") {
         var aims = ALL.opposite.RoomId
@@ -317,24 +393,25 @@ function doPost(e) {
         ALL.mode = 0 //讓mode回復正常
 
         var k = "沒有找到"
-        for(var j=0;j<ALL.TG_bot_updateID_array.length;j++){
-          if(TG_bot_updateID_array[j].line_roomID == ALL.opposite.RoomId){
+        for (var j = 0; j < ALL.TG_bot_updateID_array.length; j++) {
+          if (TG_bot_updateID_array[j].line_roomID == ALL.opposite.RoomId) {
             k = j
             break
           }
         }
-        if(k = "沒有找到"){
+        if (k = "沒有找到") {
           var d = new Date();
-          GmailApp.sendEmail(email, "telegram-line出事啦(沒有找到)", d + "\n\n" + ee + "\n\n" + e + "\n\n"+k);
-        }else {
-          ALL.TG_bot_updateID_array.splice(k,1)
+          GmailApp.sendEmail(email, "telegram-line出事啦(沒有找到)", d + "\n\n" + ee + "\n\n" + e + "\n\n" + k);
+        } else {
+          ALL.TG_bot_updateID_array.splice(k, 1)
+
         }
 
         var r = JSON.stringify(ALL);
         doc.setText(r); //寫入
 
         var notification = false
-        text = "已升級成功(๑•̀ㅂ•́)و✧\n\n"+"房間狀態:\n" + JSON.stringify(ALL.data[number])
+        text = "已降級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
         keyboard_main(text, doc_key)
       } else {
         //以下指令分流
@@ -627,21 +704,7 @@ function doPost(e) {
               ]
               var keyboard2 = [
                 [{
-                  'text': '🚀 發送訊息'
-                }, {
-                  'text': '📬 讀取留言'
-                }, {
-                  'text': '🔖 重新命名'
-                }],
-                [{
                   'text': '💫 降級房間'
-                }, {
-                  'text': '🐳 開啟通知'
-                }, {
-                  'text': '🔰 暫停通知'
-                }],
-                [{
-                  'text': "🔥 刪除房間"
                 }, {
                   'text': "🔙 返回房間"
                 }]
@@ -650,7 +713,7 @@ function doPost(e) {
               if (ALL.data[FM].botToken) { //如果遇到已升級的則改"降級"
                 keyboard = keyboard2
               }
-              var resize_keyboard = false
+              var resize_keyboard = true
               var one_time_keyboard = false
               ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, text)
             } else if (Stext.substr(0, 2) == "/d") {
@@ -691,21 +754,7 @@ function doPost(e) {
               ]
               var keyboard2 = [
                 [{
-                  'text': '🚀 發送訊息'
-                }, {
-                  'text': '📬 讀取留言'
-                }, {
-                  'text': '🔖 重新命名'
-                }],
-                [{
                   'text': '💫 降級房間'
-                }, {
-                  'text': '🐳 開啟通知'
-                }, {
-                  'text': '🔰 暫停通知'
-                }],
-                [{
-                  'text': "🔥 刪除房間"
                 }, {
                   'text': "🔙 返回房間"
                 }]
@@ -714,7 +763,7 @@ function doPost(e) {
               if (ALL.data[FM].botToken) { //如果遇到已升級的則改"降級"
                 keyboard = keyboard2
               }
-              var resize_keyboard = false
+              var resize_keyboard = true
               var one_time_keyboard = false
               ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, text)
             } else {
@@ -963,9 +1012,6 @@ function doPost(e) {
           sendtext(text, notification);
           text = e;
           sendtext(text, notification);
-        } finally {
-          var d = new Date();
-          GmailApp.sendEmail(email, "telegram-line出事啦", d + "\n\n" + ee + "\n\n" + e);
         }
       } else if (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId) {
         if (message_json.type == "text") {
@@ -1410,11 +1456,11 @@ function TG_Send_Photo_To_Line(Line_id, photo_id) {
   UrlFetchApp.fetch(url, options);
 }
 //=================================================================================
-function TG_Send_video_To_Line(Line_id, video_id,Telegram_bot_key) {
+function TG_Send_video_To_Line(Line_id, video_id, Telegram_bot_key) {
   //為什麼就跟錄音跟影片要原本的TG_token?? 是說不用原本的就是TG出bug了吧?
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-  var G = TGdownloadURL(getpath(video_id,Telegram_bot_key),Telegram_bot_key)
+  var G = TGdownloadURL(getpath(video_id, Telegram_bot_key), Telegram_bot_key)
 
   var url = 'https://api.line.me/v2/bot/message/push';
   //--------------------------------------------------
@@ -1440,11 +1486,11 @@ function TG_Send_video_To_Line(Line_id, video_id,Telegram_bot_key) {
   UrlFetchApp.fetch(url, options);
 }
 //=================================================================================
-function TG_Send_audio_To_Line(Line_id, audio_id, duration,Telegram_bot_key) {
+function TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key) {
   //為什麼就跟錄音跟影片要原本的TG_token?? 是說不用原本的就是TG出bug了吧?
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-  var G = TGdownloadURL(getpath(audio_id,Telegram_bot_key),Telegram_bot_key)
+  var G = TGdownloadURL(getpath(audio_id, Telegram_bot_key), Telegram_bot_key)
 
   var url = 'https://api.line.me/v2/bot/message/push';
   //--------------------------------------------------
@@ -1519,7 +1565,7 @@ function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_addres
   }
 }
 //=================================================================================
-function getpath(id,Telegram_bot_key) {
+function getpath(id, Telegram_bot_key) {
   var base_json = base()
   var Telegram_bot_key = Telegram_bot_key || base_json.Telegram_bot_key
   url = "https://api.telegram.org/bot" + Telegram_bot_key + "/getFile?file_id=" + id
@@ -1530,7 +1576,7 @@ function getpath(id,Telegram_bot_key) {
   return path;
 }
 //=================================================================================
-function TGdownloadURL(path,Telegram_bot_key) {
+function TGdownloadURL(path, Telegram_bot_key) {
   var base_json = base()
   var Telegram_bot_key = Telegram_bot_key || base_json.Telegram_bot_key
   var TGDurl = "https://api.telegram.org/file/bot" + Telegram_bot_key + "/" + path
