@@ -8,7 +8,7 @@ function base() {
   var CHANNEL_ACCESS_TOKEN = ''; //你的Line token
   var email = "@gmail.com"; //你的email(祈禱永遠別收到來自此的e-mail)
   var FolderId = ""; //你的選擇要存的資料夾(google_grive_FolderId)，必須獨立不能共用!
-  var gsURL = "";  //該gs檔的發佈網址
+  var gsURL = ""; //該gs檔的發佈網址
   //前期準備完成!==============================================================
   var base_json = {
     "sheet_key": sheet_key,
@@ -19,12 +19,19 @@ function base() {
     "CHANNEL_ACCESS_TOKEN": CHANNEL_ACCESS_TOKEN,
     "email": email,
     "FolderId": FolderId,
-    "gsURL":gsURL
+    "gsURL": gsURL
   }
   return base_json
 }
 //============================================================================
-function TTTTTTTT() {
+function setWebhook() {
+  var base_json = base()
+  var Telegram_bot_key = base_json.Telegram_bot_key
+  var gsURL = base_json.gsURL
+  UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/setWebhook?" + gsURL + "&max_connections=1")
+}
+//============================================================================
+function TTTTTTT() {
   var base_json = base()
   var sheet_key = base_json.sheet_key
   var doc_key = base_json.doc_key
@@ -39,7 +46,7 @@ function TTTTTTTT() {
   //123
   var gsURL = ""
   var Stext = ""
-  var response = UrlFetchApp.fetch("https://api.telegram.org/bot"+Stext+"/setWebhook?"+gsURL)
+  var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + Stext + "/setWebhook?" + gsURL)
   var responseCode = response.getResponseCode()
   var responseBody = response.getContentText()
   //*/
