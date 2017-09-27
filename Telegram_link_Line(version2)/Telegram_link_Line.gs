@@ -107,6 +107,8 @@ function doPost(e) {
       var TG_bot_updateID_array = ALL.TG_bot_updateID_array //再次轉型態
       text = "doc資料庫更新完畢!，如之後有問題可以手動還原\n#doc備份點"
       sendtext(text, notification);
+      text = "請重新執行上一個指令_(:з」∠)_"
+      sendtext(text, notification);
     }
     var now_updateID = estringa.update_id
     var TG_control_bot_updateID = ALL.TG_control_bot_updateID
@@ -174,12 +176,14 @@ function doPost(e) {
       } else if (estringa.message.audio) {
         text = "(暫時不支援audio傳送喔!)"
         var duration = estringa.message.audio.duration
-        var audio_id = estringa.message.audio.file_id
-        TG_Send_audio_To_Line(Line_id, audio_id, duration)
+        //var audio_id = estringa.message.audio.file_id
+        chkey(TG_token);
+        sendtext(text, notification);
       } else if (estringa.message.voice) {
         text = "(暫時不支援voice傳送喔!)"
-        var duration = estringa.message.voice.duration
-        TG_Send_audio_To_Line(Line_id, audio_id, duration)
+        //var duration = estringa.message.voice.duration
+        chkey(TG_token);
+        sendtext(text, notification);
       } else if (estringa.message.location) {
 
         var latitude = estringa.message.location.latitude
@@ -313,10 +317,7 @@ function doPost(e) {
           if (n == 3) {
             var aims = ALL.opposite.RoomId
             var number = ALL.FastMatch2[aims]
-            ALL.data[number].botToken = Stext
-            ALL.data[number].status = "已升級房間"
             ALL.mode = "/uproom_2" //切mode
-
             var line_roomID = ALL.data[number].RoomId
             var Room_Name = ALL.data[number].Name
             var array = {
@@ -325,7 +326,6 @@ function doPost(e) {
               "line_roomID": line_roomID,
               "Room_Name": Room_Name
             }
-
             ALL.TG_bot_updateID_array.splice(ALL.TG_bot_updateID_array.length, 0, array)
 
             var r = JSON.stringify(ALL);
@@ -334,7 +334,6 @@ function doPost(e) {
             var notification = false
             text = "Webhook已連結!\n進入最後一個步驟了! \n請至新機器人聊天室那任意輸入文字以進行綁定。"
             sendtext(text, notification);
-
           } else {
             var notification = false
             text = "看來發生了一點錯誤.....\n請稍候再試....."
@@ -342,7 +341,7 @@ function doPost(e) {
           }
         } catch (e) {
           var notification = false
-          text = "看來發生了一點錯誤>_<\n請輸入正確token，並稍候再試!"
+          text = "看來發生了一點錯誤>_<\n請輸入正確token!"
           sendtext(text, notification);
           text = e
           sendtext(text, notification);
@@ -351,32 +350,34 @@ function doPost(e) {
         if (Math.abs(ALL.TG_control_bot_updateID - now_updateID) > 100) {
           var opposite_RoomId = "沒找到"
           var mais_i = "X"
-            for (var i = 0; i < ALL.TG_bot_updateID_array.length; i++) {
-              var value = Math.abs(ALL.now_updateID - ALL.TG_bot_updateID_array[i].update_id)
-              if (value < 100) {
-                opposite_RoomId = TG_bot_updateID_array[i].line_roomID //找到指定bot了
-                ALL.TG_bot_updateID_array[i].update_id = now_updateID
+          for (var i = 0; i < ALL.TG_bot_updateID_array.length; i++) {
+            var value = Math.abs(ALL.now_updateID - ALL.TG_bot_updateID_array[i].update_id)
+            if (value < 100) {
+              opposite_RoomId = TG_bot_updateID_array[i].line_roomID //找到指定bot了
+              ALL.TG_bot_updateID_array[i].update_id = now_updateID
 
-                var r = JSON.stringify(ALL);
-                doc.setText(r); //寫入
-                break;
-              }
-              if (ALL.TG_bot_updateID_array[i].update_id == 0)
-                aims_i = i
+              var r = JSON.stringify(ALL);
+              doc.setText(r); //寫入
+              break;
             }
+            if (ALL.TG_bot_updateID_array[i].update_id == 0)
+              aims_i = i
+          }
           if (opposite_RoomId != "沒找到") {
             text = "這個 '聊天室' 已被其他bot佔用了!\n請至新的bot聊天室留言。"
             var notification = false
             sendtext(text, notification);
             return 0;
           }
+          var aims = ALL.opposite.RoomId
+          var number = ALL.FastMatch2[aims]
+          ALL.data[number].botToken = ALL.TG_bot_updateID_array[aims_i].TG_token
+          ALL.data[number].status = "已升級房間"
           ALL.mode = 0
           ALL.TG_bot_updateID_array[aims_i].update_id = now_updateID //寫入id
           var r = JSON.stringify(ALL);
           doc.setText(r); //寫入
 
-          var aims = ALL.opposite.RoomId
-          var number = ALL.FastMatch2[aims]
           var notification = false
           text = "已升級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
           keyboard_main(text, doc_key)
@@ -388,6 +389,18 @@ function doPost(e) {
       } else if (mode == "💫 降級房間" & Stext == "/droproom") {
         var aims = ALL.opposite.RoomId
         var number = ALL.FastMatch2[aims]
+        var D_token = ALL.data[number].botToken
+        try {
+          var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + D_token + "/deleteWebhook");
+          var responseCode = response.getResponseCode()
+        } catch (e) {
+          text = "降級失敗! 詳情如下：\n" + "responseCode：" + responseCode + "\nerror：\n" + e
+          var notification = false
+          sendtext(text, notification);
+          return 0;
+        }
+
+
         delete ALL.data[number].botToken
         ALL.data[number].status = "normal"
         ALL.mode = 0 //讓mode回復正常
@@ -816,10 +829,11 @@ function doPost(e) {
       }
     } else if (estringa.message.audio) {
       if (mode == "🚀 發送訊息") {
-        text = "(暫時不支援聲音傳送喔!)"
+        text = "(暫時不支援audio傳送喔!)"
         var duration = estringa.message.audio.duration
-        var audio_id = estringa.message.audio.file_id
-        TG_Send_audio_To_Line(Line_id, audio_id, duration)
+        //var audio_id = estringa.message.audio.file_id
+        //TG_Send_audio_To_Line(Line_id, audio_id, duration)
+        sendtext(text, notification);
       } else {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
         var notification = false
@@ -827,9 +841,10 @@ function doPost(e) {
       }
     } else if (estringa.message.voice) {
       if (mode == "🚀 發送訊息") {
-        text = "(暫時不支援貼圖傳送喔!)"
-        var duration = estringa.message.voice.duration
-        TG_Send_audio_To_Line(Line_id, audio_id, duration)
+        text = "(暫時不支援voice傳送喔!)"
+        //var duration = estringa.message.voice.duration
+        //TG_Send_audio_To_Line(Line_id, audio_id, duration)
+        sendtext(text, notification);
       } else {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
         var notification = false
@@ -1025,6 +1040,7 @@ function doPost(e) {
           var url = message_json.DURL
           var notification = true
           var caption = "來自: " + message_json.userName
+          sendtext("(正在傳送圖片，請稍後...)", notification);
           sendPhoto(url, notification, caption)
           //sendPhoto(url, notification)
           //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
@@ -1032,7 +1048,8 @@ function doPost(e) {
         } else if (message_json.type == "sticker") {
           var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
           var notification = true
-          var caption = "來自: " + message_json.userName
+          var caption = "來自: " + message_json.
+          sendtext("(正在傳送貼圖，請稍後...)", notification);
           sendPhoto(sticker_png_url, notification, caption)
           //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
           /*
