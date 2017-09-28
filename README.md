@@ -42,7 +42,7 @@
 
 3.  二個gs檔(google apps script)，並將v3其中的"Telegram_link_Line.gs"的內容複製在一開始給你的"程式碼"區內。    
   ![Imgur](https://i.imgur.com/V3KF0rh.png)
-  複製完後按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱 -> 將"baseANDtest"內容複製上去__    
+  複製完後按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱 -> 將"baseANDtest"內容複製上去並填上資訊(註一)__    
   ![Imgur](https://i.imgur.com/tt2F4cj.png)
   ----    
   ![Imgur](https://i.imgur.com/ySQ5jJO.png)
