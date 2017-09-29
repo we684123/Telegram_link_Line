@@ -960,13 +960,13 @@ function doPost(e) {
           if (message_json.type == "text") {
             var p = message_json.userName + "：\n" + message_json.text
             //Logger.log("ppp = ", p)
-            var notification = true
+            var notification = false
             sendtext(p, notification);
             //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
             //"text":"51"}
           } else if (message_json.type == "image") {
             var url = message_json.DURL
-            var notification = true
+            var notification = false
             var caption = "來自: " + message_json.userName
             sendPhoto(url, notification, caption)
             //sendPhoto(url, notification)
@@ -974,7 +974,7 @@ function doPost(e) {
             //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
           } else if (message_json.type == "sticker") {
             var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
-            var notification = true
+            var notification = false
             var caption = "來自: " + message_json.userName
             sendPhoto(sticker_png_url, notification, caption)
             //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
@@ -989,12 +989,12 @@ function doPost(e) {
             //"stickerId":"502","packageId":"2"}
           } else if (message_json.type == "audio") {
             var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
-            var notification = true
+            var notification = false
             sendtext(url, notification)
             //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
             //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
           } else if (message_json.type == "location") {
-            var notification = true
+            var notification = false
             if (message_json.address) {
               var text = message_json.address
               sendtext(text, notification);
@@ -1009,14 +1009,14 @@ function doPost(e) {
             //"latitude":24.759711,"longitude":121.750114}
           } else if (message_json.type == "video") {
             var url = message_json.DURL
-            var notification = true
+            var notification = false
             var caption = "來自: " + message_json.userName
             sendVoice(url, notification, caption)
             //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
             //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
           } else if (message_json.type == "file") {
             var url = message_json.DURL + "\n\n來自:  " + message_json.userName
-            var notification = true
+            var notification = false
             sendtext(text, notification);
             //senddocument(url)
           }
