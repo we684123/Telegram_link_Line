@@ -1048,7 +1048,7 @@ function doPost(e) {
         } else if (message_json.type == "sticker") {
           var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
           var notification = true
-          var caption = "來自: " + message_json.
+          var caption = "來自: " + message_json.userName
           sendtext("(正在傳送貼圖，請稍後...)", notification);
           sendPhoto(sticker_png_url, notification, caption)
           //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
