@@ -94,9 +94,8 @@ function doPost(e) {
       var confirm2 = JSON.parse(TG_bot_updateID_array); //如果非json則會error 代表沒有
     } catch (e) { //新增 TG_bot_updateID_array
       CP();
-      var notification = false
       text = "已備份舊資料，更新doc資料庫中..."
-      sendtext(text, notification);
+      sendtext(text);
       var doc = DocumentApp.openById(doc_key)
       var f = doc.getText()
       var ALL = JSON.parse(f);
@@ -156,29 +155,26 @@ function doPost(e) {
         TG_Send_Photo_To_Line(Line_id, photo_id)
 
         text = "(圖片已發送!)"
-        var notification = false
         chkey(TG_token);
-        sendtext(text, notification);
+        sendtext(text);
       } else if (estringa.message.video) {
         //以下選擇telegram video並發到line
         var video_id = estringa.message.video.file_id
         TG_Send_video_To_Line(Line_id, video_id, TG_token) //就你最特別,多吃一個TGtoken
 
         text = "(影片已發送!)"
-        var notification = false
         chkey(TG_token);
-        sendtext(text, notification);
+        sendtext(text);
       } else if (estringa.message.sticker) {
         text = "(暫時不支援貼圖傳送喔!)"
-        var notification = false
         chkey(TG_token);
-        sendtext(text, notification);
+        sendtext(text);
       } else if (estringa.message.audio) {
         text = "(暫時不支援audio傳送喔!)"
         var duration = estringa.message.audio.duration
         //var audio_id = estringa.message.audio.file_id
         chkey(TG_token);
-        sendtext(text, notification);
+        sendtext(text);
       } else if (estringa.message.voice) {
         text = "(暫時不支援voice傳送喔!)"
         //var duration = estringa.message.voice.duration
@@ -206,8 +202,7 @@ function doPost(e) {
         //以下準備接收telegram資訊並發到line
         if (In(Stext) || Stext.substr(0, 2) == "/d") {
           text = "請先按下 /exit 離開後再下指令喔!"
-          var notification = false
-          sendtext(text, notification);
+          sendtext(text);
           return 0;
         }
         try {
@@ -331,20 +326,17 @@ function doPost(e) {
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
 
-            var notification = false
             text = "Webhook已連結!\n進入最後一個步驟了! \n請至新機器人聊天室那任意輸入文字以進行綁定。"
-            sendtext(text, notification);
+            sendtext(text);
           } else {
-            var notification = false
             text = "看來發生了一點錯誤.....\n請稍候再試....."
-            sendtext(text, notification);
+            sendtext(text);
           }
         } catch (e) {
-          var notification = false
           text = "看來發生了一點錯誤>_<\n請輸入正確token!"
-          sendtext(text, notification);
+          sendtext(text);
           text = e
-          sendtext(text, notification);
+          sendtext(text);
         }
       } else if (mode == "/uproom_2") {
         if (Math.abs(ALL.TG_control_bot_updateID - now_updateID) > 100) {
@@ -365,8 +357,7 @@ function doPost(e) {
           }
           if (opposite_RoomId != "沒找到") {
             text = "這個 '聊天室' 已被其他bot佔用了!\n請至新的bot聊天室留言。"
-            var notification = false
-            sendtext(text, notification);
+            sendtext(text);
             return 0;
           }
           var aims = ALL.opposite.RoomId
@@ -378,13 +369,11 @@ function doPost(e) {
           var r = JSON.stringify(ALL);
           doc.setText(r); //寫入
 
-          var notification = false
           text = "已升級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
           keyboard_main(text, doc_key)
         } else {
           text = "請至__新機器人聊天室__!!!那任意輸入文字以進行綁定。\n不是這裡喔!"
-          var notification = false
-          sendtext(text, notification);
+          sendtext(text);
         }
       } else if (mode == "💫 降級房間" & Stext == "/droproom") {
         var aims = ALL.opposite.RoomId
@@ -395,8 +384,7 @@ function doPost(e) {
           var responseCode = response.getResponseCode()
         } catch (e) {
           text = "降級失敗! 詳情如下：\n" + "responseCode：" + responseCode + "\nerror：\n" + e
-          var notification = false
-          sendtext(text, notification);
+          sendtext(text);
           return 0;
         }
 
@@ -423,7 +411,6 @@ function doPost(e) {
         var r = JSON.stringify(ALL);
         doc.setText(r); //寫入
 
-        var notification = false
         text = "已降級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
         keyboard_main(text, doc_key)
       } else {
@@ -600,8 +587,7 @@ function doPost(e) {
             doc.setText(r); //寫入
             text = "你確定要刪除 " + ALL.opposite.Name + " 嗎?\n" + "若是請按一下 /delete\n" +
               "若沒按下則不會刪除!!!"
-            var notification = false
-            sendtext(text, notification);
+            sendtext(text);
             break;
           case '🐳 開啟通知':
             var OName = ALL.opposite.Name
@@ -615,8 +601,7 @@ function doPost(e) {
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
             text = "已開啟 " + OName + " 的通知"
-            var notification = false
-            sendtext(text, notification);
+            sendtext(text);
             //以下處理RoomKeyboard==================================================
             REST_keyboard(doc_key) //重新編排keyborad
             break;
@@ -632,8 +617,7 @@ function doPost(e) {
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
             text = "已暫停 " + OName + " 的通知"
-            var notification = false
-            sendtext(text, notification);
+            sendtext(text);
             //以下處理RoomKeyboard==================================================
             REST_keyboard(doc_key) //重新編排keyborad
             break;
@@ -643,13 +627,11 @@ function doPost(e) {
             doc.setText(r); //寫入
 
             text = "⭐ 升級房間功能介紹：\n升級房間後，以後來自該對象(Line)的訊息皆會及時傳到新的bot聊天室，而不會傳到這個bot聊天室中，這個功能是可以回來這裡取消的。"
-            var notification = false
-            sendtext(text, notification);
+            sendtext(text);
 
             text = "您確定要升級 " + ALL.opposite.Name + " 嗎?\n若是請按一下 /uproom \n" +
               "若沒按下則不會升級!!!"
-            var notification = false
-            sendtext(text, notification);
+            sendtext(text);
             break;
           case '💫 降級房間':
             ALL.mode = "💫 降級房間"
@@ -658,8 +640,7 @@ function doPost(e) {
 
             text = "您確定要降級 " + ALL.opposite.Name + " 嗎?\n若是請按一下 /droproom \n" +
               "若沒按下則不會降級!!!"
-            var notification = false
-            sendtext(text, notification);
+            sendtext(text);
             break;
           case '/debug':
             REST_FastMatch1and2();
@@ -669,8 +650,7 @@ function doPost(e) {
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
             text = "已debug"
-            var notification = false
-            sendtext(text, notification);
+            sendtext(text);
             break;
           case '/AllRead':
           case '/Allread':
@@ -781,8 +761,7 @@ function doPost(e) {
               ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, text)
             } else {
               text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-              var notification = false
-              sendtext(text, notification);
+              sendtext(text);
             }
         }
       }
@@ -796,12 +775,10 @@ function doPost(e) {
         var Line_id = ALL.opposite.RoomId;
         TG_Send_Photo_To_Line(Line_id, photo_id)
         text = "(圖片已發送!)"
-        var notification = false
-        sendtext(text, notification);
+        sendtext(text);
       } else {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-        var notification = false
-        sendtext(text, notification);
+        sendtext(text)
       }
     } else if (estringa.message.video) {
       if (mode == "🚀 發送訊息") {
@@ -810,22 +787,18 @@ function doPost(e) {
         var Line_id = ALL.opposite.RoomId;
         TG_Send_video_To_Line(Line_id, video_id)
         text = "(影片已發送!)"
-        var notification = false
-        sendtext(text, notification);
+        sendtext(text);
       } else {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-        var notification = false
-        sendtext(text, notification);
+        sendtext(text);
       }
     } else if (estringa.message.sticker) {
       if (mode == "🚀 發送訊息") {
         text = "(暫時不支援貼圖傳送喔!)"
-        var notification = false
-        sendtext(text, notification);
+        sendtext(text);
       } else {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-        var notification = false
-        sendtext(text, notification);
+        sendtext(text);
       }
     } else if (estringa.message.audio) {
       if (mode == "🚀 發送訊息") {
@@ -847,8 +820,7 @@ function doPost(e) {
         sendtext(text, notification);
       } else {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-        var notification = false
-        sendtext(text, notification);
+        sendtext(text);
       }
     } else if (estringa.message.location) {
       if (mode == "🚀 發送訊息") {
@@ -865,8 +837,7 @@ function doPost(e) {
         TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
       } else {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-        var notification = false
-        sendtext(text, notification);
+        sendtext(text);
       }
     }
 
@@ -960,8 +931,7 @@ function doPost(e) {
           if (message_json.type == "text") {
             var p = message_json.userName + "：\n" + message_json.text
             //Logger.log("ppp = ", p)
-            var notification = false
-            sendtext(p, notification);
+            sendtext(p);
             //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
             //"text":"51"}
           } else if (message_json.type == "image") {
@@ -989,8 +959,7 @@ function doPost(e) {
             //"stickerId":"502","packageId":"2"}
           } else if (message_json.type == "audio") {
             var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
-            var notification = false
-            sendtext(url, notification)
+            sendtext(url)
             //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
             //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
           } else if (message_json.type == "location") {
@@ -1016,24 +985,21 @@ function doPost(e) {
             //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
           } else if (message_json.type == "file") {
             var url = message_json.DURL + "\n\n來自:  " + message_json.userName
-            var notification = false
-            sendtext(text, notification);
+            sendtext(text);
             //senddocument(url)
           }
         } catch (e) {
           chkey(Telegram_bot_key)
-          var notification = false
           text = "030....你是否忘記先跟新辦的bot說過話呢?\n請看下列錯誤回報以debug!"
-          sendtext(text, notification);
+          sendtext(text);
           text = e;
-          sendtext(text, notification);
+          sendtext(text);
         }
       } else if (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId) {
         if (message_json.type == "text") {
           var p = message_json.userName + "：\n" + message_json.text
           //Logger.log("ppp = ", p)
-          var notification = true
-          sendtext(p, notification);
+          sendtext(p);
           //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
           //"text":"51"}
         } else if (message_json.type == "image") {
@@ -1110,8 +1076,7 @@ function doPost(e) {
         var Notice = ALL.data[col - 1].Notice //通知 true or false
         if (Notice) {
           text = "你有新訊息!\n來自：" + ALL.data[col - 1].Name + "\n點擊以快速切換至該房間 /d" + (col - 1);
-          var notification = false
-          sendtext(text, notification);
+          sendtext(text);
         }
       }
 
