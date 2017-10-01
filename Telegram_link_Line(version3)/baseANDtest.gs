@@ -28,7 +28,7 @@ function setWebhook() {
   var base_json = base()
   var Telegram_bot_key = base_json.Telegram_bot_key
   var gsURL = base_json.gsURL
-  UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/setWebhook?" + gsURL + "&max_connections=1")
+  UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/setWebhook?url=" + gsURL + "&max_connections=1")
 }
 //============================================================================
 function TTTTTTT() {
