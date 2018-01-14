@@ -644,7 +644,7 @@ function doPost(e) {
             break;
           case '/debug':
             var xfjhxgfh = REST_FastMatch1and2(); //強制等待，不知道為什麼有時候不會執行
-            var ydjdy = REST_keyboard();  //強制等待，不知道為什麼有時候不會執行
+            var ydjdyf = REST_keyboard();  //強制等待，不知道為什麼有時候不會執行
             //還有sheet那邊的訊息區處理還未 (Amount)
             ALL.mode = 0
             var r = JSON.stringify(ALL);
