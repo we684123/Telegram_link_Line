@@ -157,7 +157,24 @@
         },
         "FastMatch2": {
             "zzz": 0
-        }
+        },
+        "TG_control_bot_updateID": 610460242,
+        "TG_bot_updateID_array": [{
+            "update_id": 873054250,
+            "TG_token": "437876669:AAE4bwnipQZiKdJEO9LndVdAqH76I0__ito",
+            "line_roomID": "U9d16309b78be9a02acf3bcfb06b28df3",
+            "Room_Name": "永格天@李孟哲✅"
+        }, {
+            "update_id": 488717600,
+            "TG_token": "394777564:AAE9M7-e9vq74sfsByMg9RaIBdO4NYYwfQ4",
+            "line_roomID": "C56858d2726373c094e030152171b2e23",
+            "Room_Name": "吃飯團✅"
+        }, {
+            "update_id": 444300614,
+            "TG_token": "437876669:AAE4bwnipQZiKdJEO9LndVdAqH76I0__ito",
+            "line_roomID": "Ua117f5dc6861315c9f7a0184c1ff4154",
+            "Room_Name": "XXA班✅"
+        }]
     }
 
 data = 存放房間資訊
@@ -179,6 +196,12 @@ RoomKeyboard = 房間的keyboard，為節省重生時間而生
 FastMatch = 快速索引用
 
 FastMatch2 = 快速索引用
+
+TG_control_bot_updateID =
+因為現在是多個bot對同一個程式post(獨立房間功能)，所以要知道哪個bot是主控bot(中控台的概念)
+
+TG_bot_updateID_array =
+有連線的bot(獨立房間)
 
 # 版本資訊
   2017/09/28 - V3初次發布!
