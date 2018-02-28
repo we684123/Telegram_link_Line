@@ -161,18 +161,18 @@
         "TG_control_bot_updateID": 610460242,
         "TG_bot_updateID_array": [{
             "update_id": 873054250,
-            "TG_token": "437876669:AAE4bwnipQZiKdJEO9LndVdAqH76I0__ito",
-            "line_roomID": "U9d16309b78be9a02acf3bcfb06b28df3",
+            "TG_token": "437876669:AAE4bwnipQZiKdJEO9LndVdAqH76I0__ito(修過了 不用試了)",
+            "line_roomID": "U9d16309b78be9a02acf3bcfb06b28df3(修過了 不用試了)",
             "Room_Name": "永格天@李孟哲✅"
         }, {
             "update_id": 488717600,
-            "TG_token": "394777564:AAE9M7-e9vq74sfsByMg9RaIBdO4NYYwfQ4",
-            "line_roomID": "C56858d2726373c094e030152171b2e23",
+            "TG_token": "394777564:AAE9M7-e9vq74sfsByMg9RaIBdO4NYYwfQ4"(修過了 不用試了),
+            "line_roomID": "C56858d2726373c094e030152171b2e23(修過了 不用試了)",
             "Room_Name": "吃飯團✅"
         }, {
             "update_id": 444300614,
-            "TG_token": "437876669:AAE4bwnipQZiKdJEO9LndVdAqH76I0__ito",
-            "line_roomID": "Ua117f5dc6861315c9f7a0184c1ff4154",
+            "TG_token": "437876669:AAE4bwnipQZiKdJEO9LndVdAqH76I0__ito(修過了 不用試了)",
+            "line_roomID": "Ua117f5dc6861315c9f7a0184c1ff4154(修過了 不用試了)",
             "Room_Name": "XXA班✅"
         }]
     }
