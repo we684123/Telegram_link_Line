@@ -255,6 +255,10 @@ function doPost(e) {
 
         //doc處理
         ALL.data.splice(number, 1) //刪除目標
+        for(var x=0;x++;x<len(ALL.TG_bot_updateID_array)){
+          if(ALL.TG_bot_updateID_array[x]==aims)
+            ALL.data.splice(x, 1)
+        }
         ALL.mode = 0
         var r = JSON.stringify(ALL);
         doc.setText(r); //重新寫入
