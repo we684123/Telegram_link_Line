@@ -4,7 +4,7 @@ function doPost(e) {
   var success = lock.tryLock(20000);
 
   var base_json = base();
-  var debug = 1; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
+  var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
   //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
   //模擬Line的話記得把要模擬的東西複製到分頁debug中的B2
 
@@ -156,7 +156,9 @@ function doPost(e) {
         var max = p.length - 1;
         var photo_id = p[max].file_id
         TG_Send_Photo_To_Line(Line_id, photo_id)
-        //等等回來補照片消息
+        if (estringa.message.caption) //如有簡介則一同發出
+          TG_Send_text_To_Line(Line_id, estringa.message.caption)
+        
         text = "(圖片已發送!)"
         chkey(TG_token);
         sendtext(text);
@@ -783,6 +785,9 @@ function doPost(e) {
         var photo_id = p[max].file_id
         var Line_id = ALL.opposite.RoomId;
         TG_Send_Photo_To_Line(Line_id, photo_id)
+        if (estringa.message.caption)
+          TG_Send_text_To_Line(Line_id, estringa.message.caption)
+        //如有簡介則一同發出
         text = "(圖片已發送!)"
         sendtext(text);
       } else {
