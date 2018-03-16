@@ -1,16 +1,30 @@
-# 這是測試版，別用!!!
-這是測試版，別用!!!    
-    這是測試版，別用!!!    
-        這是測試版，別用!!!    
-
 # Telegram_link_Line
 >用Telegram來收發Line的訊息。
 >use telegram to Send and receive messages(from Line).
 *****
-舊版的在v1分支，此為針對v2的README。    
+舊版的在v1、v2分支，此為針對v3的README。    
 如果是 Telegram_Bot 新手推薦看完 [這個影片](https://youtu.be/On9yeMtG2Wg)後在來使用。    
 
 如果想要獲取更新之訊，可以加入這個頻道  https://t.me/TG_link_Line
+
+
+
+| 功能 | V1 | V2 | V3 |     
+|-------|:----:|:-----:|:-----:|     
+| 文字      |  ✓ |    ✓     |   ✓  |    
+| 貼圖      |     |            | 僅Line發給TG |      
+| 照片      |     | 僅TG發給Line |    ✓  |       
+| 影片      |     |            |   ✓  |      
+| 錄音      |     |            | 僅Line發給TG |      
+| 位置      |     |            |   ✓  |      
+| 檔案      |     |            | 僅Line發給TG |      
+| 知道誰發言 |     |    ✓      |   ✓  |      
+| 針對回復   |     |           |   ✓  |      
+| 房間分類   |     |    ✓      |   ✓  |      
+| 獨立房間   |     |           |    ✓  |      
+* V2、V3有時會不知道是誰發言是因為對方[版本](https://goo.gl/noYa7L)不夠新。
+
+
 
 # 準備
  ##### 需要使用者申請 Telegram_bot跟Line_bot(Developer Trial)
@@ -18,7 +32,7 @@
  ##### 需有一google帳號並在其中創建：
 
 
-1.  一個doc檔，並將v2中的"doc.gs"內容複製上去。
+1.  一個doc檔，並將v3中的"doc.gs"內容複製上去。
 
 2.  一個sheet檔
     * 在sheet中新增5個分頁(page)：    
@@ -27,7 +41,17 @@
     [說明圖1](http://i.imgur.com/za6Ia6Q.png)、[說明圖2](http://i.imgur.com/rj9vlR3.png)    
 
 
-3.  一個gs檔(google apps script)，並將v2其中的"Telegram_link_Line.gs"的內容複製上去，之後依檔案中3~9行的要求填入資料(註一)。 然成後請如下操作：
+3.  二個gs檔(google apps script)，並將v3其中的"Telegram_link_Line.gs"的內容複製在一開始給你的"程式碼"區內。    
+  ![Imgur](https://i.imgur.com/V3KF0rh.png)
+  複製完後按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱 -> 將"baseANDtest"內容複製上去並填上資訊(註一)__    
+  ![Imgur](https://i.imgur.com/tt2F4cj.png)
+  ----    
+  ![Imgur](https://i.imgur.com/ySQ5jJO.png)
+  ----    
+  ![Imgur](https://i.imgur.com/MvEDdfk.png)
+  ----    
+  ![Imgur](https://i.imgur.com/WgT109q.png)
+  然成後請如下操作：
     * 接下來按下左上角的
     * "發佈" ->
     * "部屬為網路應用程式" ->
@@ -38,9 +62,11 @@
     * 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)
     * 將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)(用來備份整個doc)    
     [說明圖1](http://i.imgur.com/KGXuqhT.png)、[說明圖2](http://i.imgur.com/GWpqmYH.png)、[說明圖3](http://i.imgur.com/tP8HUgR.png)、[說明圖4](http://i.imgur.com/HHs9qOH.png)
-##### Telegram bot 需要新增兩個指令：
+##### Telegram bot 需要新增四個指令：
 
        main - 開啟主選單
+       allread - 全部已讀
+       debug - 重生資料(bot壞掉時用)(不會讓房間不見)
        exit - 離開對話
 
   * 跟 @BotFather 對話  ->    
@@ -49,13 +75,8 @@
   * 在進去 "edit Bot"  ->    
   * "edit commands"  ->    
   * 貼上上方指令並送出  ->    
-  * 完成！
-##### Telegram bot 新增兩個指令(2016/06/25)：
-
-      /allread - 全部已讀
-      /debug - 重生資料(bot壞掉時用)(不會讓房間不見)
-
-  * 這兩個指令推薦新增在"@BotFather 中的編輯bot 的 About內，因為不常用又怕點到，還是要丟到指令中也可，隨意。
+  * 完成！    
+  ps' /allread、/debug這兩個指令也可以移到bot的About裡面     
 ----
 - 註一
 
@@ -80,7 +101,7 @@
 
   Telegram用     
   ```html
-  "https://api.telegram.org/bot<token>/setWebhook?url=https://XXX"
+  "https://api.telegram.org/bot<token>/setWebhook?url=<https://XXX>&max_connections=1"
   ```    
   (這個格式("&lt;token&gt;"改成你的bot token 跟 "url="後面接gs專案網址 ))    
   (設定Webhook的方式就是將你改好的網址丟到任一瀏覽器上，並按Enter送出)
@@ -95,7 +116,11 @@
     現在Line伺服器在群組中有時會發userID(須對方line app更新)    
     所以有些知道是誰說的，有些不知道，我現在也很困擾。
 # Screenshot
-![Imgur](http://i.imgur.com/n9vBs6V.png)
+![Imgur](https://i.imgur.com/n9vBs6V.png)
+----
+![Imgur](https://i.imgur.com/FDVa131.png)
+----
+![Imgur](https://i.imgur.com/vlcHMHT.png)
 
 # doc的json說明
 
@@ -132,7 +157,24 @@
         },
         "FastMatch2": {
             "zzz": 0
-        }
+        },
+        "TG_control_bot_updateID": 610460242,
+        "TG_bot_updateID_array": [{
+            "update_id": 873054250,
+            "TG_token": "437876669:AAE4bwnipQZiKdJEO9LndVdAqH76I0__ito(修過了 不用試了)",
+            "line_roomID": "U9d16309b78be9a02acf3bcfb06b28df3(修過了 不用試了)",
+            "Room_Name": "永格天@李孟哲✅"
+        }, {
+            "update_id": 488717600,
+            "TG_token": "394777564:AAE9M7-e9vq74sfsByMg9RaIBdO4NYYwfQ4"(修過了 不用試了),
+            "line_roomID": "C56858d2726373c094e030152171b2e23(修過了 不用試了)",
+            "Room_Name": "吃飯團✅"
+        }, {
+            "update_id": 444300614,
+            "TG_token": "437876669:AAE4bwnipQZiKdJEO9LndVdAqH76I0__ito(修過了 不用試了)",
+            "line_roomID": "Ua117f5dc6861315c9f7a0184c1ff4154(修過了 不用試了)",
+            "Room_Name": "XXA班✅"
+        }]
     }
 
 data = 存放房間資訊
@@ -155,63 +197,14 @@ FastMatch = 快速索引用
 
 FastMatch2 = 快速索引用
 
+TG_control_bot_updateID =
+因為現在是多個bot對同一個程式post(獨立房間功能)，所以要知道哪個bot是主控bot(中控台的概念)
+
+TG_bot_updateID_array =
+有連線的bot(獨立房間)
+
 # 版本資訊
-  2017/09/21 -     
-  修正生及時出不去的問題(180)    
-  增加一些防呆(829~838)    
-  In() 這個函式增加資料    
-  chid() 改 chkey() 這個bug有點久，以前到底是怎麼跑得動的????    
-  start(payload) 改良    
-  現在突然不行用升級後的房間發話了
+  2017/09/28 - V3初次發布!
 
-  2017/09/01 - 現在將bot加入Telegram群組將不會有反應。
-  2017/08/17 -     
-  將base跟測試用的TTTTTTTT移到另一個gs文件，安全美觀。    
-  allread 功能現在能把從Line下載過的相片影片...等丟到垃圾桶，**能用來在程式速度變慢時清理垃圾用!!!**    
-
-  2017/08/15 - 預計之後能用"專屬房間"。    
-  2017/07/30 -     
-  現在開始能知道群組中是誰發言了!!!    
-  如果不行那是對方客戶端版本不夠新或未同意條款([詳情按此](https://goo.gl/noYa7L))    
-  能從Telegram發送圖片至Line。    
-
-  2017/06/30 - debug    
-
-  2017/06/29 -     
-  現在如果對方私訊你的bot你也能知道對方是誰了。    
-  群組中你可以知道是誰的發言了(有些不行但我也沒辦法QQ)。    
-  順便做了一個跟你說你的id的bot @you_id_bot    
-
-  2017/06/25 - 一頭拉苦的up(+爆肝)    
-  完成 "對應Line更新的修正"、"快速切換房間"、"刪除聊天室"、"重生資料"、"全部已讀"、"重新整理"。    
-
-  2017/06/20 - 改進函式呼叫方式、修正重新命名的bug    
-  ~~修正因為Line更新而導致的bug~~ (2017/06/25)
-  2017/06/01 - 更新說明文件    
-  待做功能增加：    
-  - ~~顯示自己ID~~  (將另做一個機器人取代，不要耗這裡的效能)      
-  - ~~快速讀取訊息功能~~
-
-  2017/05/22 - 簡化UI(最近都在忙證照，都沒時間更新(汗.. )        
-
-  2017/04/13 - 加入自動修正doc.json崩潰
-  * * *
-  2017/04/08 - 初步發佈最基本款(收發訊息)
-  (整體通知功能暫時沒用因為telegram已經有了，所以猶豫中)
-
-  待做功能：
-
-  - 自動依時間編排房間位置
-  - ~~刪除聊天室~~ (2017/06/25完成)
-  - ~~重生資料(有bug時緊急排除)~~ (2017/06/25完成)
-  - 傳送照片、聲音、影片、位置...等
-
-  ~~待排除bug：~~ (2017/04/13修復)
-
-  - doc的資料不穩定，Telegram端同時傳兩個指令有機率塞入兩次"data"，此時需手動排除。因此請盡量等他給予回應後再傳下一個指令。
-#Require
-    - python3.x
-    - youtube_dl
-    - gdrive
 # Author
 永格天
