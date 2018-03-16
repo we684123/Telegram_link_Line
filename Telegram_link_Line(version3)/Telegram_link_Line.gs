@@ -857,6 +857,16 @@ function doPost(e) {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
         sendtext(text);
       }
+    } else if (estringa.message.document) {
+      if (mode == "🚀 發送訊息") {
+        text = "(暫時不支援document傳送喔!)"
+        //var duration = estringa.message.voice.duration
+        //TG_Send_audio_To_Line(Line_id, audio_id, duration)
+        sendtext(text, notification);
+      } else {
+        text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        sendtext(text);
+      }
     }
 
     //=====================================================================================================
