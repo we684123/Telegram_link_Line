@@ -158,7 +158,7 @@ function doPost(e) {
         TG_Send_Photo_To_Line(Line_id, photo_id)
         if (estringa.message.caption) //如有簡介則一同發出
           TG_Send_text_To_Line(Line_id, estringa.message.caption)
-        
+
         text = "(圖片已發送!)"
         chkey(TG_token);
         sendtext(text);
@@ -846,7 +846,11 @@ function doPost(e) {
         var t2 = JSON.parse(t)
         var t3 = JSON.stringify(t2.results)
         var t4 = JSON.parse(t3) //這麼多t我也很無奈...
-        var formatted_address = t4[0]["formatted_address"]
+        try {
+          var formatted_address = t4[0]["formatted_address"]
+        } catch (e) {
+          var formatted_address = "未找到地點"
+        }
         //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
         TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
       } else {
