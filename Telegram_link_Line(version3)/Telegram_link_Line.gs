@@ -1,10 +1,10 @@
 function doPost(e) {
-  // Get a script lock, because we're about to modify a shared resource.
-  //var lock = LockService.getScriptLock();
-  // Wait for up to 30 seconds for other processes to finish.
-  //lock.waitLock(30000);
+  //嘗試lock
+  var lock = LockService.getScriptLock();
+  var success = lock.tryLock(20000);
+
   var base_json = base();
-  var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
+  var debug = 1; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
   //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
   //模擬Line的話記得把要模擬的東西複製到分頁debug中的B2
 
@@ -68,8 +68,10 @@ function doPost(e) {
     var Stext = estringa.message.text; //前期準備完成
 
     //以下檢查是否為群組================================================================
-    if (estringa.message.chat.id < 0)
+    if (estringa.message.chat.id < 0){
+      lock.releaseLock();
       return 0;//是的話就不要浪費資源 直接結束
+    }
     //所有人檢查==================================================================
     if (Telegram_id != estringa.message.chat.id) { //如果不是 發一段話即結束
       var text = "您好!這是私人用的bot，不對他人開放\
@@ -85,6 +87,7 @@ function doPost(e) {
         "payload": payload
       }
       UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
+      lock.releaseLock();
       return 0;
     }
     //來源bot檢查==================================================================
@@ -153,7 +156,7 @@ function doPost(e) {
         var max = p.length - 1;
         var photo_id = p[max].file_id
         TG_Send_Photo_To_Line(Line_id, photo_id)
-
+        //等等回來補照片消息
         text = "(圖片已發送!)"
         chkey(TG_token);
         sendtext(text);
@@ -194,6 +197,7 @@ function doPost(e) {
         //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
         TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
       }
+      lock.releaseLock();
       return 0;
     }
     //============================================================================
@@ -203,6 +207,7 @@ function doPost(e) {
         if (In(Stext) || Stext.substr(0, 2) == "/d") {
           text = "請先按下 /exit 離開後再下指令喔!"
           sendtext(text);
+          lock.releaseLock();
           return 0;
         }
         try {
@@ -1149,7 +1154,7 @@ function doPost(e) {
   } else {
     GmailApp.sendEmail("email", "telegram-line出事啦", d + "\n" + ee);
   }
-  //lock.releaseLock();
+  lock.releaseLock();
 }
 
 //以下各類函式支援
@@ -1797,6 +1802,7 @@ function start(payload) {
     "method": "post",
     "payload": payload
   }
+  //Logger.log("ZZZZ = ",payload)
   UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
   /*/  為了速度和穩定 不必要就算了
   var sheet_key = base_json.sheet_key
