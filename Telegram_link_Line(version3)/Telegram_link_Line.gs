@@ -939,7 +939,7 @@ function doPost(e) {
       message_json.type = "video"
       downloadFromLine(cutMessage.id)
       message_json.DURL = getGdriveFileDownloadURL()
-    } else if (cutMessage.type == "file") { //Line現在居然不能傳送文件 這應該沒用了(?
+    } else if (cutMessage.type == "file") { //文件
       message_json.type = "file"
       downloadFromLine(cutMessage.id)
       message_json.DURL = getGdriveFileDownloadURL()
@@ -1013,7 +1013,7 @@ function doPost(e) {
             //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
           } else if (message_json.type == "file") {
             var url = message_json.DURL + "\n\n來自:  " + message_json.userName
-            sendtext(text);
+            sendtext(url);
             //senddocument(url)
           }
         } catch (e) {
@@ -1085,7 +1085,7 @@ function doPost(e) {
         } else if (message_json.type == "file") {
           var url = message_json.DURL + "\n\n來自:  " + message_json.userName
           var notification = true
-          sendtext(text, notification);
+          sendtext(url, notification);
           //senddocument(url)
         }
       } else {
@@ -1693,6 +1693,34 @@ function ch_Name_and_Description() {
       var getSeconds = d.getSeconds(); // 17 秒
       var getMilliseconds = d.getMilliseconds(); // 234 毫秒
       file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds + ".mp3")
+      file.setDescription(d.getTime());
+      //Logger.log("NNNNNNN = ", file.getName())
+      break;
+    }
+    if (file.getName() == 'content.pdf') {
+      var d = new Date();
+      var getFullYear = d.getFullYear(); // 2016 年
+      var getMonth = d.getMonth(); // 12 月
+      var getDate = d.getDate(); // 22 日(號)
+      var getHours = d.getHours(); // 16 時(0~23.0)
+      var getMinutes = d.getMinutes(); // 29 分
+      var getSeconds = d.getSeconds(); // 17 秒
+      var getMilliseconds = d.getMilliseconds(); // 234 毫秒
+      file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds + ".pdf")
+      file.setDescription(d.getTime());
+      //Logger.log("NNNNNNN = ", file.getName())
+      break;
+    }
+    if (file.getName() == 'content.doc') {
+      var d = new Date();
+      var getFullYear = d.getFullYear(); // 2016 年
+      var getMonth = d.getMonth(); // 12 月
+      var getDate = d.getDate(); // 22 日(號)
+      var getHours = d.getHours(); // 16 時(0~23.0)
+      var getMinutes = d.getMinutes(); // 29 分
+      var getSeconds = d.getSeconds(); // 17 秒
+      var getMilliseconds = d.getMilliseconds(); // 234 毫秒
+      file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds + ".doc")
       file.setDescription(d.getTime());
       //Logger.log("NNNNNNN = ", file.getName())
       break;
