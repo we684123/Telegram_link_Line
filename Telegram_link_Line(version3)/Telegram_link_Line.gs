@@ -68,9 +68,9 @@ function doPost(e) {
     var Stext = estringa.message.text; //前期準備完成
 
     //以下檢查是否為群組================================================================
-    if (estringa.message.chat.id < 0){
+    if (estringa.message.chat.id < 0) {
       lock.releaseLock();
-      return 0;//是的話就不要浪費資源 直接結束
+      return 0; //是的話就不要浪費資源 直接結束
     }
     //所有人檢查==================================================================
     if (Telegram_id != estringa.message.chat.id) { //如果不是 發一段話即結束
@@ -262,8 +262,8 @@ function doPost(e) {
 
         //doc處理
         ALL.data.splice(number, 1) //刪除目標
-        for(var x=0;x++;x<len(ALL.TG_bot_updateID_array)){
-          if(ALL.TG_bot_updateID_array[x]==aims)
+        for (var x = 0; x++; x < len(ALL.TG_bot_updateID_array)) {
+          if (ALL.TG_bot_updateID_array[x] == aims)
             ALL.data.splice(x, 1)
         }
         ALL.mode = 0
@@ -655,7 +655,7 @@ function doPost(e) {
             break;
           case '/debug':
             var xfjhxgfh = REST_FastMatch1and2(); //強制等待，不知道為什麼有時候不會執行
-            var ydjdyf = REST_keyboard();  //強制等待，不知道為什麼有時候不會執行
+            var ydjdyf = REST_keyboard(); //強制等待，不知道為什麼有時候不會執行
             //還有sheet那邊的訊息區處理還未 (Amount)
             ALL.mode = 0
             var r = JSON.stringify(ALL);
@@ -1239,7 +1239,7 @@ function keyboard_main(text, doc_key) {
   ReplyKeyboardMakeup(keyboard_main, resize_keyboard, one_time_keyboard, text)
 }
 //=================================================================================
-function In(name) {//防止與命令衝突的命名
+function In(name) { //防止與命令衝突的命名
   var arr = ["/main", "🔙 返回房間", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言",
     "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃  重新整理", "🔥 刪除房間", "/delete", "/debug",
     "/AllRead", "/allread", "Allread", "allRead", "⭐️ 升級房間", "💫 降級房間", "/uproom", "droproom"
@@ -1661,6 +1661,11 @@ function downloadFromLine(linkId) {
   ch_Name_and_Description()
 }
 //=================================================================================
+function get_extension(filename, reciprocal) {
+  var extension = filename.split(".")[reciprocal]
+  return extension
+}
+//=================================================================================
 function ch_Name_and_Description() {
   var base_json = base()
   var FolderId = base_json.FolderId
@@ -1669,20 +1674,6 @@ function ch_Name_and_Description() {
 
   while (files.hasNext()) {
     var file = files.next();
-    if (file.getName() == 'content.jpg' || file.getName() == 'content.mp4') {
-      var d = new Date();
-      var getFullYear = d.getFullYear(); // 2016 年
-      var getMonth = d.getMonth(); // 12 月
-      var getDate = d.getDate(); // 22 日(號)
-      var getHours = d.getHours(); // 16 時(0~23.0)
-      var getMinutes = d.getMinutes(); // 29 分
-      var getSeconds = d.getSeconds(); // 17 秒
-      var getMilliseconds = d.getMilliseconds(); // 234 毫秒
-      file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds)
-      file.setDescription(d.getTime());
-      //Logger.log("NNNNNNN = ", file.getName())
-      break;
-    }
     if (file.getName() == 'content') {
       var d = new Date();
       var getFullYear = d.getFullYear(); // 2016 年
@@ -1696,8 +1687,7 @@ function ch_Name_and_Description() {
       file.setDescription(d.getTime());
       //Logger.log("NNNNNNN = ", file.getName())
       break;
-    }
-    if (file.getName() == 'content.pdf') {
+    } else if (get_extension(file.getName(), 0) == 'content') {
       var d = new Date();
       var getFullYear = d.getFullYear(); // 2016 年
       var getMonth = d.getMonth(); // 12 月
@@ -1706,25 +1696,13 @@ function ch_Name_and_Description() {
       var getMinutes = d.getMinutes(); // 29 分
       var getSeconds = d.getSeconds(); // 17 秒
       var getMilliseconds = d.getMilliseconds(); // 234 毫秒
-      file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds + ".pdf")
+      file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds)
       file.setDescription(d.getTime());
       //Logger.log("NNNNNNN = ", file.getName())
       break;
     }
-    if (file.getName() == 'content.doc') {
-      var d = new Date();
-      var getFullYear = d.getFullYear(); // 2016 年
-      var getMonth = d.getMonth(); // 12 月
-      var getDate = d.getDate(); // 22 日(號)
-      var getHours = d.getHours(); // 16 時(0~23.0)
-      var getMinutes = d.getMinutes(); // 29 分
-      var getSeconds = d.getSeconds(); // 17 秒
-      var getMilliseconds = d.getMilliseconds(); // 234 毫秒
-      file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds + ".doc")
-      file.setDescription(d.getTime());
-      //Logger.log("NNNNNNN = ", file.getName())
-      break;
-    }
+    //Logger.log("NNNNNNN = ", file.getName())
+    //Logger.log("NNNNNNN222 = ", get_extension(file.getName(), 0))
   }
 }
 //=================================================================================
