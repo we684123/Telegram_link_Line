@@ -1,7 +1,7 @@
 function doPost(e) {
   //嘗試lock
   var lock = LockService.getScriptLock();
-  var success = lock.tryLock(20000);
+  var success = lock.tryLock(1200000);
 
   var base_json = base();
   var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
@@ -255,7 +255,7 @@ function doPost(e) {
           keyboard_main(text, doc_key)
         }
         //================================================================
-      } else if (mode == "🔥 刪除房間" & Stext == "/delete") {
+      } else if (mode == "🔥 刪除房間" && Stext == "/delete") {
         REST_FastMatch1and2();
         var aims = ALL.opposite.RoomId
         var number = ALL.FastMatch2[aims]
@@ -281,7 +281,7 @@ function doPost(e) {
         text = "已刪除此聊天室";
         keyboard_main(text, doc_key)
         return 0;
-      } else if (mode == "⭐ 升級房間" & Stext == "/uproom") {
+      } else if (mode == "⭐ 升級房間" && Stext == "/uproom") {
         ALL.mode = "/uproom"
         var r = JSON.stringify(ALL);
         doc.setText(r); //寫入
@@ -386,7 +386,7 @@ function doPost(e) {
           text = "請至__新機器人聊天室__!!!那任意輸入文字以進行綁定。\n不是這裡喔!"
           sendtext(text);
         }
-      } else if (mode == "💫 降級房間" & Stext == "/droproom") {
+      } else if (mode == "💫 降級房間" && Stext == "/droproom") {
         var aims = ALL.opposite.RoomId
         var number = ALL.FastMatch2[aims]
         var D_token = ALL.data[number].botToken
@@ -424,6 +424,52 @@ function doPost(e) {
 
         text = "已降級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
         keyboard_main(text, doc_key)
+      } else if (mode == "📎 新增關鍵字" && Stext != "/main") {
+        try {
+          var addwkey = Stext
+          var tt = addwkey.replace('，', ',')
+          var addwkey_array = tt.split(',')
+
+          for (var i = 0; i < addwkey_array.length; i++) {
+            ALL.keyword.push(addwkey_array[i])
+          } //新增關鍵字
+          All.mode = 0
+          var r = JSON.stringify(ALL);
+          doc.setText(r); //寫入
+
+          text = "已成功新增"
+          var notification = true
+        } catch (e) {
+          text = "新增失敗，原因如下：\n" + string(e)
+          var notification = false
+        }
+        sendtext(text, notification);
+      } else if (mode == "♻ 移除關鍵字" && Stext != "/main") {
+        try {
+          var addwkey = Stext
+          var tt = addwkey.replace('，', ',')
+          var addwkey_array = tt.split(',')
+
+          for (var i = 0; i < addwkey_array.length; i++) {
+            delete ALL.keyword[(parseInt(addwkey_array[i]) - 1)]
+          } //移除關鍵字
+          All.mode = 0
+          var r = JSON.stringify(ALL);
+          doc.setText(r); //寫入
+
+          text = "已成功移除"
+          var notification = true
+        } catch (e) {
+          text1 = "移除失敗，如遇重新移除請先再次看過關鍵字名單再操作\n"
+          text2 = "按下 /lookkeyword 可顯示名單\n"
+          text2 = "移除失敗原因如下：\n" + string(e)
+          var notification = false
+        }
+        sendtext(text, notification);
+      } else if ((mode == "♻ 移除關鍵字" || mode == "📎 新增關鍵字") && Stext == "/lookkeyword") {
+        text = get_all_keyword(ALL)
+        var notification = true
+        sendtext(text, notification);
       } else {
         //以下指令分流
         switch (Stext) {
@@ -669,6 +715,79 @@ function doPost(e) {
           case '/allread':
             AllRead();
             text = "已全已讀"
+            var notification = true
+            sendtext(text, notification);
+            break;
+          case '🔑設定關鍵字提醒':
+            if (ALL.keyword_notice == undefined) { //這一次啟動時的重製
+              ALL.keyword_notice = false
+              var r = JSON.stringify(ALL);
+              doc.setText(r); //寫入
+              text = "提醒您，如要啟用關鍵字提醒，請記得按下方按鈕開啟！\n預設為'關閉提醒'"
+              var notification = true
+              sendtext(text, notification);
+            }
+
+            var keyword_keyboard1 = [
+              [{
+                'text': '📎 新增關鍵字'
+              }, {
+                'text': "♻ 移除關鍵字"
+              }],
+              [{
+                'text': "暫停關鍵字提醒"
+              }, {
+                'text': "🔙 返回房間"
+              }]
+            ]
+            var keyword_keyboard2 = [
+              [{
+                'text': '📎 新增關鍵字'
+              }, {
+                'text': "♻ 移除關鍵字"
+              }],
+              [{
+                'text': "啟動關鍵字提醒"
+              }, {
+                'text': "🔙 返回房間"
+              }]
+            ]
+            if (ALL.keyword_notice) {
+              var keyword_keyboard = keyword_keyboard1
+            } else {
+              var keyword_keyboard = keyword_keyboard2
+            }
+
+            var all_word = get_all_keyword(ALL)
+            var resize_keyboard = true
+            var one_time_keyboard = false
+            ReplyKeyboardMakeup(keyword_keyboard, resize_keyboard, one_time_keyboard, all_word)
+            break;
+          case '📎 新增關鍵字':
+            ALL.mode = "📎 新增關鍵字"
+            text = "請輸入欲新增關鍵字\n如遇新增多組關鍵字請用','或'，'號隔開\n 如遇離開請按 /main"
+            ReplyKeyboardRemove(text)
+            break;
+            //ALL.keyword.push()
+          case '♻ 移除關鍵字':
+            ALL.mode = "♻ 移除關鍵字"
+            AllRead();
+            text = "請輸入欲移除關鍵字的前方編號\n如欲刪除多組關鍵字請用','或'，'號隔開\n 如遇離開請按 /main"
+            ReplyKeyboardRemove(text)
+            break;
+          case '啟動關鍵字提醒':
+            ALL.keyword_notice = true
+            var r = JSON.stringify(ALL);
+            doc.setText(r); //寫入
+            text = "已啟用關鍵字提醒!"
+            var notification = true
+            sendtext(text, notification);
+            break;
+          case '暫停關鍵字提醒':
+            ALL.keyword_notice = false
+            var r = JSON.stringify(ALL);
+            doc.setText(r); //寫入
+            text = "已暫停關鍵字提醒!"
             var notification = true
             sendtext(text, notification);
             break;
@@ -1664,6 +1783,14 @@ function downloadFromLine(linkId) {
 function get_extension(filename, reciprocal) {
   var extension = filename.split(".")[reciprocal]
   return extension
+}
+//=================================================================================
+function get_all_keyword(ALL) {
+  var all_word = ''
+  for (var i = 0; i < ALL.keyword.length; i++) {
+    all_word = all_word + (i + 1) + '. "' + ALL.keyword[i] + '"\n'
+  }
+  return all_word
 }
 //=================================================================================
 function ch_Name_and_Description() {
