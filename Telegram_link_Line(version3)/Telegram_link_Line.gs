@@ -460,9 +460,10 @@ function doPost(e) {
           text = "已成功移除"
           var notification = true
         } catch (e) {
-          text1 = "移除失敗，如遇重新移除請先再次看過關鍵字名單再操作\n"
-          text2 = "按下 /lookkeyword 可顯示名單\n"
-          text2 = "移除失敗原因如下：\n" + string(e)
+          var text1 = "移除失敗，如遇重新移除請先再次看過關鍵字名單再操作\n"
+          var text2 = "按下 /lookkeyword 可顯示名單\n"
+          var text3 = "移除失敗原因如下：\n" + string(e)
+          text = text1 + text2 + text3
           var notification = false
         }
         sendtext(text, notification);
@@ -717,6 +718,23 @@ function doPost(e) {
             text = "已全已讀"
             var notification = true
             sendtext(text, notification);
+            break;
+          case '🔧 更多設定':
+            more_keyboard = [
+              [{
+                'text': "🔑設定關鍵字提醒"
+              }, {
+                'text': '訊息時間啟用?'
+              }],
+              [{
+                'text': "🔙 返回房間"
+              }]
+            ]
+
+            var text1 = '設定狀態：\n'
+            var text2 = ' ● 關鍵字提醒：' + ALL.keyword_notice + '\n'
+            var text3 = ' ● 訊息時間啟用：' + ALL.massage_time + '\n'
+            text = text1 + text2 + text3
             break;
           case '🔑設定關鍵字提醒':
             if (ALL.keyword_notice == undefined) { //這一次啟動時的重製
@@ -1418,6 +1436,8 @@ function REST_keyboard() {
 
   keyboard.splice(0, 0, [{
     'text': "🔃  重新整理"
+  }, {
+    'text': '🔧 更多設定'
   }, {
     'text': "🔭 訊息狀態"
   }]) //加入返回鍵
