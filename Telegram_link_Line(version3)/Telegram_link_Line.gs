@@ -471,11 +471,42 @@ function doPost(e) {
         text = get_all_keyword(ALL)
         var notification = true
         sendtext(text, notification);
+      } else if (mode == "⏰訊息時間啟用?") {
+        function mixT() {
+          text = "已成功 " + Stext + " 訊息時間啟用!"
+          sendtext(text, notification);
+        }
+        if (Stext == "開啟") {
+          ALL.massage_time = true
+          ALL.mode = 0
+          if (var e = write_ALL(ALL, doc)) {
+            mixT()
+          } else {
+            var text = "寫入失敗，詳情如下："
+            sendtext(e, notification);
+          }
+
+        } else if (Stext == "關閉") {
+          ALL.massage_time = false
+          ALL.mode = 0
+          if (var e = write_ALL(ALL, doc)) {
+            mixT()
+          } else {
+            var text = "寫入失敗，詳情如下："
+            sendtext(e, notification);
+          }
+        }
+
       } else {
         //以下指令分流
         switch (Stext) {
           case '/main':
           case '🔃  重新整理':
+            if (ALL.mode != 0) {
+              ALL.mode = 0
+              var r = JSON.stringify(ALL);
+              doc.setText(r); //寫入
+            }
             var text = "🔮 開啟主選單"
             keyboard_main(text, doc_key)
             break;
@@ -720,21 +751,52 @@ function doPost(e) {
             sendtext(text, notification);
             break;
           case '🔧 更多設定':
-            more_keyboard = [
+            var more_keyboard = [
               [{
                 'text': "🔑設定關鍵字提醒"
               }, {
-                'text': '訊息時間啟用?'
+                'text': '⏰訊息時間啟用?'
               }],
               [{
                 'text': "🔙 返回房間"
               }]
             ]
-
+            if (ALL.keyword_notice == undefined) {
+              ALL.keyword_notice = false
+              var istrue = true
+            }
+            if (ALL.massage_time == undefined) {
+              ALL.massage_time = false
+              var istrue = true
+            }
+            if (istrue) {
+              var r = JSON.stringify(ALL);
+              doc.setText(r); //寫入
+            }
             var text1 = '設定狀態：\n'
             var text2 = ' ● 關鍵字提醒：' + ALL.keyword_notice + '\n'
             var text3 = ' ● 訊息時間啟用：' + ALL.massage_time + '\n'
             text = text1 + text2 + text3
+            var resize_keyboard = true
+            var one_time_keyboard = false
+            ReplyKeyboardMakeup(more_keyboard, resize_keyboard, one_time_keyboard, text)
+            break;
+          case '⏰訊息時間啟用?':
+            ALL.mode = "⏰訊息時間啟用?"
+            var r = JSON.stringify(ALL);
+            doc.setText(r); //寫入
+
+            var massage_time_q_keyboard = [
+              [{
+                'text': "開啟"
+              }, {
+                'text': "關閉"
+              }]
+            ]
+            text = "請選擇開啟或關閉"
+            var resize_keyboard = true
+            var one_time_keyboard = false
+            ReplyKeyboardMakeup(massage_time_q_keyboard, resize_keyboard, one_time_keyboard, text)
             break;
           case '🔑設定關鍵字提醒':
             if (ALL.keyword_notice == undefined) { //這一次啟動時的重製
@@ -1869,6 +1931,8 @@ function CP() {
 }
 //=================================================================================
 function sendtext(text, notification) {
+  if (notification == undefined)
+    notification = false
   var payload = {
     "method": "sendMessage",
     'chat_id': "Telegram_id",
@@ -1879,6 +1943,8 @@ function sendtext(text, notification) {
 }
 //=================================================================
 function sendPhoto(url, notification, caption) {
+  if (notification == undefined)
+    notification = false
   caption = caption || ""
   var payload = {
     "method": "sendPhoto",
@@ -1891,6 +1957,8 @@ function sendPhoto(url, notification, caption) {
 }
 //=================================================================================
 function sendAudio(url, notification, caption) {
+  if (notification == undefined)
+    notification = false
   caption = caption || ""
   var payload = {
     "method": "sendAudio",
@@ -1903,6 +1971,8 @@ function sendAudio(url, notification, caption) {
 }
 //=================================================================
 function sendVoice(url, notification, caption) {
+  if (notification == undefined)
+    notification = false
   caption = caption || ""
   var payload = {
     "method": "sendVoice",
@@ -1915,6 +1985,8 @@ function sendVoice(url, notification, caption) {
 }
 //=================================================================
 function senddocument(url, notification, caption) {
+  if (notification == undefined)
+    notification = false
   caption = caption || ""
   var payload = {
     "method": "senddocument",
@@ -1927,6 +1999,8 @@ function senddocument(url, notification, caption) {
 }
 //=================================================================
 function sendLocation(latitude, longitude, notification) {
+  if (notification == undefined)
+    notification = false
   var payload = {
     "method": "sendLocation",
     "chat_id": "",
@@ -1956,7 +2030,16 @@ function chkey(number) {
     SheetD.getRange(3, 2).setValue("") //清空
     return id
   }
-
+}
+//=================================================================================
+function write_ALL(ALL, doc) {
+  try {
+    var r = JSON.stringify(ALL);
+    doc.setText(r); //寫入
+  } catch (e) {
+    return e
+  }
+  return true
 }
 //=================================================================================
 function start(payload) {
