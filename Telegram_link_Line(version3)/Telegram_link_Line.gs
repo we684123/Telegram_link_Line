@@ -423,53 +423,71 @@ function doPost(e) {
 
         text = "已降級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
         keyboard_main(text, doc_key)
-      } else if (mode == "📎 新增關鍵字" && Stext != "/main") {
-        try {
-          var addwkey = Stext
-          var tt = addwkey.replace('，', ',')
-          var addwkey_array = tt.split(',')
-
-          for (var i = 0; i < addwkey_array.length; i++) {
-            ALL.keyword.push(addwkey_array[i])
-          } //新增關鍵字
-          All.mode = 0
-          var r = JSON.stringify(ALL);
-          doc.setText(r); //寫入
-
-          text = "已成功新增"
-          var notification = true
-        } catch (e) {
-          text = "新增失敗，原因如下：\n" + string(e)
-          var notification = false
-        }
-        sendtext(text, notification);
-      } else if (mode == "♻ 移除關鍵字" && Stext != "/main") {
-        try {
-          var addwkey = Stext
-          var tt = addwkey.replace('，', ',')
-          var addwkey_array = tt.split(',')
-
-          for (var i = 0; i < addwkey_array.length; i++) {
-            delete ALL.keyword[(parseInt(addwkey_array[i]) - 1)]
-          } //移除關鍵字
-          All.mode = 0
-          var r = JSON.stringify(ALL);
-          doc.setText(r); //寫入
-
-          text = "已成功移除"
-          var notification = true
-        } catch (e) {
-          var text1 = "移除失敗，如遇重新移除請先再次看過關鍵字名單再操作\n"
-          var text2 = "按下 /lookkeyword 可顯示名單\n"
-          var text3 = "移除失敗原因如下：\n" + string(e)
-          text = text1 + text2 + text3
-          var notification = false
-        }
-        sendtext(text, notification);
       } else if ((mode == "♻ 移除關鍵字" || mode == "📎 新增關鍵字") && Stext == "/lookkeyword") {
         text = get_all_keyword(ALL)
         var notification = true
         sendtext(text, notification);
+      } else if (mode == "📎 新增關鍵字" && Stext != "/main") {
+        try {
+          var addwkey = String(Stext)
+          var tt = addwkey.replace(/，/g, ',')
+          var addwkey_array = tt.split(',')
+
+          if (addwkey.search(",") == -1 && addwkey.search("，") == -1) {
+            ALL.keyword.push(addwkey)
+          } else {
+            for (var i = 0; i < addwkey_array.length; i++) {
+              ALL.keyword.push(addwkey_array[i])
+            } //新增關鍵字
+          }
+
+          write_ALL(ALL, doc)
+          var li = get_all_keyword(ALL)
+          text = "已成功新增\n\n" + li + "\n\n如遇離開請按 /main\n或者繼續輸入新增"
+          var notification = true
+          sendtext(text, notification);
+        } catch (e) {
+          text = "新增失敗，原因如下：\n" + String(e)
+          var notification = false
+          sendtext(text, notification);
+          return 0
+        }
+      } else if (mode == "♻ 移除關鍵字" && Stext != "/main") {
+        try { //移除關鍵字
+          var rmwkey = String(Stext)
+          if (rmwkey.search(",") == -1 && rmwkey.search("，") == -1) {
+            var index = parseInt(rmwkey) - 1
+            ALL.keyword.splice(index, 1)
+          } else {
+            var tt = rmwkey.replace(/，/g, ',')
+            var rmwkey_array = tt.split(',')
+            rmwkey_array.sort(function(a, b) {
+              return b - a;
+            })
+            Logger.log("TTTT111 = ",rmwkey_array)
+            for (var i = 0; i < rmwkey_array.length; i++) {
+              Logger.log("TTTEEEE = ",i)
+              var index = parseInt(rmwkey_array[i]) - 1
+              Logger.log("TTTindex = ",index)
+              ALL.keyword.splice(index, 1)
+              Logger.log("TTTT222 = ",ALL.keyword)
+            }
+          }
+
+          write_ALL(ALL, doc)
+          var li = get_all_keyword(ALL)
+          text = "已成功移除\n\n" + li + "\n\n如遇離開請按 /main\n或者繼續輸入移除"
+          var notification = true
+          sendtext(text, notification);
+        } catch (e) {
+          var text1 = "移除失敗，如遇重新移除請先再次看過關鍵字名單再操作\n"
+          var text2 = "按下 /lookkeyword 可顯示名單\n"
+          var text3 = "移除失敗原因如下：\n" + String(e)
+          text = text1 + text2 + text3
+          var notification = false
+          sendtext(text, notification);
+          return 0
+        }
       } else if (mode == "⏰訊息時間啟用?") {
         function mixT() {
           text = "已成功 " + Stext + " 訊息時間啟用!"
@@ -879,32 +897,63 @@ function doPost(e) {
             break;
           case '📎 新增關鍵字':
             ALL.mode = "📎 新增關鍵字"
-            text = "請輸入欲新增關鍵字\n如遇新增多組關鍵字請用','或'，'號隔開\n 如遇離開請按 /main"
+            text = "請輸入欲新增關鍵字\n新增多組關鍵字請用','或'，'號隔開\n如遇離開請按 /main"
             ReplyKeyboardRemove(text)
+            write_ALL(ALL, doc)
             break;
-            //ALL.keyword.push()
           case '♻ 移除關鍵字':
             ALL.mode = "♻ 移除關鍵字"
             AllRead();
-            text = "請輸入欲移除關鍵字的前方編號\n如欲刪除多組關鍵字請用','或'，'號隔開\n 如遇離開請按 /main"
-            ReplyKeyboardRemove(text)
+            text = "請輸入欲移除關鍵字的**前方編號!!!**\n刪除多組關鍵字請用','或'，'號隔開\n如遇離開請按 /main"
+            ReplyKeyboardRemove(text,"Markdown")
+            write_ALL(ALL, doc)
             break;
           case '啟動關鍵字提醒':
             ALL.keyword_notice = true
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
             text = "已啟用關鍵字提醒!"
-            var notification = true
-            sendtext(text, notification);
+            var keyboard = [
+              [{
+                'text': '📎 新增關鍵字'
+              }, {
+                'text': "♻ 移除關鍵字"
+              }],
+              [{
+                'text': "暫停關鍵字提醒"
+              }, {
+                'text': "🔙 返回房間"
+              }]
+            ]
+            var resize_keyboard = true
+            var one_time_keyboard = false
+            ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, text)
             break;
           case '暫停關鍵字提醒':
             ALL.keyword_notice = false
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
             text = "已暫停關鍵字提醒!"
+            var keyboard = [
+              [{
+                'text': '📎 新增關鍵字'
+              }, {
+                'text': "♻ 移除關鍵字"
+              }],
+              [{
+                'text': "啟動關鍵字提醒"
+              }, {
+                'text': "🔙 返回房間"
+              }]
+            ]
+            var resize_keyboard = true
+            var one_time_keyboard = false
+            ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, text)
+            break;
+          case '/lookkeyword':
+            text = get_all_keyword(ALL)
             var notification = true
             sendtext(text, notification);
             break;
+            //-------------------------------------------------------------------
           default:
             if (ALL.FastMatch[Stext] != undefined) {
               var FM = ALL.FastMatch[Stext]
@@ -1342,18 +1391,24 @@ function doPost(e) {
         }
         //已下處理關鍵字通知====================================================
         var keyword_notice = ALL.keyword_notice
+        //Logger.log("已下處理關鍵字通知")
         if (keyword_notice) {
-          var txt = Stext
+          var txt = text
           var keys = ALL.keyword
-          var keys_value = key_word_check(txt, keys)
-
+          var keys_value = key_word_check(message_json.text, keys)
+          //Logger.log("TTTT = ",keys_value)
+          //Logger.log("Tkeys_value.length = ",keys_value.length)
           if (keys_value.length > 0) {
+          //Logger.log("TTTT33333 = ")
             var text1 = "有關鍵字被提及！\n"
             var text2 = ""
             for (var i = 0; i < keys_value.length; i++) {
               text2 += keys_value[i] + " "
             }
-            var text3 = "\nby: " + ALL.data[col - 1].Name
+            var text3 = "\nby: " + ALL.data[col - 1].Name + "\n點擊以快速切換至該房間 /d" + (col - 1);
+            text = text1 + text2 + text3
+             //Logger.log("TTTT4444 = ",text)
+            sendtext(text);
           }
         }
         //===================================================================
@@ -1451,7 +1506,9 @@ function Log(estringa, from, sheet_key, email) {
   }
 }
 //=================================================================
-function ReplyKeyboardRemove(text) {
+function ReplyKeyboardRemove(text, parse_mode) {
+  if (parse_mode == undefined)
+    parse_mode = ""
   var ReplyKeyboardRemove = {
     'remove_keyboard': true,
     'selective': false
@@ -1460,6 +1517,7 @@ function ReplyKeyboardRemove(text) {
     "method": "sendMessage",
     'chat_id': "Telegram_id",
     'text': text,
+    "parse_mode": parse_mode,
     'reply_markup': JSON.stringify(ReplyKeyboardRemove)
   }
   start(payload);
@@ -1983,14 +2041,17 @@ function CP() {
   Sheet.getRange(LastRow + 1, 2).setValue(f);
 }
 //=================================================================================
-function sendtext(text, notification) {
+function sendtext(text, notification, parse_mode) {
   if (notification == undefined)
     notification = false
+  if (parse_mode == undefined)
+    parse_mode = ""
   var payload = {
     "method": "sendMessage",
     'chat_id': "Telegram_id",
     'text': text,
-    'disable_notification': notification
+    'disable_notification': notification,
+    "parse_mode": parse_mode
   } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
   start(payload);
 }
@@ -2098,15 +2159,19 @@ function write_ALL(ALL, doc) {
 function key_word_check(txt, keys) {
   var keys_value = []
   for (var i = 0; i < keys.length; i++) {
-    if (txt.indexOf(String(keys[i])) > -1) {
-      for (var i = 0; i < keys_value.length; i++) {
-        if (keys_value[i] == keys[i]) {
+    if (txt.search(String(keys[i])) > -1) {
+      //Logger.log("TTTTSSS = ",txt.search(String(keys[i])))
+      for (var j = 0; j < keys_value.length; j++) {
+        //Logger.log("TTUU5555 = ",i," , ",j)
+        if (keys_value[j] == keys[i]) {
+          //Logger.log("TTUU5555 = continue")
           continue
         }
       }
-      keys_value.append(String(keys[i]))
+      keys_value.push(String(keys[i]))
     }
   }
+  //Logger.log(keys_value)
   return keys_value
 }
 //=================================================================================
