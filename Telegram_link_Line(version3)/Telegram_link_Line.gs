@@ -1339,6 +1339,23 @@ function doPost(e) {
           text = "你有新訊息!\n來自：" + ALL.data[col - 1].Name + "\n點擊以快速切換至該房間 /d" + (col - 1);
           sendtext(text);
         }
+        //已下處理關鍵字通知====================================================
+        var keyword_notice = ALL.keyword_notice
+        if (keyword_notice) {
+          var txt = Stext
+          var keys = ALL.keyword
+          var keys_value = key_word_check(txt, keys)
+
+          if (keys_value.length > 0) {
+            var text1 = "有關鍵字被提及！\n"
+            var text2 = ""
+            for (var i = 0; i < keys_value.length; i++) {
+              text2 += keys_value[i] + " "
+            }
+            var text3 = "\nby: " + ALL.data[col - 1].Name
+          }
+        }
+        //===================================================================
       }
 
     } else { //以下處理未登記的(新資料)=======================
@@ -2074,6 +2091,21 @@ function write_ALL(ALL, doc) {
     return e
   }
   return true
+}
+//=================================================================================
+function key_word_check(txt, keys) {
+  var keys_value = []
+  for (var i = 0; i < keys.length; i++) {
+    if (txt.indexOf(String(keys[i])) > -1) {
+      for (var i = 0; i < keys_value.length; i++) {
+        if (keys_value[i] == keys[i]) {
+          continue
+        }
+      }
+      keys_value.append(String(keys[i]))
+    }
+  }
+  return keys_value
 }
 //=================================================================================
 function start(payload) {
