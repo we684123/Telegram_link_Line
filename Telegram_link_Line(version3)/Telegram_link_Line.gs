@@ -455,8 +455,9 @@ function doPost(e) {
       } else if (mode == "♻ 移除關鍵字" && Stext != "/main") {
         try { //移除關鍵字
           var rmwkey = String(Stext)
-          if (rmwkey.search(",") == -1 && rmwkey.search("，") == -1) {
+          if (!isNaN(parseInt(rmwkey))) {
             var index = parseInt(rmwkey) - 1
+            Logger.log("index = ",index)
             ALL.keyword.splice(index, 1)
           } else {
             var tt = rmwkey.replace(/，/g, ',')
@@ -464,13 +465,16 @@ function doPost(e) {
             rmwkey_array.sort(function(a, b) {
               return b - a;
             })
-            Logger.log("TTTT111 = ",rmwkey_array)
+            Logger.log("TTTT111 = ", rmwkey_array)
             for (var i = 0; i < rmwkey_array.length; i++) {
-              Logger.log("TTTEEEE = ",i)
+              if (isNaN(parseInt(rmwkey_array[i]))) {
+                continue
+              }
+              Logger.log("TTTEEEE = ", i)
               var index = parseInt(rmwkey_array[i]) - 1
-              Logger.log("TTTindex = ",index)
+              Logger.log("TTTindex = ", index)
               ALL.keyword.splice(index, 1)
-              Logger.log("TTTT222 = ",ALL.keyword)
+              Logger.log("TTTT222 = ", ALL.keyword)
             }
           }
 
@@ -905,7 +909,7 @@ function doPost(e) {
             ALL.mode = "♻ 移除關鍵字"
             AllRead();
             text = "請輸入欲移除關鍵字的**前方編號!!!**\n刪除多組關鍵字請用','或'，'號隔開\n如遇離開請按 /main"
-            ReplyKeyboardRemove(text,"Markdown")
+            ReplyKeyboardRemove(text, "Markdown")
             write_ALL(ALL, doc)
             break;
           case '啟動關鍵字提醒':
@@ -1399,7 +1403,7 @@ function doPost(e) {
           //Logger.log("TTTT = ",keys_value)
           //Logger.log("Tkeys_value.length = ",keys_value.length)
           if (keys_value.length > 0) {
-          //Logger.log("TTTT33333 = ")
+            //Logger.log("TTTT33333 = ")
             var text1 = "有關鍵字被提及！\n"
             var text2 = ""
             for (var i = 0; i < keys_value.length; i++) {
@@ -1407,7 +1411,7 @@ function doPost(e) {
             }
             var text3 = "\nby: " + ALL.data[col - 1].Name + "\n點擊以快速切換至該房間 /d" + (col - 1);
             text = text1 + text2 + text3
-             //Logger.log("TTTT4444 = ",text)
+            //Logger.log("TTTT4444 = ",text)
             sendtext(text);
           }
         }
