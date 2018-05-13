@@ -576,6 +576,11 @@ function doPost(e) {
                 //SheetM.getRange(1, col).setValue(Amount);
               }
 
+              function get_time_txt(timestamp) {
+                var formattedDate = Utilities.formatDate(new Date(timestamp), "GMT", "yyyy-MM-dd' 'HH:mm:ss");
+                return formattedDate;
+              }
+
               for (var i = st; i <= ed; i++) {
                 text = SheetM.getRange(i, col).getDisplayValue()
                 Logger.log("text = ", text)
@@ -584,6 +589,10 @@ function doPost(e) {
                 if (message_json.type == "text") {
                   var p = message_json.userName + "：\n" + message_json.text
                   //Logger.log("ppp = ", p)
+                  if (ALL.massage_time) {
+                    t = get_time_txt(message_json.timestamp)
+                    p += "\n" + t
+                  }
                   var notification = true
                   sendtext(p, notification);
                   //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
@@ -593,6 +602,10 @@ function doPost(e) {
                   var url = message_json.DURL
                   var notification = true
                   var caption = "來自: " + message_json.userName
+                  if (ALL.massage_time) {
+                    t = get_time_txt(message_json.timestamp)
+                    caption += "\n" + t
+                  }
                   sendPhoto(url, notification, caption)
                   //sendPhoto(url, notification)
                   //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
@@ -602,6 +615,10 @@ function doPost(e) {
                   var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
                   var notification = true
                   var caption = "來自: " + message_json.userName
+                  if (ALL.massage_time) {
+                    t = get_time_txt(message_json.timestamp)
+                    caption += "\n" + t
+                  }
                   sendPhoto(sticker_png_url, notification, caption)
                   //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
                   /*
@@ -616,6 +633,10 @@ function doPost(e) {
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "audio") {
                   var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
+                  if (ALL.massage_time) {
+                    t = get_time_txt(message_json.timestamp)
+                    url += "\n" + t
+                  }
                   var notification = true
                   sendtext(url, notification)
                   //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
@@ -631,6 +652,10 @@ function doPost(e) {
                   var longitude = message_json.longitude
                   sendLocation(latitude, longitude, notification)
                   var text = "以上來自: " + message_json.userName
+                  if (ALL.massage_time) {
+                    t = get_time_txt(message_json.timestamp)
+                    text += "\n" + t
+                  }
                   sendtext(text, notification);
                   //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
                   //"address":"260台灣宜蘭縣宜蘭市舊城西路107號",
@@ -640,12 +665,20 @@ function doPost(e) {
                   var url = message_json.DURL
                   var notification = true
                   var caption = "來自: " + message_json.userName
+                  if (ALL.massage_time) {
+                    t = get_time_txt(message_json.timestamp)
+                    caption += "\n" + t
+                  }
                   sendVoice(url, notification, caption)
                   //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "file") {
                   var url = message_json.DURL + "\n\n來自:  " + message_json.userName
+                  if (ALL.massage_time) {
+                    t = get_time_txt(message_json.timestamp)
+                    text += "\n" + t
+                  }
                   var notification = true
                   sendtext(text, notification);
                   //senddocument(url)
@@ -1111,7 +1144,8 @@ function doPost(e) {
     var message_json = { //前面先寫 後面補充
       "type": "type",
       "message_id": cutMessage.id,
-      "userName": userName
+      "userName": userName,
+      "timestamp": parseInt(estringa.events[0].timestamp)
     }
 
     if (cutMessage.type == "text") { //文字
