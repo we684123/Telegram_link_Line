@@ -411,12 +411,11 @@ function doPost(e) {
             break
           }
         }
-        if (k = "沒有找到") {
+        if (k == "沒有找到") {
           var d = new Date();
           GmailApp.sendEmail(email, "telegram-line出事啦(沒有找到)", d + "\n\n" + ee + "\n\n" + e + "\n\n" + k);
         } else {
           ALL.TG_bot_updateID_array.splice(k, 1)
-
         }
 
         var r = JSON.stringify(ALL);
@@ -474,12 +473,13 @@ function doPost(e) {
       } else if (mode == "⏰訊息時間啟用?") {
         function mixT() {
           text = "已成功 " + Stext + " 訊息時間啟用!"
-          sendtext(text, notification);
+          keyboard_main(text, doc_key)
         }
         if (Stext == "開啟") {
           ALL.massage_time = true
           ALL.mode = 0
-          if (var e = write_ALL(ALL, doc)) {
+          var e = write_ALL(ALL, doc)
+          if (e) {
             mixT()
           } else {
             var text = "寫入失敗，詳情如下："
@@ -489,7 +489,8 @@ function doPost(e) {
         } else if (Stext == "關閉") {
           ALL.massage_time = false
           ALL.mode = 0
-          if (var e = write_ALL(ALL, doc)) {
+          var e = write_ALL(ALL, doc)
+          if (e) {
             mixT()
           } else {
             var text = "寫入失敗，詳情如下："
@@ -501,7 +502,7 @@ function doPost(e) {
         //以下指令分流
         switch (Stext) {
           case '/main':
-          case '🔃  重新整理':
+          case '🔃 重新整理':
             if (ALL.mode != 0) {
               ALL.mode = 0
               var r = JSON.stringify(ALL);
@@ -577,7 +578,7 @@ function doPost(e) {
               }
 
               function get_time_txt(timestamp) {
-                var formattedDate = Utilities.formatDate(new Date(timestamp), "GMT", "yyyy-MM-dd' 'HH:mm:ss");
+                var formattedDate = Utilities.formatDate(new Date(timestamp), "GMT+8", "yyyy-MM-dd' 'HH:mm:ss");
                 return formattedDate;
               }
 
@@ -771,7 +772,7 @@ function doPost(e) {
             ALL.mode = 0
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
-            text = "已debug"
+            text = "已debug\n" + "REST_FastMatch1and2() : " + xfjhxgfh + "\nREST_keyboard() : " + ydjdyf
             sendtext(text);
             break;
           case '/AllRead':
@@ -1491,7 +1492,7 @@ function keyboard_main(text, doc_key) {
 //=================================================================================
 function In(name) { //防止與命令衝突的命名
   var arr = ["/main", "🔙 返回房間", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言",
-    "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃  重新整理", "🔥 刪除房間", "/delete", "/debug",
+    "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃 重新整理", "🔥 刪除房間", "/delete", "/debug",
     "/AllRead", "/allread", "Allread", "allRead", "⭐️ 升級房間", "💫 降級房間", "/uproom", "droproom"
   ];
 
@@ -1548,7 +1549,7 @@ function REST_keyboard() {
   }
 
   keyboard.splice(0, 0, [{
-    'text': "🔃  重新整理"
+    'text': "🔃 重新整理"
   }, {
     'text': '🔧 更多設定'
   }, {
@@ -1556,8 +1557,8 @@ function REST_keyboard() {
   }]) //加入返回鍵
   //=================================================
   ALL.RoomKeyboard = keyboard //寫回RoomKeynoard
-  var r = JSON.stringify(ALL);
-  doc.setText(r); //寫入
+  write_ALL(ALL, doc) //寫入
+  return 1
 }
 //=================================================================================
 function REST_FastMatch1and2() { //重製快速索引
@@ -1581,6 +1582,7 @@ function REST_FastMatch1and2() { //重製快速索引
 
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
+  return 1
 }
 //=================================================================================
 function AllRead() {
