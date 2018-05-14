@@ -437,6 +437,9 @@ function doPost(e) {
             ALL.keyword.push(addwkey)
           } else {
             for (var i = 0; i < addwkey_array.length; i++) {
+              if (addwkey_array[i] == "") {
+                continue
+              }
               ALL.keyword.push(addwkey_array[i])
             } //新增關鍵字
           }
@@ -455,27 +458,21 @@ function doPost(e) {
       } else if (mode == "♻ 移除關鍵字" && Stext != "/main") {
         try { //移除關鍵字
           var rmwkey = String(Stext)
-          if (!isNaN(parseInt(rmwkey))) {
-            var index = parseInt(rmwkey) - 1
-            Logger.log("index = ",index)
-            ALL.keyword.splice(index, 1)
-          } else {
-            var tt = rmwkey.replace(/，/g, ',')
-            var rmwkey_array = tt.split(',')
-            rmwkey_array.sort(function(a, b) {
-              return b - a;
-            })
-            Logger.log("TTTT111 = ", rmwkey_array)
-            for (var i = 0; i < rmwkey_array.length; i++) {
-              if (isNaN(parseInt(rmwkey_array[i]))) {
-                continue
-              }
-              Logger.log("TTTEEEE = ", i)
-              var index = parseInt(rmwkey_array[i]) - 1
-              Logger.log("TTTindex = ", index)
-              ALL.keyword.splice(index, 1)
-              Logger.log("TTTT222 = ", ALL.keyword)
+          var tt = rmwkey.replace(/，/g, ',')
+          var re = /\d+/g
+          var rmwkey_array = tt.match(re)
+          rmwkey_array.sort(function(a, b) {
+            return b - a;
+          })
+          for (var i = 0; i < rmwkey_array.length; i++) {
+            if (isNaN(parseInt(rmwkey_array[i]))) {
+              continue
             }
+            //Logger.log("TTTEEEE = ", i)
+            var index = parseInt(rmwkey_array[i]) - 1
+            //Logger.log("TTTindex = ", index)
+            ALL.keyword.splice(index, 1)
+            //Logger.log("TTTT222 = ", ALL.keyword)
           }
 
           write_ALL(ALL, doc)
@@ -518,6 +515,9 @@ function doPost(e) {
             var text = "寫入失敗，詳情如下："
             sendtext(e, notification);
           }
+        }else {
+          var text = "030...\n請不要給我吃怪怪的東西..."
+          sendtext(text);
         }
 
       } else {
@@ -908,7 +908,7 @@ function doPost(e) {
           case '♻ 移除關鍵字':
             ALL.mode = "♻ 移除關鍵字"
             AllRead();
-            text = "請輸入欲移除關鍵字的**前方編號!!!**\n刪除多組關鍵字請用','或'，'號隔開\n如遇離開請按 /main"
+            text = '請輸入欲移除關鍵字的**前方編號!!!**\n刪除多組關鍵字請用 "任意符號" 隔開(推薦用","或"，")\n如遇離開請按 /main'
             ReplyKeyboardRemove(text, "Markdown")
             write_ALL(ALL, doc)
             break;
