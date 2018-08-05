@@ -107,14 +107,14 @@
   ```    
   (這個格式("&lt;token&gt;"改成你的bot token 跟 "url="後面接gs專案網址 ))    
   EX:    
-  token = "123123:ZFDGFG"    
-  url   = "https://XXX"     
+    token = "123123:ZFDGFG"    
+    url   = "https://XXX"     
   那網址就是:    
   "https://api.telegram.org/bot123123:ZFDGFG/setWebhook?url=https://XXX&max_connections=1"    
   __沒有 "<" 跟 ">"，請務必把這兩個符號刪掉!__    
 
   (設定Webhook的方式就是將你改好的網址丟到任一瀏覽器上，並按Enter送出)    
-    
+
   Line則要到後台改([長這樣](http://i.imgur.com/k0pSRfR.png))
 
 
