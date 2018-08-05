@@ -107,8 +107,8 @@
   ```    
   (這個格式("&lt;token&gt;"改成你的bot token 跟 "url="後面接gs專案網址 ))    
   EX:    
-    token = "123123:ZFDGFG"    
-    url   = "https://XXX"     
+    	token = "123123:ZFDGFG"    
+    	url   = "https://XXX"     
   那網址就是:    
   "https://api.telegram.org/bot123123:ZFDGFG/setWebhook?url=https://XXX&max_connections=1"    
   __沒有 "<" 跟 ">"，請務必把這兩個符號刪掉!__    
