@@ -1,7 +1,11 @@
 function doPost(e) {
   //嘗試lock
   var lock = LockService.getScriptLock();
+<<<<<<< HEAD
   var success = lock.tryLock(1200000);
+=======
+  var success = lock.tryLock(20000);
+>>>>>>> beta
 
   var base_json = base();
   var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
@@ -68,9 +72,15 @@ function doPost(e) {
     var Stext = estringa.message.text; //前期準備完成
 
     //以下檢查是否為群組================================================================
+<<<<<<< HEAD
     if (estringa.message.chat.id < 0) {
       lock.releaseLock();
       return 0; //是的話就不要浪費資源 直接結束
+=======
+    if (estringa.message.chat.id < 0){
+      lock.releaseLock();
+      return 0;//是的話就不要浪費資源 直接結束
+>>>>>>> beta
     }
     //所有人檢查==================================================================
     if (Telegram_id != estringa.message.chat.id) { //如果不是 發一段話即結束
@@ -158,7 +168,11 @@ function doPost(e) {
         TG_Send_Photo_To_Line(Line_id, photo_id)
         if (estringa.message.caption) //如有簡介則一同發出
           TG_Send_text_To_Line(Line_id, estringa.message.caption)
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> beta
         text = "(圖片已發送!)"
         chkey(TG_token);
         sendtext(text);
@@ -255,15 +269,24 @@ function doPost(e) {
           keyboard_main(text, doc_key)
         }
         //================================================================
+<<<<<<< HEAD
       } else if (mode == "🔥 刪除房間" && Stext == "/delete") {
+=======
+      } else if (mode == "🔥 刪除房間" & Stext == "/delete") {
+>>>>>>> beta
         REST_FastMatch1and2();
         var aims = ALL.opposite.RoomId
         var number = ALL.FastMatch2[aims]
 
         //doc處理
         ALL.data.splice(number, 1) //刪除目標
+<<<<<<< HEAD
         for (var x = 0; x++; x < len(ALL.TG_bot_updateID_array)) {
           if (ALL.TG_bot_updateID_array[x] == aims)
+=======
+        for(var x=0;x++;x<len(ALL.TG_bot_updateID_array)){
+          if(ALL.TG_bot_updateID_array[x]==aims)
+>>>>>>> beta
             ALL.data.splice(x, 1)
         }
         ALL.mode = 0
@@ -281,7 +304,11 @@ function doPost(e) {
         text = "已刪除此聊天室";
         keyboard_main(text, doc_key)
         return 0;
+<<<<<<< HEAD
       } else if (mode == "⭐ 升級房間" && Stext == "/uproom") {
+=======
+      } else if (mode == "⭐ 升級房間" & Stext == "/uproom") {
+>>>>>>> beta
         ALL.mode = "/uproom"
         var r = JSON.stringify(ALL);
         doc.setText(r); //寫入
@@ -386,7 +413,11 @@ function doPost(e) {
           text = "請至__新機器人聊天室__!!!那任意輸入文字以進行綁定。\n不是這裡喔!"
           sendtext(text);
         }
+<<<<<<< HEAD
       } else if (mode == "💫 降級房間" && Stext == "/droproom") {
+=======
+      } else if (mode == "💫 降級房間" & Stext == "/droproom") {
+>>>>>>> beta
         var aims = ALL.opposite.RoomId
         var number = ALL.FastMatch2[aims]
         var D_token = ALL.data[number].botToken
@@ -411,11 +442,19 @@ function doPost(e) {
             break
           }
         }
+<<<<<<< HEAD
         if (k == "沒有找到") {
+=======
+        if (k = "沒有找到") {
+>>>>>>> beta
           var d = new Date();
           GmailApp.sendEmail(email, "telegram-line出事啦(沒有找到)", d + "\n\n" + ee + "\n\n" + e + "\n\n" + k);
         } else {
           ALL.TG_bot_updateID_array.splice(k, 1)
+<<<<<<< HEAD
+=======
+
+>>>>>>> beta
         }
 
         var r = JSON.stringify(ALL);
@@ -423,6 +462,7 @@ function doPost(e) {
 
         text = "已降級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
         keyboard_main(text, doc_key)
+<<<<<<< HEAD
       } else if ((mode == "♻ 移除關鍵字" || mode == "📎 新增關鍵字") && Stext == "/lookkeyword") {
         text = get_all_keyword(ALL)
         var notification = true
@@ -520,16 +560,22 @@ function doPost(e) {
           sendtext(text);
         }
 
+=======
+>>>>>>> beta
       } else {
         //以下指令分流
         switch (Stext) {
           case '/main':
+<<<<<<< HEAD
           case '🔃 重新整理':
             if (ALL.mode != 0) {
               ALL.mode = 0
               var r = JSON.stringify(ALL);
               doc.setText(r); //寫入
             }
+=======
+          case '🔃  重新整理':
+>>>>>>> beta
             var text = "🔮 開啟主選單"
             keyboard_main(text, doc_key)
             break;
@@ -599,11 +645,14 @@ function doPost(e) {
                 //SheetM.getRange(1, col).setValue(Amount);
               }
 
+<<<<<<< HEAD
               function get_time_txt(timestamp) {
                 var formattedDate = Utilities.formatDate(new Date(timestamp), "GMT+8", "yyyy-MM-dd' 'HH:mm:ss");
                 return formattedDate;
               }
 
+=======
+>>>>>>> beta
               for (var i = st; i <= ed; i++) {
                 text = SheetM.getRange(i, col).getDisplayValue()
                 Logger.log("text = ", text)
@@ -612,10 +661,13 @@ function doPost(e) {
                 if (message_json.type == "text") {
                   var p = message_json.userName + "：\n" + message_json.text
                   //Logger.log("ppp = ", p)
+<<<<<<< HEAD
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     p += "\n" + t
                   }
+=======
+>>>>>>> beta
                   var notification = true
                   sendtext(p, notification);
                   //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
@@ -625,10 +677,13 @@ function doPost(e) {
                   var url = message_json.DURL
                   var notification = true
                   var caption = "來自: " + message_json.userName
+<<<<<<< HEAD
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     caption += "\n" + t
                   }
+=======
+>>>>>>> beta
                   sendPhoto(url, notification, caption)
                   //sendPhoto(url, notification)
                   //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
@@ -638,10 +693,13 @@ function doPost(e) {
                   var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
                   var notification = true
                   var caption = "來自: " + message_json.userName
+<<<<<<< HEAD
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     caption += "\n" + t
                   }
+=======
+>>>>>>> beta
                   sendPhoto(sticker_png_url, notification, caption)
                   //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
                   /*
@@ -656,10 +714,13 @@ function doPost(e) {
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "audio") {
                   var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
+<<<<<<< HEAD
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     url += "\n" + t
                   }
+=======
+>>>>>>> beta
                   var notification = true
                   sendtext(url, notification)
                   //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
@@ -675,10 +736,13 @@ function doPost(e) {
                   var longitude = message_json.longitude
                   sendLocation(latitude, longitude, notification)
                   var text = "以上來自: " + message_json.userName
+<<<<<<< HEAD
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     text += "\n" + t
                   }
+=======
+>>>>>>> beta
                   sendtext(text, notification);
                   //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
                   //"address":"260台灣宜蘭縣宜蘭市舊城西路107號",
@@ -688,20 +752,26 @@ function doPost(e) {
                   var url = message_json.DURL
                   var notification = true
                   var caption = "來自: " + message_json.userName
+<<<<<<< HEAD
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     caption += "\n" + t
                   }
+=======
+>>>>>>> beta
                   sendVoice(url, notification, caption)
                   //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "file") {
                   var url = message_json.DURL + "\n\n來自:  " + message_json.userName
+<<<<<<< HEAD
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     text += "\n" + t
                   }
+=======
+>>>>>>> beta
                   var notification = true
                   sendtext(text, notification);
                   //senddocument(url)
@@ -789,12 +859,20 @@ function doPost(e) {
             break;
           case '/debug':
             var xfjhxgfh = REST_FastMatch1and2(); //強制等待，不知道為什麼有時候不會執行
+<<<<<<< HEAD
             var ydjdyf = REST_keyboard(); //強制等待，不知道為什麼有時候不會執行
+=======
+            var ydjdyf = REST_keyboard();  //強制等待，不知道為什麼有時候不會執行
+>>>>>>> beta
             //還有sheet那邊的訊息區處理還未 (Amount)
             ALL.mode = 0
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
+<<<<<<< HEAD
             text = "已debug\n" + "REST_FastMatch1and2() : " + xfjhxgfh + "\nREST_keyboard() : " + ydjdyf
+=======
+            text = "已debug"
+>>>>>>> beta
             sendtext(text);
             break;
           case '/AllRead':
@@ -806,6 +884,7 @@ function doPost(e) {
             var notification = true
             sendtext(text, notification);
             break;
+<<<<<<< HEAD
           case '🔧 更多設定':
             var more_keyboard = [
               [{
@@ -958,6 +1037,8 @@ function doPost(e) {
             sendtext(text, notification);
             break;
             //-------------------------------------------------------------------
+=======
+>>>>>>> beta
           default:
             if (ALL.FastMatch[Stext] != undefined) {
               var FM = ALL.FastMatch[Stext]
@@ -1132,17 +1213,22 @@ function doPost(e) {
         var t2 = JSON.parse(t)
         var t3 = JSON.stringify(t2.results)
         var t4 = JSON.parse(t3) //這麼多t我也很無奈...
+<<<<<<< HEAD
         try {
           var formatted_address = t4[0]["formatted_address"]
         } catch (e) {
           var formatted_address = "未找到地點"
         }
+=======
+        var formatted_address = t4[0]["formatted_address"]
+>>>>>>> beta
         //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
         TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
       } else {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
         sendtext(text);
       }
+<<<<<<< HEAD
     } else if (estringa.message.document) {
       if (mode == "🚀 發送訊息") {
         text = "(暫時不支援document傳送喔!)"
@@ -1153,6 +1239,8 @@ function doPost(e) {
         text = "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
         sendtext(text);
       }
+=======
+>>>>>>> beta
     }
 
     //=====================================================================================================
@@ -1198,8 +1286,12 @@ function doPost(e) {
     var message_json = { //前面先寫 後面補充
       "type": "type",
       "message_id": cutMessage.id,
+<<<<<<< HEAD
       "userName": userName,
       "timestamp": parseInt(estringa.events[0].timestamp)
+=======
+      "userName": userName
+>>>>>>> beta
     }
 
     if (cutMessage.type == "text") { //文字
@@ -1226,7 +1318,11 @@ function doPost(e) {
       message_json.type = "video"
       downloadFromLine(cutMessage.id)
       message_json.DURL = getGdriveFileDownloadURL()
+<<<<<<< HEAD
     } else if (cutMessage.type == "file") { //文件
+=======
+    } else if (cutMessage.type == "file") { //Line現在居然不能傳送文件 這應該沒用了(?
+>>>>>>> beta
       message_json.type = "file"
       downloadFromLine(cutMessage.id)
       message_json.DURL = getGdriveFileDownloadURL()
@@ -1300,7 +1396,11 @@ function doPost(e) {
             //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
           } else if (message_json.type == "file") {
             var url = message_json.DURL + "\n\n來自:  " + message_json.userName
+<<<<<<< HEAD
             sendtext(url);
+=======
+            sendtext(text);
+>>>>>>> beta
             //senddocument(url)
           }
         } catch (e) {
@@ -1372,7 +1472,11 @@ function doPost(e) {
         } else if (message_json.type == "file") {
           var url = message_json.DURL + "\n\n來自:  " + message_json.userName
           var notification = true
+<<<<<<< HEAD
           sendtext(url, notification);
+=======
+          sendtext(text, notification);
+>>>>>>> beta
           //senddocument(url)
         }
       } else {
@@ -1393,6 +1497,7 @@ function doPost(e) {
           text = "你有新訊息!\n來自：" + ALL.data[col - 1].Name + "\n點擊以快速切換至該房間 /d" + (col - 1);
           sendtext(text);
         }
+<<<<<<< HEAD
         //已下處理關鍵字通知====================================================
         var keyword_notice = ALL.keyword_notice
         //Logger.log("已下處理關鍵字通知")
@@ -1416,6 +1521,8 @@ function doPost(e) {
           }
         }
         //===================================================================
+=======
+>>>>>>> beta
       }
 
     } else { //以下處理未登記的(新資料)=======================
@@ -1510,9 +1617,13 @@ function Log(estringa, from, sheet_key, email) {
   }
 }
 //=================================================================
+<<<<<<< HEAD
 function ReplyKeyboardRemove(text, parse_mode) {
   if (parse_mode == undefined)
     parse_mode = ""
+=======
+function ReplyKeyboardRemove(text) {
+>>>>>>> beta
   var ReplyKeyboardRemove = {
     'remove_keyboard': true,
     'selective': false
@@ -1521,7 +1632,10 @@ function ReplyKeyboardRemove(text, parse_mode) {
     "method": "sendMessage",
     'chat_id': "Telegram_id",
     'text': text,
+<<<<<<< HEAD
     "parse_mode": parse_mode,
+=======
+>>>>>>> beta
     'reply_markup': JSON.stringify(ReplyKeyboardRemove)
   }
   start(payload);
@@ -1552,9 +1666,15 @@ function keyboard_main(text, doc_key) {
   ReplyKeyboardMakeup(keyboard_main, resize_keyboard, one_time_keyboard, text)
 }
 //=================================================================================
+<<<<<<< HEAD
 function In(name) { //防止與命令衝突的命名
   var arr = ["/main", "🔙 返回房間", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言",
     "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃 重新整理", "🔥 刪除房間", "/delete", "/debug",
+=======
+function In(name) {//防止與命令衝突的命名
+  var arr = ["/main", "🔙 返回房間", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言",
+    "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃  重新整理", "🔥 刪除房間", "/delete", "/debug",
+>>>>>>> beta
     "/AllRead", "/allread", "Allread", "allRead", "⭐️ 升級房間", "💫 降級房間", "/uproom", "droproom"
   ];
 
@@ -1611,16 +1731,25 @@ function REST_keyboard() {
   }
 
   keyboard.splice(0, 0, [{
+<<<<<<< HEAD
     'text': "🔃 重新整理"
   }, {
     'text': '🔧 更多設定'
+=======
+    'text': "🔃  重新整理"
+>>>>>>> beta
   }, {
     'text': "🔭 訊息狀態"
   }]) //加入返回鍵
   //=================================================
   ALL.RoomKeyboard = keyboard //寫回RoomKeynoard
+<<<<<<< HEAD
   write_ALL(ALL, doc) //寫入
   return 1
+=======
+  var r = JSON.stringify(ALL);
+  doc.setText(r); //寫入
+>>>>>>> beta
 }
 //=================================================================================
 function REST_FastMatch1and2() { //重製快速索引
@@ -1644,7 +1773,10 @@ function REST_FastMatch1and2() { //重製快速索引
 
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
+<<<<<<< HEAD
   return 1
+=======
+>>>>>>> beta
 }
 //=================================================================================
 function AllRead() {
@@ -1977,6 +2109,7 @@ function downloadFromLine(linkId) {
   ch_Name_and_Description()
 }
 //=================================================================================
+<<<<<<< HEAD
 function get_extension(filename, reciprocal) {
   var extension = filename.split(".")[reciprocal]
   return extension
@@ -1990,6 +2123,8 @@ function get_all_keyword(ALL) {
   return all_word
 }
 //=================================================================================
+=======
+>>>>>>> beta
 function ch_Name_and_Description() {
   var base_json = base()
   var FolderId = base_json.FolderId
@@ -1998,7 +2133,11 @@ function ch_Name_and_Description() {
 
   while (files.hasNext()) {
     var file = files.next();
+<<<<<<< HEAD
     if (file.getName() == 'content') {
+=======
+    if (file.getName() == 'content.jpg' || file.getName() == 'content.mp4') {
+>>>>>>> beta
       var d = new Date();
       var getFullYear = d.getFullYear(); // 2016 年
       var getMonth = d.getMonth(); // 12 月
@@ -2007,11 +2146,20 @@ function ch_Name_and_Description() {
       var getMinutes = d.getMinutes(); // 29 分
       var getSeconds = d.getSeconds(); // 17 秒
       var getMilliseconds = d.getMilliseconds(); // 234 毫秒
+<<<<<<< HEAD
       file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds + ".mp3")
       file.setDescription(d.getTime());
       //Logger.log("NNNNNNN = ", file.getName())
       break;
     } else if (get_extension(file.getName(), 0) == 'content') {
+=======
+      file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds)
+      file.setDescription(d.getTime());
+      //Logger.log("NNNNNNN = ", file.getName())
+      break;
+    }
+    if (file.getName() == 'content') {
+>>>>>>> beta
       var d = new Date();
       var getFullYear = d.getFullYear(); // 2016 年
       var getMonth = d.getMonth(); // 12 月
@@ -2020,13 +2168,20 @@ function ch_Name_and_Description() {
       var getMinutes = d.getMinutes(); // 29 分
       var getSeconds = d.getSeconds(); // 17 秒
       var getMilliseconds = d.getMilliseconds(); // 234 毫秒
+<<<<<<< HEAD
       file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds)
+=======
+      file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds + ".mp3")
+>>>>>>> beta
       file.setDescription(d.getTime());
       //Logger.log("NNNNNNN = ", file.getName())
       break;
     }
+<<<<<<< HEAD
     //Logger.log("NNNNNNN = ", file.getName())
     //Logger.log("NNNNNNN222 = ", get_extension(file.getName(), 0))
+=======
+>>>>>>> beta
   }
 }
 //=================================================================================
@@ -2045,24 +2200,35 @@ function CP() {
   Sheet.getRange(LastRow + 1, 2).setValue(f);
 }
 //=================================================================================
+<<<<<<< HEAD
 function sendtext(text, notification, parse_mode) {
   if (notification == undefined)
     notification = false
   if (parse_mode == undefined)
     parse_mode = ""
+=======
+function sendtext(text, notification) {
+>>>>>>> beta
   var payload = {
     "method": "sendMessage",
     'chat_id': "Telegram_id",
     'text': text,
+<<<<<<< HEAD
     'disable_notification': notification,
     "parse_mode": parse_mode
+=======
+    'disable_notification': notification
+>>>>>>> beta
   } //上面的Telegram_id因為最後發送隊對象都相同，所以在start()中補。
   start(payload);
 }
 //=================================================================
 function sendPhoto(url, notification, caption) {
+<<<<<<< HEAD
   if (notification == undefined)
     notification = false
+=======
+>>>>>>> beta
   caption = caption || ""
   var payload = {
     "method": "sendPhoto",
@@ -2075,8 +2241,11 @@ function sendPhoto(url, notification, caption) {
 }
 //=================================================================================
 function sendAudio(url, notification, caption) {
+<<<<<<< HEAD
   if (notification == undefined)
     notification = false
+=======
+>>>>>>> beta
   caption = caption || ""
   var payload = {
     "method": "sendAudio",
@@ -2089,8 +2258,11 @@ function sendAudio(url, notification, caption) {
 }
 //=================================================================
 function sendVoice(url, notification, caption) {
+<<<<<<< HEAD
   if (notification == undefined)
     notification = false
+=======
+>>>>>>> beta
   caption = caption || ""
   var payload = {
     "method": "sendVoice",
@@ -2103,8 +2275,11 @@ function sendVoice(url, notification, caption) {
 }
 //=================================================================
 function senddocument(url, notification, caption) {
+<<<<<<< HEAD
   if (notification == undefined)
     notification = false
+=======
+>>>>>>> beta
   caption = caption || ""
   var payload = {
     "method": "senddocument",
@@ -2117,8 +2292,11 @@ function senddocument(url, notification, caption) {
 }
 //=================================================================
 function sendLocation(latitude, longitude, notification) {
+<<<<<<< HEAD
   if (notification == undefined)
     notification = false
+=======
+>>>>>>> beta
   var payload = {
     "method": "sendLocation",
     "chat_id": "",
@@ -2148,6 +2326,7 @@ function chkey(number) {
     SheetD.getRange(3, 2).setValue("") //清空
     return id
   }
+<<<<<<< HEAD
 }
 //=================================================================================
 function write_ALL(ALL, doc) {
@@ -2177,6 +2356,9 @@ function key_word_check(txt, keys) {
   }
   //Logger.log(keys_value)
   return keys_value
+=======
+
+>>>>>>> beta
 }
 //=================================================================================
 function start(payload) {
