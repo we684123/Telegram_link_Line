@@ -1636,7 +1636,7 @@ function REST_FastMatch1and2() { //重製快速索引
   ALL.FastMatch = {}
   ALL.FastMatch2 = {}
   for (var i = 0; i < data_len; i++) {
-    var Name = ALL.data[i].Name
+    var Name =  String(ALL.data[i].Name)
     ALL.FastMatch[Name] = i
   }
   for (var i = 0; i < data_len; i++) {
