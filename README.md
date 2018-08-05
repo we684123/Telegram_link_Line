@@ -1,12 +1,7 @@
 # Telegram_link_Line
-<<<<<<< Updated upstream
-用Telegram來收發Line的訊息。
-use telegram to Send and receive messages(from Line).
-=======
 >用Telegram來收發Line的訊息。
 >use telegram to Send and receive messages(from Line).
 *****
-<<<<<<< HEAD
 舊版的在v1、v2分支，此為針對v3的README。    
 如果是 Telegram_Bot 新手推薦看完 [這個影片](https://youtu.be/On9yeMtG2Wg)後在來使用。    
 
@@ -27,11 +22,8 @@ use telegram to Send and receive messages(from Line).
 | 針對回復   |     |           |   ✓  |      
 | 房間分類   |     |    ✓      |   ✓  |      
 | 獨立房間   |     |           |    ✓  |      
-<<<<<<< HEAD
 | 關鍵字提醒 |     |           |    ✓  |      
 | 訊息時間   |     |           |    ✓  |      
-=======
->>>>>>> beta
 * V2、V3有時會不知道是誰發言是因為對方[版本](https://goo.gl/noYa7L)不夠新。
 
 
@@ -132,7 +124,6 @@ use telegram to Send and receive messages(from Line).
 ----
 ![Imgur](https://i.imgur.com/vlcHMHT.png)
 
-<<<<<<< HEAD
 關鍵字提及：    
 ![Imgur](https://i.imgur.com/NdYFcNY.png)    
 
@@ -198,61 +189,6 @@ use telegram to Send and receive messages(from Line).
         },
         "keyword_notice": false,
         "massage_time": false
-=======
-# doc的json說明
-
-    {
-        "data": [{
-            "RoomId": "zzz",
-            "Name": "(這個房間是空的)❎",
-            "status": "normal",
-            "Amount": 0,
-            "Notice": false
-        }],
-        "mode": 0,
-        "Notice": "正常通知",
-        "opposite": {
-            "RoomId": "zzz",
-            "Name": "(這個房間是空的)❎"
-        },
-        "last": {
-            "RoomId": "zzz",
-            "Name": "zzz"
-        },
-        "Order": [0, 2, 1, 4, 3],
-        "keyword": ["mi", "bot"],
-        "RoomKeyboard": [
-            [{
-                "text": "🔭 訊息狀態"
-            }],
-            [{
-                "text": "(這個房間是空的)❎"
-            }]
-        ],
-        "FastMatch": {
-            "(這個房間是空的)❎": 0
-        },
-        "FastMatch2": {
-            "zzz": 0
-        },
-        "TG_control_bot_updateID": 610460242,
-        "TG_bot_updateID_array": [{
-            "update_id": 873054250,
-            "TG_token": "437876669:AAE4bwnipQZiKdJEO9LndVdAqH76I0__ito(修過了 不用試了)",
-            "line_roomID": "U9d16309b78be9a02acf3bcfb06b28df3(修過了 不用試了)",
-            "Room_Name": "永格天@李孟哲✅"
-        }, {
-            "update_id": 488717600,
-            "TG_token": "394777564:AAE9M7-e9vq74sfsByMg9RaIBdO4NYYwfQ4"(修過了 不用試了),
-            "line_roomID": "C56858d2726373c094e030152171b2e23(修過了 不用試了)",
-            "Room_Name": "吃飯團✅"
-        }, {
-            "update_id": 444300614,
-            "TG_token": "437876669:AAE4bwnipQZiKdJEO9LndVdAqH76I0__ito(修過了 不用試了)",
-            "line_roomID": "Ua117f5dc6861315c9f7a0184c1ff4154(修過了 不用試了)",
-            "Room_Name": "XXA班✅"
-        }]
->>>>>>> beta
     }
 
 data = 存放房間資訊
@@ -267,11 +203,7 @@ last = 來自Line端的最後訊息房間(未作用)
 
 Order = 預計用來做自動依時間排序房間(未作用)
 
-<<<<<<< HEAD
 keyword = 關鍵字設定，出現關鍵字自動通知
-=======
-keyword = 關鍵字設定，出現關鍵字自動通知(未作用)
->>>>>>> beta
 
 RoomKeyboard = 房間的keyboard，為節省重生時間而生
 
@@ -285,7 +217,6 @@ TG_control_bot_updateID =
 TG_bot_updateID_array =
 有連線的bot(獨立房間)
 
-<<<<<<< HEAD
 keyword_notice =
 是否開啟關鍵字通知(預設為"關閉")
 
@@ -309,20 +240,3 @@ massage_time =
 
 # Author
 [永格天](https://we684123.carrd.co/)
-=======
-# 版本資訊
-  2018/03/16 -     
-    有效提升穩定性、現在發圖片時的"簡介"也會一同被發出去了    
-  2017/09/28 - V3初次發布!
-
-# Author
-永格天
->>>>>>> beta
-=======
-舊版的在v1資料夾，此為針對v2的README。    
-如果是 Telegram_Bot 新手推薦看完 [這個影片](https://youtu.be/On9yeMtG2Wg)後在來使用。
->>>>>>> Stashed changes
-
-V1.0目前僅支援text，且還沒有"名子" 看之後的狀況再看看要不要些改吧!。(2017/2/19)
-V1.5修正來源是room or group會error的問題。(2017/2/20)
->>>>>>> text_to_branch(V1)
