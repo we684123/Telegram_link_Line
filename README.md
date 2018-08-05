@@ -39,7 +39,7 @@
 2.  一個sheet檔
     * 在sheet中新增5個分頁(page)：    
   __"Debug"、"Log"、"紀錄發送的訊息"、"Line訊息區"、"JSON備份"__   
-    * 其中 "Line訊息區" 在其"A1"中填入0(整數數字)，然後將除了第1列的格式全部設為字串(純文字)。      
+    * 其中 "Line訊息區" 在其"A1"中填入 "[0,0]" (字串)，然後選取所有儲存格的格式設為字串(純文字)。      
     [說明圖1](http://i.imgur.com/za6Ia6Q.png)、[說明圖2](http://i.imgur.com/rj9vlR3.png)    
 
 
@@ -53,15 +53,15 @@
   ![Imgur](https://i.imgur.com/MvEDdfk.png)
   ----    
   ![Imgur](https://i.imgur.com/WgT109q.png)
-  然成後請如下操作：
-    * 接下來按下左上角的
-    * "發佈" ->
-    * "部屬為網路應用程式" ->
-    * (專案版本 選"新增") ->
-    * (將應用程式執行為 改成"我") ->
-    * (具有應用程式存取的使用者 改成"任何人甚至匿名使用者") ->
-    * 確定(or更新)(註二) ->
-    * 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)
+  然成後請如下操作：    
+    * 接下來按下左上角的     
+    * "發佈" ->     
+    * "部屬為網路應用程式" ->     
+    * (專案版本 選"新增") ->     
+    * (將應用程式執行為 改成"我") ->     
+    * (具有應用程式存取的使用者 改成"任何人甚至匿名使用者") ->     
+    * 確定(or更新)(註二) ->     
+    * 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)     
     * 將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)(用來備份整個doc)    
     [說明圖1](http://i.imgur.com/KGXuqhT.png)、[說明圖2](http://i.imgur.com/GWpqmYH.png)、[說明圖3](http://i.imgur.com/tP8HUgR.png)、[說明圖4](http://i.imgur.com/HHs9qOH.png)
 ##### Telegram bot 需要新增四個指令：
