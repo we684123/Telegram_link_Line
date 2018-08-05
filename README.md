@@ -40,7 +40,7 @@
     * 在sheet中新增5個分頁(page)：    
   __"Debug"、"Log"、"紀錄發送的訊息"、"Line訊息區"、"JSON備份"__   
     * 其中 "Line訊息區" 在其"A1"中填入 "[0,0]" (字串)，然後選取所有儲存格的格式設為字串(純文字)。      
-    [說明圖1](http://i.imgur.com/za6Ia6Q.png)、[說明圖2](http://i.imgur.com/rj9vlR3.png)    
+    [說明圖](https://i.imgur.com/CnrhMB7.png)    
 
 
 3.  二個gs檔(google apps script)，並將v3其中的"Telegram_link_Line.gs"的內容複製在一開始給你的"程式碼"區內。    
@@ -118,7 +118,7 @@
   __沒有 "<" 跟 ">"，請務必把這兩個符號刪掉!__    
 
 
-  (設定Webhook的方式就是將你改好的網址丟到任一瀏覽器上，並按Enter送出)    
+  (設定Webhook的方式就是將你改好的網址丟到任一瀏覽器上，並按Enter送出，如果成功會回你 "Webhook was set" 或 "Webhook always set")    
 
   Line則要到後台改([長這樣](http://i.imgur.com/k0pSRfR.png))
 
