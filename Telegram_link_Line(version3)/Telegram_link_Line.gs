@@ -1256,7 +1256,7 @@ function doPost(e) {
             sendPhoto(url, notification, caption)
             //sendPhoto(url, notification)
             //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
-            //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
+            //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNskkLZktW"}
           } else if (message_json.type == "sticker") {
             var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
             var notification = false
@@ -1276,7 +1276,7 @@ function doPost(e) {
             var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
             sendtext(url)
             //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
-            //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
+            //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9KakE5Q"}
           } else if (message_json.type == "location") {
             var notification = false
             if (message_json.address) {
@@ -1297,7 +1297,7 @@ function doPost(e) {
             var caption = "來自: " + message_json.userName
             sendVoice(url, notification, caption)
             //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
-            //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
+            //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1"}
           } else if (message_json.type == "file") {
             var url = message_json.DURL + "\n\n來自:  " + message_json.userName
             sendtext(url);
@@ -1310,7 +1310,7 @@ function doPost(e) {
           text = e;
           sendtext(text);
         }
-      } else if (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId) {
+      } else if (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId) { //以下未升級且有登記且"🚀 發送訊息"
         if (message_json.type == "text") {
           var p = message_json.userName + "：\n" + message_json.text
           //Logger.log("ppp = ", p)
@@ -1325,7 +1325,7 @@ function doPost(e) {
           sendPhoto(url, notification, caption)
           //sendPhoto(url, notification)
           //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
-          //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
+          //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZkt"}
         } else if (message_json.type == "sticker") {
           var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
           var notification = true
@@ -1347,7 +1347,7 @@ function doPost(e) {
           var notification = true
           sendtext(url, notification)
           //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
-          //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
+          //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk1ZKakE"}
         } else if (message_json.type == "location") {
           var notification = true
           if (message_json.address) {
@@ -1368,14 +1368,14 @@ function doPost(e) {
           var caption = "來自: " + message_json.userName
           sendVoice(url, notification, caption)
           //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
-          //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
+          //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1W"}
         } else if (message_json.type == "file") {
           var url = message_json.DURL + "\n\n來自:  " + message_json.userName
           var notification = true
           sendtext(url, notification);
           //senddocument(url)
         }
-      } else {
+      } else {   //以下有登記，未"🚀 發送訊息"
         //以下處理sheet========================================================
         var col = ALL.FastMatch2[Room_text] + 1; //找欄位
         var LastRowM = SheetM.getRange(1, col).getDisplayValue();
@@ -1393,9 +1393,9 @@ function doPost(e) {
           text = "你有新訊息!\n來自：" + ALL.data[col - 1].Name + "\n點擊以快速切換至該房間 /d" + (col - 1);
           sendtext(text);
         }
-        //已下處理關鍵字通知====================================================
+        //以下處理關鍵字通知====================================================
         var keyword_notice = ALL.keyword_notice
-        //Logger.log("已下處理關鍵字通知")
+        //Logger.log("以下處理關鍵字通知")
         if (keyword_notice) {
           var txt = text
           var keys = ALL.keyword
@@ -1421,12 +1421,9 @@ function doPost(e) {
     } else { //以下處理未登記的(新資料)=======================
       var newcol = Object.keys(ALL.FastMatch2).length;
       //以下處理FastMatch2==================================
-      var R = ',"' + Room_text + '":' + newcol + "}"
-      var y1 = JSON.stringify(ALL.FastMatch2)
-      var y2 = String(y1)
-      var y3 = y2.replace("}", R)
-      var r = JSON.parse(y3);
-      ALL.FastMatch2 = r; //打包好塞回去
+      ALL.FastMatch2[Room_text] = newcol
+      var r = JSON.stringify(ALL);
+      doc.setText(r); //寫入
       //以下處理data========================================
       var data_len = ALL.data.length;
 
@@ -1463,7 +1460,6 @@ function doPost(e) {
       //以下處理sheet(寫入訊息)========================================================
       var col = ALL.FastMatch2[Room_text] + 1; //找欄位
       SheetM.getRange(2, col).setValue(String(text)) //更新內容
-      SheetM.getRange(1, col).setValue(1) //更新數量
       //以下處理doc(寫入訊息)==========================================================
       ALL.data[col - 1].Amount = ALL.data[col - 1].Amount + 1 //!!!!!!!!!!!!!!!!!!!!!!
       var r = JSON.stringify(ALL);
