@@ -5,7 +5,7 @@
 舊版的在v1、v2分支，此為針對v3的README。    
 如果是 Telegram_Bot 新手推薦看完 [這個影片](https://youtu.be/On9yeMtG2Wg)後在來使用。    
 
-如果想要獲取更新之訊，可以加入這個頻道  https://t.me/TG_link_Line
+如果想要獲取更新資訊，可以加入這個頻道  https://t.me/TG_link_Line
 
 
 
@@ -26,9 +26,30 @@
 | 訊息時間   |     |           |    ✓  |      
 * V2、V3有時會不知道是誰發言是因為對方[版本](https://goo.gl/noYa7L)不夠新。
 
+----
 
+# Screenshot
+![Imgur](https://i.imgur.com/n9vBs6V.png)
+----
+![Imgur](https://i.imgur.com/FDVa131.png)
+----
+**獨立房間：**
+![Imgur](https://i.imgur.com/vlcHMHT.png)
+
+**關鍵字提及：**    
+![Imgur](https://i.imgur.com/NdYFcNY.png)    
+
+**訊息時間：**    
+![Imgur](https://i.imgur.com/BrbLaRE.png)
+
+----
 
 # 準備
+ #### [企鵝](https://t.me/penguinF)做了一個非常詳細的[圖文教學](https://hackmd.io/s/Bkc6LwAP7#)(萬分感謝 m(_ \_)m )，可以去看看。
+
+
+
+
  ##### 需要使用者申請 Telegram_bot跟Line_bot(Developer Trial)
 
  ##### 需有一google帳號並在其中創建：
@@ -54,22 +75,22 @@
   ----    
   ![Imgur](https://i.imgur.com/WgT109q.png)
   然成後請如下操作：    
-    * 接下來按下左上角的     
-    * "發佈" ->     
-    * "部屬為網路應用程式" ->     
-    * (專案版本 選"新增") ->     
-    * (將應用程式執行為 改成"我") ->     
-    * (具有應用程式存取的使用者 改成"任何人甚至匿名使用者") ->     
-    * 確定(or更新)(註二) ->     
-    * 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)     
-    * 將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)(用來備份整個doc)    
+  * 接下來按下左上角的     
+  * "發佈" ->     
+  * "部屬為網路應用程式" ->     
+  * 專案版本 選"新增"**(一定要記得!!!)** ->     
+  * 將應用程式執行為 改成"我" ->     
+  * 具有應用程式存取的使用者 改成"任何人甚至匿名使用者" ->     
+  * 確定(or更新)(註二) ->     
+  * 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)     
+  * 將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)(用來備份整個doc)    
     [說明圖1](http://i.imgur.com/KGXuqhT.png)、[說明圖2](http://i.imgur.com/GWpqmYH.png)、[說明圖3](http://i.imgur.com/tP8HUgR.png)、[說明圖4](http://i.imgur.com/HHs9qOH.png)
 ##### Telegram bot 需要新增四個指令：
 
-       main - 開啟主選單
-       allread - 全部已讀
-       debug - 重生資料(bot壞掉時用)(不會讓房間不見)
-       exit - 離開對話
+      main - 開啟主選單
+      exit - 離開對話
+      debug - 重生資料(bot壞掉時用)(不會讓房間不見)
+      allread - 全部已讀
 
   * 跟 @BotFather 對話  ->    
   * 然後 /mybots  ->    
@@ -86,9 +107,9 @@
   https://docs.google.com/spreadsheets/d/1vp35X4AfgP2mGLib0PZQ0NLaw_Ur0PSD_0rjgbwOfx/edit#gid=0
 
   那ID就是"1vp35X4AfgP2mGLib0PZQ0NLaw_Ur0PSD_0rjgbwOfx"
-  (介於"d/"跟"/edit")    
+  **(介於 "d/" 跟 "/edit" 之間)**    
 
-  不知道自己的Telegram ID可以在Telegram中找 @you_id_bot 問。    
+  不知道自己的Telegram ID可以在Telegram中找 [@you_id_bot](https://t.me/you_id_bot) 問。    
 
   然後關於gs文件中第7行的 "Line_id"、第8行的 "CHANNEL_ACCESS_TOKEN"在如下圖line的後台中。     
   ![Imgur](http://i.imgur.com/meQfSFm.jpg)
@@ -129,18 +150,8 @@
 - NOTE2：    
     現在Line伺服器在群組中有時會發userID(須對方line app更新)    
     所以有些知道是誰說的，有些不知道，我現在也很困擾。
-# Screenshot
-![Imgur](https://i.imgur.com/n9vBs6V.png)
-----
-![Imgur](https://i.imgur.com/FDVa131.png)
-----
-![Imgur](https://i.imgur.com/vlcHMHT.png)
 
-關鍵字提及：    
-![Imgur](https://i.imgur.com/NdYFcNY.png)    
-
-訊息時間：    
-![Imgur](https://i.imgur.com/BrbLaRE.png)
+----
 
 # doc的json說明
 
