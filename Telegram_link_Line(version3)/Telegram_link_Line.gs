@@ -226,7 +226,7 @@ function doPost(e) {
         TG_Send_text_To_Line(Line_id, text)
 
         //================================================================
-      } else if (mode == "🔖 重新命名") {
+      } else if (mode == "🔖 重新命名" && Stext != "/main") {
         if (ALL.FastMatch[Stext] != undefined) { //排除重名
           text = "名子不可重複，請重新輸入一個!";
           var notification = true
@@ -723,7 +723,7 @@ function doPost(e) {
             ALL.mode = "🔖 重新命名"
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
-            text = "將對 " + ALL.opposite.Name + " 重新命名!!!\n" + "請輸入新名子："
+            text = "將對 " + ALL.opposite.Name + " 重新命名!!!\n如要取消命名請按 /main 取消\n" + "請輸入新名子："
             ReplyKeyboardRemove(text)
             break;
           case '🔥 刪除房間':
@@ -1195,7 +1195,7 @@ function doPost(e) {
       userName = "";
     var cutMessage = estringa.events[0].message; //好長 看的我都花了 縮減個
 
-    var message_json = { //前面先寫 後面補充
+    var message_json = { //前面先寫 後面替換
       "type": "type",
       "message_id": cutMessage.id,
       "userName": userName,
