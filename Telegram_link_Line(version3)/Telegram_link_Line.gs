@@ -35,6 +35,8 @@ function doPost(e) {
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
   var FolderId = base_json.FolderId
   var gsURL = base_json.gsURL
+  var language_code = base_json.language_code
+  var ct = JSON.parse(language(language_code))["correspond_text"]  //語言載入
 
   /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);

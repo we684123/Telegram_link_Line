@@ -9,6 +9,7 @@ function base() {
   var email = "@gmail.com"; //你的email(祈禱永遠別收到來自此的e-mail)
   var FolderId = ""; //你的選擇要存的資料夾(google_grive_FolderId)，必須獨立不能共用!，且要為"公開"!
   var gsURL = ""; //該gs檔的發佈網址
+  var language_code = 0;  // 0(作者原生),1(自定義)(可以去下面的 language 那邊改或自己新增)
   //前期準備完成!==============================================================
   var base_json = {
     "sheet_key": sheet_key,
@@ -19,7 +20,8 @@ function base() {
     "CHANNEL_ACCESS_TOKEN": CHANNEL_ACCESS_TOKEN,
     "email": email,
     "FolderId": FolderId,
-    "gsURL": gsURL
+    "gsURL": gsURL,
+    "language_code":language_code
   }
   return base_json
 }
