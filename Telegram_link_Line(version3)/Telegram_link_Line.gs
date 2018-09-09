@@ -35,8 +35,8 @@ function doPost(e) {
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
   var FolderId = base_json.FolderId
   var gsURL = base_json.gsURL
-  var language_code = base_json.language_code
-  var ct = JSON.parse(language(language_code))["correspond_text"]  //語言載入
+  var GMT = base_json.GMT
+  var ct = JSON.parse(language(language_code))["correspond_text"] //語言載入
 
   /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -454,7 +454,7 @@ function doPost(e) {
           ct["add_keyword_success"]["text"] = ct["add_keyword_success"]["text"].format(li)
           sendtext(ct["add_keyword_success"]);
         } catch (e) {
-          ct["add_keyword_success"]["text"] =  ct["add_keyword_success"]["text"].format(String(e))
+          ct["add_keyword_success"]["text"] = ct["add_keyword_success"]["text"].format(String(e))
           sendtext(ct["add_keyword_success"]);
           // ^ "新增失敗，原因如下：\n" + String(e)
           return 0
@@ -519,7 +519,7 @@ function doPost(e) {
             sendtext(ct["w_error_status"]);
             // ^ 寫入失敗，詳情如下：
           }
-        }else {
+        } else {
           var text = ""
           sendtext(ct["not_eat_this"]);
           // ^ 030...\n請不要給我吃怪怪的東西...
@@ -529,61 +529,61 @@ function doPost(e) {
         //以下指令分流
         switch (Stext) {
           case '/main':
-          case '🔃 重新整理':
+          case ct['🔃 重新整理']["text"]:
             if (ALL.mode != 0) {
               ALL.mode = 0
               var r = JSON.stringify(ALL);
               doc.setText(r); //寫入
             }
-            var text = "🔮 開啟主選單"
-            keyboard_main(text, doc_key)
+            keyboard_main(ct["🔮 開啟主選單"], doc_key)
             break;
-          case '🔙 返回房間':
+          case ct['🔙 返回房間']:
             var keyboard = ALL.RoomKeyboard;
             var resize_keyboard = true
             var one_time_keyboard = false
-            var text = "請選擇聊天室"
+            var text = ct["請選擇聊天室"]
             ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, text)
 
             break;
-          case '🔭 訊息狀態':
+          case ct['🔭 訊息狀態']:
             data_len = ALL.data.length;
             text = ""
             for (var i = 0; i < data_len; i++) {
               if (ALL.data[i].Amount == 0)
                 continue;
-              text = text + ALL.data[i].Name + '\n' + '未讀：' + ALL.data[i].Amount + '\n' + '-------------\n'
+              ct["unread_number"]["text"] = ct["unread_number"]["text"].format(text, ALL.data[i].Name, ALL.data[i].Amount)
+              // ^ text + ALL.data[i].Name + '\n' + '未讀：' + ALL.data[i].Amount + '\n' + '-------------\n'
             }
 
-            if (text == "") {
-              text = "沒有任何未讀。"
+            if (ct["unread_number"]["text"] == "") {
+              ct["unread_number"]["text"] = "沒有任何未讀。"
             }
-            var notification = true
-            sendtext(text, notification);
+            sendtext(ct["unread_number"]);
             break;
-          case '✔ 關閉鍵盤':
-            var text = "已關閉鍵盤，如欲再次開啟請按 /main"
+          case ct['✔ 關閉鍵盤']:
+            var text = ct['colse_Keyboard_ed']
             ReplyKeyboardRemove(text)
+            // ^ "已關閉鍵盤，如欲再次開啟請按 /main"
             break;
           case '🚀 發送訊息':
             ALL.mode = "🚀 發送訊息"
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
-            text = "將對 " + ALL.opposite.Name + "發送訊息\n" + "如欲離開請輸入 /exit \n請輸入訊息："
+            text = ct["sendtext_to_XXX"]["text"].format(ALL.opposite.Name)
+            // ^  "將對 " + ALL.opposite.Name + "發送訊息\n" + "如欲離開請輸入 /exit \n請輸入訊息："
             ReplyKeyboardRemove(text)
             break;
           case '/exit':
             ALL.mode = 0
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
-            text = "======已停止對話!======"
-            keyboard_main(text, doc_key)
+            keyboard_main(ct["exit_room_ed"], doc_key)
+            // ^ "======已停止對話!======"
             break;
-          case '📬 讀取留言':
+          case ct['📬 讀取留言']:
             if (ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount == 0) {
-              text = "這個房間並沒有未讀的通知喔~ ";
-              var notification = true
-              sendtext(text, notification);
+              sendtext(ct["not_need_read"], notification);
+              // ^ "這個房間並沒有未讀的通知喔~ "
             } else {
 
               var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -605,7 +605,7 @@ function doPost(e) {
               }
 
               function get_time_txt(timestamp) {
-                var formattedDate = Utilities.formatDate(new Date(timestamp), "GMT+8", "yyyy-MM-dd' 'HH:mm:ss");
+                var formattedDate = Utilities.formatDate(new Date(timestamp), GMT, "yyyy-MM-dd' 'HH:mm:ss");
                 return formattedDate;
               }
 
@@ -628,8 +628,7 @@ function doPost(e) {
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "image") {
                   var url = message_json.DURL
-                  var notification = true
-                  var caption = "來自: " + message_json.userName
+                  var caption = ct["is_from"]["text"].format(message_json.userName)
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     caption += "\n" + t
@@ -641,8 +640,7 @@ function doPost(e) {
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "sticker") {
                   var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
-                  var notification = true
-                  var caption = "來自: " + message_json.userName
+                  var caption = ct["is_from"]["text"].format(message_json.userName)
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     caption += "\n" + t
@@ -660,13 +658,13 @@ function doPost(e) {
                   //"stickerId":"502","packageId":"2"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "audio") {
-                  var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
+                  var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     url += "\n" + t
                   }
-                  var notification = true
-                  sendtext(url, notification)
+                  sendtext(url)
+                  // ^ "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
                   //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
                   upMessageData(i, col, ed)
@@ -679,7 +677,7 @@ function doPost(e) {
                   var latitude = message_json.latitude
                   var longitude = message_json.longitude
                   sendLocation(latitude, longitude, notification)
-                  var text = "以上來自: " + message_json.userName
+                  var text = ct["is_from"]["text"].format(message_json.userName)
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     text += "\n" + t
@@ -691,8 +689,7 @@ function doPost(e) {
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "video") {
                   var url = message_json.DURL
-                  var notification = true
-                  var caption = "來自: " + message_json.userName
+                  var caption = ct["is_from"]["text"].format(message_json.userName)
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     caption += "\n" + t
@@ -702,12 +699,11 @@ function doPost(e) {
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "file") {
-                  var url = message_json.DURL + "\n\n來自:  " + message_json.userName
+                  var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     text += "\n" + t
                   }
-                  var notification = true
                   sendtext(text, notification);
                   //senddocument(url)
                   upMessageData(i, col, ed)
@@ -719,9 +715,8 @@ function doPost(e) {
               doc.setText(r); //寫入
               SheetM.getRange(1, col).setValue("[0,0]")
 
-              text = "=======讀取完畢======="
-              var notification = true
-              sendtext(text, notification);
+              sendtext(ct["read_massage_ed"]);
+              // ^ =======讀取完畢=======
             }
             break;
           case '🔖 重新命名':
@@ -1380,7 +1375,7 @@ function doPost(e) {
           sendtext(url, notification);
           //senddocument(url)
         }
-      } else {   //以下有登記，未"🚀 發送訊息"
+      } else { //以下有登記，未"🚀 發送訊息"
         //以下處理sheet========================================================
         var col = ALL.FastMatch2[Room_text] + 1; //找欄位
         var LastRowM = SheetM.getRange(1, col).getDisplayValue();
@@ -1552,8 +1547,8 @@ function ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, ct) {
     "method": "sendMessage",
     'chat_id': "Telegram_id",
     'text': text,
-    'parse_mode':parse_mode,
-    'disable_notification':notification,
+    'parse_mode': parse_mode,
+    'disable_notification': notification,
     'reply_markup': JSON.stringify(ReplyKeyboardMakeup)
   }
   start(payload);
@@ -1573,8 +1568,8 @@ function In(name) { //防止與命令衝突的命名
   var arr = ["/main", "🔙 返回房間", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言",
     "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃 重新整理", "🔥 刪除房間", "/delete", "/debug",
     "/AllRead", "/allread", "/Allread", "/allRead", "⭐️ 升級房間", "💫 降級房間", "/uproom", "droproom",
-    "/uproom_2","/unsetbot","♻ 移除關鍵字","📎 新增關鍵字","/lookkeyword","⏰訊息時間啟用?","🔧 更多設定",
-    "🔑設定關鍵字提醒","啟動關鍵字提醒","暫停關鍵字提醒",
+    "/uproom_2", "/unsetbot", "♻ 移除關鍵字", "📎 新增關鍵字", "/lookkeyword", "⏰訊息時間啟用?", "🔧 更多設定",
+    "🔑設定關鍵字提醒", "啟動關鍵字提醒", "暫停關鍵字提醒",
   ];
 
   var flag = arr.some(function(value, index, array) {
@@ -1653,7 +1648,7 @@ function REST_FastMatch1and2() { //重製快速索引
   ALL.FastMatch = {}
   ALL.FastMatch2 = {}
   for (var i = 0; i < data_len; i++) {
-    var Name =  String(ALL.data[i].Name)
+    var Name = String(ALL.data[i].Name)
     ALL.FastMatch[Name] = i
   }
   for (var i = 0; i < data_len; i++) {
@@ -2225,7 +2220,7 @@ String.format = function() {
 }
 
 //讓輸入的字串可以包含{}
-function getStringFormatPlaceHolderRegEx(placeHolderIndex){
+function getStringFormatPlaceHolderRegEx(placeHolderIndex) {
   return new RegExp('({)?\\{' + placeHolderIndex + '\\}(?!})', 'gm')
 }
 
@@ -2233,7 +2228,7 @@ function getStringFormatPlaceHolderRegEx(placeHolderIndex){
 //ex:
 // var fullName = 'Hello. My name is {0} {1} {2}.'.format('firstName', 'lastName');
 // 輸出的 fullName 為 'firstName lastName', 而不會是 'firstName lastName {2}'
-function cleanStringFormatResult(txt){
+function cleanStringFormatResult(txt) {
   if (txt == null) return "";
   return txt.replace(getStringFormatPlaceHolderRegEx("\\d+"), "");
 }
