@@ -59,6 +59,12 @@ function language(number) {
           "notification": false, //不通知? true or false
           "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
         },
+        "not_support_document": {
+          "type": "to_Telegram",
+          "text": "(暫時不支援document傳送喔!)",
+          "notification": false, //不通知? true or false
+          "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+        },
         "plz_exit_and_resend": {
           "type": "to_Telegram",
           "text": "請先按下 /exit 離開後再下指令喔!",
@@ -430,57 +436,46 @@ function language(number) {
           "type": "command(Telegram)",
           "text": "暫停關鍵字提醒"
         },
-        "": {
+        "add_keyword_ing": {
           "type": "to_Telegram",
           "text": "請輸入欲新增關鍵字\n新增多組關鍵字請用 ',' 或 '，' 號隔開\n如欲離開請按 /main",
           "notification": false, //不通知? true or false
           "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
         },
-        "": {
+        "delete_keyword_ing": {
           "type": "to_Telegram",
-          "text": "",
+          "text": '請輸入欲移除關鍵字的**前方編號!!!**\n刪除多組關鍵字請用 "任意符號" 隔開(推薦用","或"，")\n如遇離開請按 /main',
+          "notification": false, //不通知? true or false
+          "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+        },
+        "turn_on_keyword_ed": {
+          "type": "to_Telegram",
+          "text": "已啟用關鍵字提醒!",
+          "notification": true, //不通知? true or false
+          "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+        },
+        "turn_off_keyword_ed": {
+          "type": "to_Telegram",
+          "text": "已暫停關鍵字提醒!",
+          "notification": true, //不通知? true or false
+          "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+        },
+        "select_room_text": {
+          "type": "to_Telegram",
+          "text": "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?",
+          // {0} = 房間名稱 , {1} = 未讀數量 , {2} = 有沒有開啟聊天室的通知(true or false)
           "notification": false, //不通知? true or false
           "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
         },
-        "": {
+        "incorrect_operation": {
           "type": "to_Telegram",
-          "text": "",
+          "text": "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤",
           "notification": false, //不通知? true or false
           "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
         },
-        "": {
+        "not_find_location_name": {
           "type": "to_Telegram",
-          "text": "",
-          "notification": false, //不通知? true or false
-          "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-        },
-        "": {
-          "type": "to_Telegram",
-          "text": "",
-          "notification": false, //不通知? true or false
-          "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-        },
-        "": {
-          "type": "to_Telegram",
-          "text": "",
-          "notification": false, //不通知? true or false
-          "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-        },
-        "": {
-          "type": "to_Telegram",
-          "text": "",
-          "notification": false, //不通知? true or false
-          "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-        },
-        "": {
-          "type": "to_Telegram",
-          "text": "",
-          "notification": false, //不通知? true or false
-          "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-        },
-        "": {
-          "type": "to_Telegram",
-          "text": "",
+          "text": "未找到地點",
           "notification": false, //不通知? true or false
           "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
         },
