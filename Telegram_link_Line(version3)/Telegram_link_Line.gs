@@ -953,60 +953,16 @@ function doPost(e) {
             break;
             //-------------------------------------------------------------------
           default:
-            if (ALL.FastMatch[Stext] != undefined) {
-              var FM = ALL.FastMatch[Stext]
-              var OAmount = ALL.data[FM].Amount
-              var OName = ALL.data[FM].Name
-              var ORoomId = ALL.data[FM].RoomId
-              ALL.opposite.RoomId = ORoomId;
-              ALL.opposite.Name = OName;
-              var r = JSON.stringify(ALL);
-              doc.setText(r); //寫入
-              var Notice = ALL.data[FM].Notice
+            if (ALL.FastMatch[Stext] != undefined || Stext.substr(0, 2) == "/d") {
 
-              text = ct["select_room_text"].format(OName, OAmount, Notice)
-              // ^ "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?"
-              var keyboard = [
-                [{
-                  'text': ct['🚀 發送訊息']["text"]
-                }, {
-                  'text': ct['📬 讀取留言']["text"]
-                }, {
-                  'text': ct['🔖 重新命名']["text"]
-                }],
-                [{
-                  'text': ct['⭐ 升級房間']["text"]
-                }, {
-                  'text': ct['🐳 開啟通知']["text"]
-                }, {
-                  'text': ct['🔰 暫停通知']["text"]
-                }],
-                [{
-                  'text': ct["🔥 刪除房間"]["text"]
-                }, {
-                  'text': ct["🔙 返回房間"]["text"]
-                }]
-              ]
-
-
-              if (ALL.data[FM].botToken) { //如果遇到已升級的則改"降級"
-                var keyboard2 = [
-                  [{
-                    'text': ct['💫 降級房間']["text"]
-                  }, {
-                    'text': ct["🔙 返回房間"]["text"]
-                  }]
-                ]
-                keyboard = keyboard2
+              if (ALL.FastMatch[Stext] != undefined) { //一種間接抓，一種直接
+                var FM = ALL.FastMatch[Stext]
+              } else {
+                var s_len = Stext.length - 1;
+                var number = Stext.substr(2, s_len)
+                var FM = number;
               }
-              var resize_keyboard = true
-              var one_time_keyboard = false
-              ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, text)
-            } else if (Stext.substr(0, 2) == "/d") {
-              var s_len = Stext.length - 1;
-              var number = Stext.substr(2, s_len)
 
-              var FM = number;
               var OAmount = ALL.data[FM].Amount
               var OName = ALL.data[FM].Name
               var ORoomId = ALL.data[FM].RoomId
@@ -1039,7 +995,6 @@ function doPost(e) {
                   'text': ct["🔙 返回房間"]["text"]
                 }]
               ]
-
 
               if (ALL.data[FM].botToken) { //如果遇到已升級的則改"降級"
                 var keyboard2 = [
@@ -1237,8 +1192,11 @@ function doPost(e) {
     var ALL = JSON.parse(f);
     //================================================================
     if (ALL.FastMatch2[Room_text] != undefined) { //以下處理已登記的
-      if (ALL.data[ALL.FastMatch2[Room_text]].status == "已升級房間") {
-        chkey(ALL.data[ALL.FastMatch2[Room_text]].botToken)
+      if (ALL.data[ALL.FastMatch2[Room_text]].status == "已升級房間" || (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId)) {
+        if (ALL.data[ALL.FastMatch2[Room_text]].status == "已升級房間") {
+          chkey(ALL.data[ALL.FastMatch2[Room_text]].botToken)
+        }
+
         try {
           if (message_json.type == "text") {
             var p = message_json.userName + "：\n" + message_json.text
@@ -1249,7 +1207,9 @@ function doPost(e) {
           } else if (message_json.type == "image") {
             var url = message_json.DURL
             var notification = false
-            var caption = "來自: " + message_json.userName
+            var caption = ct["is_from"]["text"].format(message_json.userName)
+            sendtext(ct["sendPhoto_ing"]);
+            // ^ (正在傳送圖片，請稍後...)
             sendPhoto(url, notification, caption)
             //sendPhoto(url, notification)
             //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
@@ -1257,7 +1217,9 @@ function doPost(e) {
           } else if (message_json.type == "sticker") {
             var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
             var notification = false
-            var caption = "來自: " + message_json.userName
+            var caption = ct["is_from"]["text"].format(message_json.userName)
+            sendPhoto(ct["sendSticker_ing"])
+            // ^ (正在傳送貼圖，請稍後...)
             sendPhoto(sticker_png_url, notification, caption)
             //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
             /*
@@ -1270,8 +1232,9 @@ function doPost(e) {
             //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
             //"stickerId":"502","packageId":"2"}
           } else if (message_json.type == "audio") {
-            var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
+            var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
             sendtext(url)
+            // ^ "抱歉!請至該連結下載或聆聽!\n{0}\n\n{1}來自: "
             //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
             //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9KakE5Q"}
           } else if (message_json.type == "location") {
@@ -1283,7 +1246,7 @@ function doPost(e) {
             var latitude = message_json.latitude
             var longitude = message_json.longitude
             sendLocation(latitude, longitude, notification)
-            var text = "以上來自: " + message_json.userName
+            var text = ct["is_from"]["text"].format(message_json.userName)
             sendtext(text, notification);
             //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
             //"address":"260台灣宜蘭縣宜蘭市舊城西路107號",
@@ -1291,86 +1254,20 @@ function doPost(e) {
           } else if (message_json.type == "video") {
             var url = message_json.DURL
             var notification = false
-            var caption = "來自: " + message_json.userName
+            var caption = ct["is_from"]["text"].format(message_json.userName)
             sendVoice(url, notification, caption)
             //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
             //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1"}
           } else if (message_json.type == "file") {
-            var url = message_json.DURL + "\n\n來自:  " + message_json.userName
+            var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
             sendtext(url);
             //senddocument(url)
           }
         } catch (e) {
           chkey(Telegram_bot_key)
-          text = "030....你是否忘記先跟新辦的bot說過話呢?\n請看下列錯誤回報以debug!"
-          sendtext(text);
-          text = e;
-          sendtext(text);
-        }
-      } else if (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId) { //以下未升級且有登記且"🚀 發送訊息"
-        if (message_json.type == "text") {
-          var p = message_json.userName + "：\n" + message_json.text
-          //Logger.log("ppp = ", p)
-          sendtext(p);
-          //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
-          //"text":"51"}
-        } else if (message_json.type == "image") {
-          var url = message_json.DURL
-          var notification = true
-          var caption = "來自: " + message_json.userName
-          sendtext("(正在傳送圖片，請稍後...)", notification);
-          sendPhoto(url, notification, caption)
-          //sendPhoto(url, notification)
-          //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
-          //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZkt"}
-        } else if (message_json.type == "sticker") {
-          var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
-          var notification = true
-          var caption = "來自: " + message_json.userName
-          sendtext("(正在傳送貼圖，請稍後...)", notification);
-          sendPhoto(sticker_png_url, notification, caption)
-          //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
-          /*
-          //下面是舊的方式 現在最近去爬line發現line的東西很好爬，異常好爬(怕.png
-          //是有方法可以直接發貼圖啦，但這樣速度會變慢 乾脆直接發圖。
-          text = "[" + message_json.type + "]\nstickerId:" + message_json.stickerId + "\npackageId:" + message_json.packageId
-          var notification = true
-          sendtext(text, notification);
-          */
-          //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
-          //"stickerId":"502","packageId":"2"}
-        } else if (message_json.type == "audio") {
-          var url = "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
-          var notification = true
-          sendtext(url, notification)
-          //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
-          //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk1ZKakE"}
-        } else if (message_json.type == "location") {
-          var notification = true
-          if (message_json.address) {
-            var text = message_json.address
-            sendtext(text, notification);
-          }
-          var latitude = message_json.latitude
-          var longitude = message_json.longitude
-          sendLocation(latitude, longitude, notification)
-          var text = "以上來自: " + message_json.userName
-          sendtext(text, notification);
-          //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
-          //"address":"260台灣宜蘭縣宜蘭市舊城西路107號",
-          //"latitude":24.759711,"longitude":121.750114}
-        } else if (message_json.type == "video") {
-          var url = message_json.DURL
-          var notification = true
-          var caption = "來自: " + message_json.userName
-          sendVoice(url, notification, caption)
-          //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
-          //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1W"}
-        } else if (message_json.type == "file") {
-          var url = message_json.DURL + "\n\n來自:  " + message_json.userName
-          var notification = true
-          sendtext(url, notification);
-          //senddocument(url)
+          sendtext(ct["forget_talk_to_new_bot?"]);
+          // ^ "030....你是否忘記先跟新辦的bot說過話呢?\n請看下列錯誤回報以debug!"
+          sendtext(e); //傳錯誤訊息詳情
         }
       } else { //以下有登記，未"🚀 發送訊息"
         //以下處理sheet========================================================
@@ -1387,8 +1284,8 @@ function doPost(e) {
         //以下處理通知=========================================================
         var Notice = ALL.data[col - 1].Notice //通知 true or false
         if (Notice) {
-          text = "你有新訊息!\n來自：" + ALL.data[col - 1].Name + "\n點擊以快速切換至該房間 /d" + (col - 1);
-          sendtext(text);
+          sendtext(ct["you_have_new_massage"]["text"].format(ALL.data[col - 1].Name, (col - 1)));
+          // ^ "你有新訊息!\n來自：{0}\n點擊以快速切換至該房間 /d{1}"
         }
         //以下處理關鍵字通知====================================================
         var keyword_notice = ALL.keyword_notice
@@ -1400,16 +1297,13 @@ function doPost(e) {
           //Logger.log("TTTT = ",keys_value)
           //Logger.log("Tkeys_value.length = ",keys_value.length)
           if (keys_value.length > 0) {
-            //Logger.log("TTTT33333 = ")
-            var text1 = "有關鍵字被提及！\n"
             var text2 = ""
             for (var i = 0; i < keys_value.length; i++) {
               text2 += keys_value[i] + " "
             }
-            var text3 = "\nby: " + ALL.data[col - 1].Name + "\n點擊以快速切換至該房間 /d" + (col - 1);
-            text = text1 + text2 + text3
-            //Logger.log("TTTT4444 = ",text)
+            text = ct["keyword_trigger"]["text"].format(text2, ALL.data[col - 1].Name, (col - 1))
             sendtext(text);
+            // ^ "有關鍵字被提及！\n{0}\nby: {1}\n點擊以快速切換至該房間 /d{2}",
           }
         }
         //===================================================================

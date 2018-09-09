@@ -479,33 +479,39 @@ function language(number) {
           "notification": false, //不通知? true or false
           "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
         },
-        "": {
+        "sendPhoto_ing": {
           "type": "to_Telegram",
-          "text": "",
+          "text": "(正在傳送圖片，請稍後...)",
+          "notification": true, //不通知? true or false
+          "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+        },
+        "sendSticker_ing": {
+          "type": "to_Telegram",
+          "text": "(正在傳送貼圖，請稍後...)",
+          "notification": true, //不通知? true or false
+          "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+        },
+        "you_have_new_massage": {
+          "type": "to_Telegram",
+          "text": "你有新訊息!\n來自：{0}\n點擊以快速切換至該房間 /d{1}",
+          // {0} = 提及的來源房間 , {1} = 快速切換代號
           "notification": false, //不通知? true or false
           "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
         },
-        "": {
+        "keyword_trigger": {
           "type": "to_Telegram",
-          "text": "",
+          "text": "有關鍵字被提及！\n{0}\nby: {1}\n點擊以快速切換至該房間 /d{2}",
+          // {0} = 被提及的關鍵字組 , {1} = 提及的來源房間 , {2} = 快速切換代號
           "notification": false, //不通知? true or false
           "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
         },
-        "": {
+        "new_ID_sign_in": {
           "type": "to_Telegram",
-          "text": "",
+          "text": "已有新ID登入!!! id =\n{0}\n請盡快重新命名。",
+          // {0} = ID名稱或人的名稱
           "notification": false, //不通知? true or false
           "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-        },
-        "": {
-          "type": "to_Telegram",
-          "text": "",
-          "notification": false, //不通知? true or false
-          "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-        },
-
-
-
+        }
       }
     }, ]
   }
