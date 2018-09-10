@@ -383,7 +383,7 @@ function doPost(e) {
           doc.setText(r); //寫入
 
           ct["uproom_success"]["text"] = ct["uproom_success"]["text"].format(JSON.stringify(ALL.data[number]));
-          text = ct["rename_success"]
+          text = ct["uproom_success"]
           keyboard_main(text, doc_key)
         } else {
           sendtext(ct["not_input_here"]);
@@ -549,16 +549,25 @@ function doPost(e) {
           case ct['🔭 訊息狀態']["text"]:
             data_len = ALL.data.length;
             text = ""
+            //Logger.log('HHHHH1111 = ',ct["unread_number"]["text"])
             for (var i = 0; i < data_len; i++) {
-              if (ALL.data[i].Amount == 0)
+              if (ALL.data[i].Amount == 0) {
+                //Logger.log("IIIIII = ",i)
                 continue;
+              }
+              //Logger.log("TTTTTT = ",text)
+              //Logger.log("BBBBBBBB = ",ALL.data[i].Name)
+              //Logger.log("BBBBB2222 = ",ALL.data[i].Amount)
               ct["unread_number"]["text"] = ct["unread_number"]["text"].format(text, ALL.data[i].Name, ALL.data[i].Amount)
               // ^ text + ALL.data[i].Name + '\n' + '未讀：' + ALL.data[i].Amount + '\n' + '-------------\n'
+              //Logger.log('HHHHH2222 = ',ct["unread_number"]["text"])
+              //Logger.log("TTTTTT22222 = ",text)
             }
 
-            if (ct["unread_number"]["text"] == "") {
-              ct["unread_number"]["text"] = "沒有任何未讀。"
+            if (text == "") {
+              ct["unread_number"]["text"] = ct["unread_number"]["text"] = "沒有任何未讀。"
             }
+            //Logger.log('HHHHHH22222 = ',ct["unread_number"]["text"])
             sendtext(ct["unread_number"]);
             break;
           case ct['✔ 關閉鍵盤']["text"]:
@@ -719,10 +728,11 @@ function doPost(e) {
             }
             break;
           case ct['🔖 重新命名']["text"]:
+            var OName = ALL.opposite.Name
             ALL.mode = "🔖 重新命名"
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
-            ReplyKeyboardRemove(ct["rename_room_text"])
+            ReplyKeyboardRemove(ct["rename_room_text"]['text'].format(OName))
             // ^ "將對 {0} 重新命名!!!\n如要取消命名請按 /main 取消\n請輸入新名子："
             break;
           case ct['🔥 刪除房間']["text"]:
@@ -743,7 +753,7 @@ function doPost(e) {
             ALL.opposite.Name = u;
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
-            sendtext(ct["enabled_notification_ed"]);
+            sendtext(ct["enabled_notification_ed"]["text"].format(OName));
             // ^ "已開啟 {0} 的通知"
             //以下處理RoomKeyboard==================================================
             REST_keyboard(doc_key) //重新編排keyborad
@@ -759,7 +769,7 @@ function doPost(e) {
             ALL.opposite.Name = u;
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
-            sendtext(ct["disabled_notification_ed"]);
+            sendtext(ct["disabled_notification_ed"]["text"].format(OName));
             // ^ "已暫停 {0} 的通知"
             //以下處理RoomKeyboard==================================================
             REST_keyboard(doc_key) //重新編排keyborad
@@ -791,8 +801,8 @@ function doPost(e) {
             ALL.mode = 0
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
-            ct["debug_ed"]["text"].format(xfjhxgfh, ydjdyf)
-            sendtext(text);
+            sendtext(ct["debug_ed"]["text"].format(xfjhxgfh, ydjdyf));
+            // ^ "已debug\nREST_FastMatch1and2() : {0}\nREST_keyboard() : {1}",
             break;
           case '/AllRead':
           case '/Allread':
@@ -953,7 +963,8 @@ function doPost(e) {
             break;
             //-------------------------------------------------------------------
           default:
-            if (ALL.FastMatch[Stext] != undefined || Stext.substr(0, 2) == "/d") {
+            var st = Stext.substr(0, 2)
+            if (ALL.FastMatch[Stext] != undefined || st == "/d") {
 
               if (ALL.FastMatch[Stext] != undefined) { //一種間接抓，一種直接
                 var FM = ALL.FastMatch[Stext]
@@ -1220,7 +1231,7 @@ function doPost(e) {
             var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
             var notification = false
             var caption = ct["is_from"]["text"].format(message_json.userName)
-            sendPhoto(ct["sendSticker_ing"])
+            sendtext(ct["sendSticker_ing"])
             // ^ (正在傳送貼圖，請稍後...)
             sendPhoto(sticker_png_url, notification, caption)
             //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
@@ -1411,8 +1422,11 @@ function ReplyKeyboardRemove(ct) {
     var notification = false
     var parse_mode = ""
   }
-  if (ct["text"] == undefined)
+  if (ct["text"] == undefined) {
     var text = String(ct)
+  } else {
+    var text = ct["text"]
+  }
 
   var ReplyKeyboardRemove = {
     'remove_keyboard': true,
@@ -1443,9 +1457,11 @@ function ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, ct) {
     var notification = false
     var parse_mode = ""
   }
-  if (ct["text"] == undefined)
+  if (ct["text"] == undefined) {
     var text = String(ct)
-
+  } else {
+    var text = ct["text"]
+  }
   //Logger.log("ReplyKeyboardMakeup->ct = ", text + "\n" + ct + "\n" + ct["text"])
   var ReplyKeyboardMakeup = {
     'keyboard': keyboard,
@@ -1980,8 +1996,11 @@ function sendtext(ct) {
     var notification = false
     var parse_mode = ""
   }
-  if (ct["text"] == undefined)
+  if (ct["text"] == undefined) {
     var text = String(ct)
+  } else {
+    var text = ct["text"]
+  }
 
   var payload = {
     "method": "sendMessage",
