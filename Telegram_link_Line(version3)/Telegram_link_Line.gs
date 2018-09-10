@@ -36,7 +36,7 @@ function doPost(e) {
   var FolderId = base_json.FolderId
   var gsURL = base_json.gsURL
   var GMT = base_json.GMT
-  var ct = JSON.parse(language(language_code))["correspond_text"] //語言載入
+  var ct = language()["correspond_text"] //語言載入
 
   /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -972,8 +972,9 @@ function doPost(e) {
               doc.setText(r); //寫入
               var Notice = ALL.data[FM].Notice
 
-              text = ct["select_room_text"].format(OName, OAmount, Notice)
+              text = ct["select_room_text"]["text"].format(OName, OAmount, Notice)
               // ^ "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?"
+              //Logger.log("select_room_text = ", text)
               var keyboard = [
                 [{
                   'text': ct['🚀 發送訊息']["text"]
@@ -1009,6 +1010,7 @@ function doPost(e) {
               var resize_keyboard = true
               var one_time_keyboard = false
               ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, text)
+
             } else {
               sendtext(ct["incorrect_operation"]);
               // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
@@ -1399,7 +1401,6 @@ function Log(estringa, from, sheet_key, email) {
 //=================================================================
 function ReplyKeyboardRemove(ct) {
   try {
-    var text = ct["text"]
     var notification = ct["notification"]
     var parse_mode = ct["parse_mode"]
     if (notification == undefined || notification != true)
@@ -1407,10 +1408,11 @@ function ReplyKeyboardRemove(ct) {
     if (parse_mode == undefined)
       var parse_mode = ""
   } catch (e) {
-    var text = ct
     var notification = false
     var parse_mode = ""
   }
+  if (ct["text"] == undefined)
+    var text = String(ct)
 
   var ReplyKeyboardRemove = {
     'remove_keyboard': true,
@@ -1419,16 +1421,18 @@ function ReplyKeyboardRemove(ct) {
   var payload = {
     "method": "sendMessage",
     'chat_id': "Telegram_id",
-    'text': ct["text"],
+    'text': text,
     "parse_mode": parse_mode,
-    "notification": notification 'reply_markup': JSON.stringify(ReplyKeyboardRemove)
+    "notification": notification,
+    'reply_markup': JSON.stringify(ReplyKeyboardRemove)
   }
   start(payload);
 }
 //=================================================================================
 function ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, ct) {
+  //Logger.log("ct = ",ct)
+  //Logger.log("ct str = ",String(ct))
   try {
-    var text = ct["text"]
     var notification = ct["notification"]
     var parse_mode = ct["parse_mode"]
     if (notification == undefined || notification != true)
@@ -1436,11 +1440,13 @@ function ReplyKeyboardMakeup(keyboard, resize_keyboard, one_time_keyboard, ct) {
     if (parse_mode == undefined)
       var parse_mode = ""
   } catch (e) {
-    var text = ct
     var notification = false
     var parse_mode = ""
   }
+  if (ct["text"] == undefined)
+    var text = String(ct)
 
+  //Logger.log("ReplyKeyboardMakeup->ct = ", text + "\n" + ct + "\n" + ct["text"])
   var ReplyKeyboardMakeup = {
     'keyboard': keyboard,
     'resize_keyboard': resize_keyboard,
@@ -1964,7 +1970,6 @@ function CP() {
 //=================================================================================
 function sendtext(ct) {
   try {
-    var text = ct["text"]
     var notification = ct["notification"]
     var parse_mode = ct["parse_mode"]
     if (notification == undefined || notification != true)
@@ -1972,10 +1977,11 @@ function sendtext(ct) {
     if (parse_mode == undefined)
       var parse_mode = ""
   } catch (e) {
-    var text = ct
     var notification = false
     var parse_mode = ""
   }
+  if (ct["text"] == undefined)
+    var text = String(ct)
 
   var payload = {
     "method": "sendMessage",
@@ -2108,25 +2114,20 @@ function key_word_check(txt, keys) {
 //=================================================================================
 //喔乾，感謝 Kevin Tseng 開源這個用法
 //來源: https://kevintsengtw.blogspot.com/2011/09/javascript-stringformat.html?showComment=1536387871696#c7569907085658128584
-String.format = function() {
-  var s = arguments[0];
-
-  if (s == null) return "";
-
-  for (var i = 0; i < arguments.length - 1; i++)
-
-  {
-    var reg = getStringFormatPlaceHolderRegEx(i);
-    s = s.replace(reg, (arguments[i + 1] == null ? "" : arguments[i + 1]));
+//可在Javascript中使用如同C#中的string.format (對jQuery String的擴充方法)
+//使用方式 : var fullName = 'Hello. My name is {0} {1}.'.format('FirstName', 'LastName');
+String.prototype.format = function() {
+  var txt = this.toString();
+  for (var i = 0; i < arguments.length; i++) {
+    var exp = getStringFormatPlaceHolderRegEx(i);
+    txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
   }
-  return cleanStringFormatResult(s);
+  return cleanStringFormatResult(txt);
 }
-
 //讓輸入的字串可以包含{}
 function getStringFormatPlaceHolderRegEx(placeHolderIndex) {
   return new RegExp('({)?\\{' + placeHolderIndex + '\\}(?!})', 'gm')
 }
-
 //當format格式有多餘的position時，就不會將多餘的position輸出
 //ex:
 // var fullName = 'Hello. My name is {0} {1} {2}.'.format('firstName', 'lastName');
@@ -2151,7 +2152,7 @@ function start(payload) {
     "method": "post",
     "payload": payload
   }
-  //Logger.log("ZZZZ = ",payload)
+  Logger.log("ZZZZ = ", payload)
   UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
   /*/  為了速度和穩定 不必要就算了
   var sheet_key = base_json.sheet_key
