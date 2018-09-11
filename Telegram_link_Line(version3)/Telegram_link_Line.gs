@@ -279,11 +279,14 @@ function doPost(e) {
         var Sheet = SpreadSheet.getSheetByName("Line訊息區");
         Sheet.deleteColumn(number + 1);
 
-        REST_keyboard(); //重製快速鍵盤
-        REST_FastMatch1and2(); //重製快速索引
+        //從Line中離開
+        var a1 = Line_leave(room_or_groupID)
 
-        text = ct["delete_room_success"]
-        // ^ "已刪除此聊天室"
+        var a2 = REST_keyboard(); //重製快速鍵盤
+        var a3 = REST_FastMatch1and2(); //重製快速索引
+
+        text = ct["delete_room_success"].format(a1, a2, a3)
+        // ^ "Line_leave：{0}\nREST_keyboard：{1}\n{2}\n已刪除此聊天室"
         keyboard_main(text, doc_key)
         return 0;
       } else if (mode == "⭐ 升級房間" && Stext == "/uproom") {
@@ -425,8 +428,7 @@ function doPost(e) {
         var r = JSON.stringify(ALL);
         doc.setText(r); //寫入
 
-        ct["droproom_success"]["text"] = ct["droproom_success"]["text"].format(JSON.stringify(ALL.data[number]));
-        keyboard_main(text, doc_key)
+        keyboard_main(ct["droproom_success"]["text"].format(JSON.stringify(ALL.data[number])), doc_key)
         // ^ "已降級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
       } else if ((mode == "♻ 移除關鍵字" || mode == "📎 新增關鍵字") && Stext == "/lookkeyword") {
         text = get_all_keyword(ALL)
@@ -739,7 +741,7 @@ function doPost(e) {
             ALL.mode = "🔥 刪除房間"
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
-            sendtext(ct["sure_delete_room?"].format(ALL.opposite.Name));
+            sendtext(ct["sure_delete_room?"]["text"].format(ALL.opposite.Name));
             // ^ 你確定要刪除 {0} 嗎?\n若是請按一下 /delete\n若沒按下則不會刪除!!!"
             break;
           case ct['🐳 開啟通知']["text"]:
@@ -1828,6 +1830,27 @@ function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_addres
     SheetD.getRange(LastRowD + 1, 2).setValue(e);
     Logger.log("FFFFFFFFFFFF = ", e)
   }
+}
+//=================================================================================
+function Line_leave(room_or_groupID) {
+
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+
+  var url = 'https://api.line.me/v2/bot/room/' + room_or_groupID + '/leave';
+  //--------------------------------------------------
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+
+  var options = {
+    'headers': header,
+    'method': 'post'
+  }
+  //--------------------------------------------------
+  UrlFetchApp.fetch(url, options);
+  return "成功"
 }
 //=================================================================================
 function getpath(id, Telegram_bot_key) {
