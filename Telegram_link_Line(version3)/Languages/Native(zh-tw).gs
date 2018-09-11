@@ -510,7 +510,13 @@ function language() {
         // {0} = ID名稱或人的名稱
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-      }
+      },
+      "not_registered":{
+        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": "您好!此群似乎還沒有與資料庫綁定，等主人綁定後我才能在此服務。\n若您想要一個自己的 Telegram_link_Line 機器人，請至https://github.com/we684123/Telegram_link_Line",
+        "notification": false,  //不通知? true or false
+        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+      },
     }
   }
   /*
