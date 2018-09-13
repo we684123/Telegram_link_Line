@@ -598,7 +598,7 @@ function doPost(e) {
             //Logger.log("TTTTTT22222 = ",text)
           }
 
-          if (text == "") {
+          if (ct["unread_number"]["text"] == "{0}{1}\n未讀： {2}\n-------------\n") {
             ct["unread_number"]["text"] = ct["unread_number"]["text"] = "沒有任何未讀。"
           }
           //Logger.log('HHHHHH22222 = ',ct["unread_number"]["text"])
