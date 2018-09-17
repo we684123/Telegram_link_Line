@@ -98,20 +98,14 @@ function language() {
       },
       "plz_input_token": {
         "type": "to_Telegram",
-        "text": "請輸入botToken",
+        "text": "請輸入botToken \n或按下 /unsetroom 取消升級",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "unsetbot": {
+      "unsetroom_ed": {
         "type": "to_Telegram",
         "text": "已取消設定bot",
         "notification": false, //不通知? true or false
-        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-      },
-      "plz_input_token_not_command": {
-        "type": "to_Telegram",
-        "text": "請輸入token 而非指令!\n若要取消升級步驟請 {0}", // {0} = /unsetbot
-        "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "Webhook_success_plz_input_any_text_in_new_bot": {
@@ -355,7 +349,7 @@ function language() {
       },
       "uproom_Introduction": {
         "type": "to_Telegram",
-        "text": "⭐ 升級房間功能介紹：\n升級房間後，以後來自該對象(Line)的訊息皆會及時傳到 **新的bot聊天室** ，而不會傳到這個bot聊天室中，這個功能是可以回來這裡取消的。",
+        "text": '⭐ 升級房間功能介紹：\n升級房間後，以後來自該對象(Line)的訊息皆會及時傳到 **新的"群組"聊天室** ，而不會傳到這個"bot"聊天室中，這個功能是可以回來這裡取消的。',
         "notification": false, //不通知? true or false
         "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -514,6 +508,31 @@ function language() {
       "not_registered":{
         "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
         "text": "您好!此群似乎還沒有與資料庫綁定，等主人綁定後我才能在此服務。\n若您想要一個自己的 Telegram_link_Line 機器人，請至https://github.com/we684123/Telegram_link_Line",
+        "notification": false,  //不通知? true or false
+        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "plz_forward_verification_code":{
+        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": "請確認我在要綁定的群組中後，再轉發上方的驗證碼到那以進行綁定!\n或按下 /unsetroom 取消升級",
+        "notification": false,  //不通知? true or false
+        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "not_find_ctrl_id":{
+        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": '由於是第一次做房間升級，請稍待系統準備。\n準備好後會再跟您介紹升級房間的功用。',
+        "notification": false,  //不通知? true or false
+        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "get_ctrl_id_error":{
+        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": "抱歉綁定失敗QAQ，請稍後在試!\n失敗原因如下：{0}", // {0} = 失敗原因
+        "notification": false,  //不通知? true or false
+        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "bing_success":{
+        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": '{0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n請記得去主控bot選擇這個房間並開啟"顯示發送者"，以免Line端眾不知何人發送。',
+         // {0} = 房間名稱
         "notification": false,  //不通知? true or false
         "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
       },

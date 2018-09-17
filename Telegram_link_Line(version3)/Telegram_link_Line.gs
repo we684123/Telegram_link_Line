@@ -82,11 +82,11 @@ function doPost(e) {
       lock.releaseLock();
       return 0;
     }
-    //來源bot檢查==================================================================
-    if (chat_type != "private") { //現在只剩頻道、群組、超級群組的可能
+    //來源檢查==================================================================
+    if (chat_type == "supergroup" || chat_type == "group") { //現在只剩 群組、超級群組 的可能
       var number = ALL.FastMatch3[chat_id]
       if (number == undefined) { //當莫名被邀入群組時
-        if (ALL['TG_temporary_docking'][chat_id] == 2) {
+        if (ALL['TG_temporary_docking'][chat_id] == 3) { //容忍3句廢話(#
           delete ALL['TG_temporary_docking'][chat_id]
           TG_leaveChat(chat_id)
           lock.releaseLock();
@@ -96,37 +96,126 @@ function doPost(e) {
           var r = JSON.stringify(ALL);
           doc.setText(r); //寫入
 
-          sendtext(ct['not_registered'])
+          sendtext(chat_id,ct['not_registered'])
           // ^ 您好!此群似乎還沒有與資料庫綁定，等主人綁定後我才能在此服務。...
           lock.releaseLock();
           return 0;
-        } else { //BUG
-          var ALL_data_room = ALL.data[ALL.FastMatch3[chat_id]]
-          var room_Binding_number = ALL_data_room['Binding_number']
-          if (Stext == room_Binding_number) {
-            var chat_title = estringa.message.chat.title
-            ALL_data_room["Bind_groud_chat_id"] = chat_id
-            ALL_data_room["Bind_groud_chat_title"] = chat_title
-            ALL_data_room["Bind_groud_chat_type"] = chat_type
-            ALL_data_room.status = "已升級房間"
-            ALL_data_room["Display_name"] = false
+        } else {
+          if (ALL['wait_to_Bind'][Stext] != undefined) {
+            CP();
+            sendtext(Telegram_id,ct["backed_up_ing"])
+            // ^ "已備份舊資料，更新doc資料庫中..."
+            var n = ALL['wait_to_Bind'][Stext] //Stext是驗證碼
+            ALL.data[n]["Bind_groud_chat_id"] = chat_id
+            ALL.data[n]["Bind_groud_chat_title"] = chat_title
+            ALL.data[n]["Bind_groud_chat_type"] = chat_type
+            ALL.data[n].status = "已升級房間2"
+            ALL.data[n]["Display_name"] = false
             delete ALL['TG_temporary_docking'][chat_id]
+            delete ALL['wait_to_Bind'][Stext]
+            ALL.FastMatch3[chat_id] = n //快速存取3寫入
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
-
+            sendtext(chat_id,ct["bing_success"].format(ALL.data[n]["Name"]))
+            // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
+            //   請記得去主控bot選擇這個房間並開啟"顯示發送者"，
+            //   以免Line端眾不知何人發送。
+          }else {
+            ALL['TG_temporary_docking'][chat_id] += 1
+            var r = JSON.stringify(ALL);
+            doc.setText(r); //寫入
+            lock.releaseLock();
+            return 0;
           }
-          ALL['TG_temporary_docking'][chat_id] += 1
-          var r = JSON.stringify(ALL);
-          doc.setText(r); //寫入
-
-          lock.releaseLock();
-          return 0;
         }
+      } else { //已綁定群組中發話
+        var Line_id = ALL.data[n][RoomId] //目標LINE房間ID
+        if (ALL.data[n]["Display_name"]) {
+          var last_name =''
+          var first_name = estringa.message.from.first_name
+          if (estringa.message.from.last_name) {
+            last_name = estringa.message.from.last_name
+          }
+          var by_name = last_name + first_name
+        }
+        //以下處理發話
+        if (estringa.message.text) {
+          try {
+            if (estringa.message.reply_to_message.text) {
+              var rt = estringa.message.reply_to_message.text
+              text = ct["For_this_reply"]["text"].format(rt, Stext);
+              // ^ {0}\n^針對此回復^\n{1}
+            } else {
+              text = Stext;
+            }
+          } catch (e) {
+            text = Stext;
+          }
+          if (ALL.data[n]["Display_name"]) {
+            text = by_name + '：\n' + text
+          }
+          TG_Send_text_To_Line(Line_id, text)
+        } else if (estringa.message.photo) { //如果是照片
+          //以下選擇telegram照片並發到line
+          var p = estringa.message.photo
+          var max = p.length - 1;
+          var photo_id = p[max].file_id
+          TG_Send_Photo_To_Line(Line_id, photo_id)
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id,(ct["caption_der_form"]+by_name))
+          }
+          if (estringa.message.caption){//如有簡介則一同發出
+            if (ALL.data[n]["Display_name"]) {
+              TG_Send_text_To_Line(Line_id,(ct["caption_der_form"]+by_name))
+            }else {
+              var text = by_name + '：\n' + estringa.message.caption
+              TG_Send_text_To_Line(Line_id, text)
+            }
+          }
 
+
+          sendtext(ct["sendPhoto_ed"]);
+          // ^ "(圖片已發送!)"
+        } else if (estringa.message.video) {
+          //以下選擇telegram video並發到line
+          var video_id = estringa.message.video.file_id
+          TG_Send_video_To_Line(Line_id, video_id, TG_token) //就你最特別,多吃一個TGtoken
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id,(ct["caption_der_form"]+by_name))
+          }
+          sendtext(ct["sendVideo_ed"]);
+          // ^ "(影片已發送!)"
+        } else if (estringa.message.sticker) {
+          sendtext(ct["not_support_sticker"]);
+          // ^ "(暫時不支援貼圖傳送喔!)"
+        } else if (estringa.message.audio) {
+          var duration = estringa.message.audio.duration
+          //var audio_id = estringa.message.audio.file_id
+          sendtext(ct["not_support_audio"]);
+          // ^ "(暫時不支援audio傳送喔!)"
+        } else if (estringa.message.voice) {
+          //var duration = estringa.message.voice.duration
+          sendtext(ct["not_support_voice"]);
+          // ^  "(暫時不支援voice傳送喔!)"
+        } else if (estringa.message.location) {
+          var latitude = estringa.message.location.latitude
+          var longitude = estringa.message.location.longitude
+          var key = ""
+          var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=" + key + "&language=zh-tw"
+          var t = UrlFetchApp.fetch(url)
+          var t2 = JSON.parse(t)
+          var t3 = JSON.stringify(t2.results)
+          var t4 = JSON.parse(t3) //這麼多t我也很無奈...
+          var formatted_address = t4[0]["formatted_address"]
+          //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
+          TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id,(ct["caption_der_form"]+by_name))
+          }
+        }
       }
-    } else { //被邀入群組
-
-    }
+      lock.releaseLock();
+      return 0;
   }
   /*
   try { //這是一開始沒有TG_bot_updateID_array的話要新增的，看超久才突然想起來
@@ -177,64 +266,7 @@ function doPost(e) {
   //來源bot檢查完成!================================================================
   if (opposite_RoomId != "主控bot") { //找到opposite_RoomID的話才會進來直接發
     var Line_id = opposite_RoomId
-    if (estringa.message.text) {
-      try {
-        if (estringa.message.reply_to_message.text) {
-          var rt = estringa.message.reply_to_message.text
-          text = ct["For_this_reply"]["text"].format(rt, Stext);
-          // ^ {0}\n^針對此回復^\n{1}
-        } else {
-          text = Stext;
-        }
-      } catch (e) {
-        text = Stext;
-      }
-      TG_Send_text_To_Line(Line_id, text)
-    } else if (estringa.message.photo) { //如果是照片
-      //以下選擇telegram照片並發到line
-      var p = estringa.message.photo
-      var max = p.length - 1;
-      var photo_id = p[max].file_id
-      TG_Send_Photo_To_Line(Line_id, photo_id)
-      if (estringa.message.caption) //如有簡介則一同發出
-        TG_Send_text_To_Line(Line_id, estringa.message.caption)
 
-      sendtext(ct["sendPhoto_ed"]);
-      // ^ "(圖片已發送!)"
-    } else if (estringa.message.video) {
-      //以下選擇telegram video並發到line
-      var video_id = estringa.message.video.file_id
-      TG_Send_video_To_Line(Line_id, video_id, TG_token) //就你最特別,多吃一個TGtoken
-
-      sendtext(ct["sendVideo_ed"]);
-      // ^ "(影片已發送!)"
-    } else if (estringa.message.sticker) {
-      sendtext(ct["not_support_sticker"]);
-      // ^ "(暫時不支援貼圖傳送喔!)"
-    } else if (estringa.message.audio) {
-      var duration = estringa.message.audio.duration
-      //var audio_id = estringa.message.audio.file_id
-      sendtext(ct["not_support_audio"]);
-      // ^ "(暫時不支援audio傳送喔!)"
-    } else if (estringa.message.voice) {
-      //var duration = estringa.message.voice.duration
-      sendtext(ct["not_support_voice"]);
-      // ^  "(暫時不支援voice傳送喔!)"
-    } else if (estringa.message.location) {
-      var latitude = estringa.message.location.latitude
-      var longitude = estringa.message.location.longitude
-      var key = ""
-      var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=" + key + "&language=zh-tw"
-      var t = UrlFetchApp.fetch(url)
-      var t2 = JSON.parse(t)
-      var t3 = JSON.stringify(t2.results)
-      var t4 = JSON.parse(t3) //這麼多t我也很無奈...
-      var formatted_address = t4[0]["formatted_address"]
-      //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
-      TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
-    }
-    lock.releaseLock();
-    return 0;
     //至此為止來自群組的都被發完了，剩下的情況只有主控者對bot說話
   }
   //============================================================================
@@ -323,106 +355,25 @@ function doPost(e) {
       return 0;
     } else if (mode == "⭐ 升級房間" && Stext == "/uproom") {
       ALL.mode = "/uproom"
+      var FastMatch2_number = ALL.FastMatch2[ALL.opposite.RoomId]
+      var Binding_number = String(Random_text())
+      ALL.data[FastMatch2_number]['Binding_number'] = Binding_number //有點多餘但可確保
+      ALL['wait_to_Bind'][Binding_number] = FastMatch2_number
       var r = JSON.stringify(ALL);
       doc.setText(r); //寫入
-
-      sendtext(ct["plz_input_token"]);
-      // ^ "請輸入botToken"
+      sendtext(Binding_number)
+      sendtext(ct["plz_forward_verification_code"]);
+      // ^ "請確認我在要綁定的群組中後，再轉發上方的驗證碼到那以進行綁定! \
+      //   \n或按下 /unsetroom 取消升級"
     } else if (mode == "/uproom") {
-      if (Stext == "/unsetbot") {
+      if (Stext == "/unsetroom") {
         ALL.mode = 0
         var r = JSON.stringify(ALL);
         doc.setText(r); //寫入
 
-        sendtext(ct["unsetbot"]);
+        sendtext(ct["unsetroom_ed"]);
         // ^ "已取消設定bot"
         return 0
-      }
-      if (In(Stext) || Stext.substr(0, 2) == "/d") { //先檢查不會跟指令重複後再在下一步
-        ct["plz_input_token_not_command"]["text"] = ct["plz_input_token_not_command"]["text"].format('/unsetbot');
-        sendtext(ct["plz_input_token_not_command"]);
-        // ^ "請輸入token 而非指令!\n若要取消升級步驟請 /unsetbot"
-        return 0;
-      }
-      CP();
-      try {
-        var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + Stext + "/setWebhook?url=" + gsURL + "&max_connections=1")
-        var responseCode = response.getResponseCode()
-        var responseBody = response.getContentText()
-        var responseCode_json = JSON.parse(responseBody)
-        var n = 0; //嘗試用類似chmod的方式判斷狀況
-
-        if (responseCode === 200)
-          n = n + 1
-        if (responseCode_json.description == "Webhook was set")
-          n = n + 2
-        if (responseCode_json.description == "Webhook is already set")
-          n = n + 2
-        if (n == 3) {
-          var aims = ALL.opposite.RoomId
-          var number = ALL.FastMatch2[aims]
-          ALL.mode = "/uproom_2" //切mode
-          var line_roomID = ALL.data[number].RoomId
-          var Room_Name = ALL.data[number].Name
-          var array = {
-            "update_id": 0, //下一個步驟補
-            "TG_token": Stext,
-            "line_roomID": line_roomID,
-            "Room_Name": Room_Name
-          }
-          ALL.TG_bot_updateID_array.splice(ALL.TG_bot_updateID_array.length, 0, array)
-
-          var r = JSON.stringify(ALL);
-          doc.setText(r); //寫入
-
-          sendtext(ct["Webhook_success_plz_input_any_text_in_new_bot"]);
-          // ^ "Webhook已連結!\n進入最後一個步驟了! \n請至新機器人聊天室那任意輸入文字以進行綁定。"
-        } else {
-          sendtext(ct["some_error"]);
-          // ^ "看來發生了一點錯誤.....\n請稍候再試....."
-        }
-      } catch (e) {
-        sendtext(ct["plz_input_correct_token"]);
-        // ^ "看來發生了一點錯誤>_<\n請輸入正確token!"
-        sendtext(e);
-      }
-    } else if (mode == "/uproom_2") {
-      if (Math.abs(ALL.TG_control_bot_updateID - now_updateID) > 100) {
-        var opposite_RoomId = "沒找到"
-        var mais_i = "X"
-        for (var i = 0; i < ALL.TG_bot_updateID_array.length; i++) {
-          var value = Math.abs(ALL.now_updateID - ALL.TG_bot_updateID_array[i].update_id)
-          if (value < 100) {
-            opposite_RoomId = TG_bot_updateID_array[i].line_roomID //找到指定bot了
-            ALL.TG_bot_updateID_array[i].update_id = now_updateID
-
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
-            break;
-          }
-          if (ALL.TG_bot_updateID_array[i].update_id == 0)
-            aims_i = i
-        }
-        if (opposite_RoomId != "沒找到") {
-          sendtext(ct["Occupied_ed"]);
-          // ^ "這個 '聊天室' 已被其他bot佔用了!\n請至新的bot聊天室留言。"
-          return 0;
-        }
-        var aims = ALL.opposite.RoomId
-        var number = ALL.FastMatch2[aims]
-        ALL.data[number].botToken = ALL.TG_bot_updateID_array[aims_i].TG_token
-        ALL.data[number].status = "已升級房間"
-        ALL.mode = 0
-        ALL.TG_bot_updateID_array[aims_i].update_id = now_updateID //寫入id
-        var r = JSON.stringify(ALL);
-        doc.setText(r); //寫入
-
-        ct["uproom_success"]["text"] = ct["uproom_success"]["text"].format(JSON.stringify(ALL.data[number]));
-        text = ct["uproom_success"]
-        keyboard_main(text, doc_key)
-      } else {
-        sendtext(ct["not_input_here"]);
-        // ^ 請至 __新機器人聊天室__ !!!那任意輸入文字以進行綁定。\n不是這裡喔!"
       }
     } else if (mode == "💫 降級房間" && Stext == "/droproom") {
       var aims = ALL.opposite.RoomId
@@ -809,13 +760,37 @@ function doPost(e) {
           REST_keyboard(doc_key) //重新編排keyborad
           break;
         case ct['⭐ 升級房間']["text"]:
+          if (!ALL.ctrl_bot_id) {
+            var t = ct["not_find_ctrl_id"]['text']
+            var payload = {
+              "method": "sendMessage",
+              'chat_id': chat_id,
+              'text': t,
+              'disable_notification': ct["not_find_ctrl_id"]['notification']
+            }
+            var data = {
+              "method": "post",
+              "payload": payload
+            }
+            var ans = UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
+            var ans_json = JSON.parse(ans)
+            var ctrl_bot_id = ans_json['result'].from.id
+            if (ctrl_bot_id == undefined) {
+              sendtext(ct["get_ctrl_id_error"].format(ans))
+              return 0
+            }
+            ALL.ctrl_bot_id = ctrl_bot_id
+            var r = JSON.stringify(ALL);
+            doc.setText(r); //寫入
+          }
+
           ALL.mode = "⭐ 升級房間"
           var r = JSON.stringify(ALL);
           doc.setText(r); //寫入
 
           sendtext(ct["uproom_Introduction"]);
           // ^ "⭐ 升級房間功能介紹：\n升級房間後，以後來自該對象(Line)的訊息
-          //皆會及時傳到 **新的bot聊天室** ，而不會傳到這個bot聊天室中，
+          //皆會及時傳到 **新的"群組"聊天室** ，而不會傳到這個"bot"聊天室中，
           //這個功能是可以回來這裡取消的。
           sendtext(ct['uproom_sure?']["text"].format(ALL.opposite.Name));
           // ^ "您確定要升級 {0} 嗎?\n若是請按一下 /uproom \n若沒按下則不會進入升級!!!"
@@ -1525,7 +1500,7 @@ function In(name) { //防止與命令衝突的命名
   var arr = ["/main", "🔙 返回房間", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言",
     "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃 重新整理", "🔥 刪除房間", "/delete", "/debug",
     "/AllRead", "/allread", "/Allread", "/allRead", "⭐️ 升級房間", "💫 降級房間", "/uproom", "droproom",
-    "/uproom_2", "/unsetbot", "♻ 移除關鍵字", "📎 新增關鍵字", "/lookkeyword", "⏰訊息時間啟用?", "🔧 更多設定",
+    "/uproom_2", "/unsetroom", "♻ 移除關鍵字", "📎 新增關鍵字", "/lookkeyword", "⏰訊息時間啟用?", "🔧 更多設定",
     "🔑設定關鍵字提醒", "啟動關鍵字提醒", "暫停關鍵字提醒",
   ];
 
@@ -2215,6 +2190,17 @@ function getStringFormatPlaceHolderRegEx(placeHolderIndex) {
 function cleanStringFormatResult(txt) {
   if (txt == null) return "";
   return txt.replace(getStringFormatPlaceHolderRegEx("\\d+"), "");
+}
+//=================================================================================
+function Random_text() {
+  var id = ""
+  var codeLength = 12
+  var selectChar = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
+  for (var i = 0; i < codeLength; i++) {
+    var charIndex = Math.floor(Math.random() * 36);
+    id += selectChar[charIndex];
+  }
+  return id
 }
 //=================================================================================
 function start(payload) {
