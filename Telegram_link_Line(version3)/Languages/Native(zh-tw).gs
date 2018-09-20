@@ -280,7 +280,7 @@ function language() {
       },
       "caption_der_form": { //喔甘這個命名www
         "type": "to_Telegram(only_text)",
-        "text": "來自: {0}", // {0} = LINE中發此訊息的人名
+        "text": "來自: {0}", // {0} = TG、LINE中發此訊息的人名
       },
       "sorry_plz_go_to_url": {
         "type": "to_Telegram",
