@@ -284,7 +284,7 @@ function language() {
       },
       "sorry_plz_go_to_url": {
         "type": "to_Telegram",
-        "text": "抱歉!請至該連結下載或聆聽!\n{0}\n\n{1}來自: ",
+        "text": "抱歉!請至該連結下載或聆聽!\n{0}\n\n來自:{1} ",
         // {0} = audio DURL , {1} = LINE中發此訊息的人名
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
@@ -437,7 +437,7 @@ function language() {
       },
       "delete_keyword_ing": {
         "type": "to_Telegram",
-        "text": '請輸入欲移除關鍵字的**前方編號!!!**\n刪除多組關鍵字請用 "任意符號" 隔開(推薦用","或"，")\n如遇離開請按 /main',
+        "text": '請輸入欲移除關鍵字的 **前方編號!!!** \n刪除多組關鍵字請用 "任意符號" 隔開(推薦用","或"，")\n如遇離開請按 /main',
         "notification": false, //不通知? true or false
         "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -533,6 +533,25 @@ function language() {
         "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
         "text": '{0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n請記得去主控bot選擇這個房間並開啟"顯示發送者"，以免Line端眾不知何人發送。',
          // {0} = 房間名稱
+        "notification": false,  //不通知? true or false
+        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "text_format":{
+        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": '{0}：\n{1} ',
+         // {0} = 發送者名稱 、 {1} = 所發送的訊息
+        "notification": false,  //不通知? true or false
+        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "send_to_TG_error":{
+        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": '傳送失敗...，原因如下\n\n{0}', // {0} = 失敗原因
+        "notification": false,  //不通知? true or false
+        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "lookkeyword_result":{
+        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": '傳送失敗...，原因如下\n\n{0}', // {0} = 失敗原因
         "notification": false,  //不通知? true or false
         "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
       },

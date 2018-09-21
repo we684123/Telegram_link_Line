@@ -4,7 +4,7 @@ function doPost(e) {
   var success = lock.tryLock(10000);
 
   var base_json = base();
-  var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
+  var debug = 0 ; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
   //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
   //模擬Line的話記得把要模擬的東西複製到分頁debug中的B2
 
@@ -131,12 +131,16 @@ function doPost(e) {
             ALL.data[n]["Bind_groud_chat_type"] = chat_type
             ALL.data[n].status = "已升級房間2"
             ALL.data[n]["Display_name"] = false
-            delete ALL['TG_temporary_docking'][chat_id]
-            delete ALL['wait_to_Bind'][Stext]
             ALL.FastMatch3[chat_id] = n //快速存取3寫入
+            //下面收拾善後
+            delete ALL.data[n]["Binding_number"]
+            delete ALL['TG_temporary_docking'][chat_id]
+            ALL['wait_to_Bind'] = {}
+            ALL.mode = 0
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
-            sendtext(chat_id,ct["bing_success"].format(ALL.data[n]["Name"]))
+            text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
+            keyboard_main(chat_id, text, doc_key)
             // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
             //   請記得去主控bot選擇這個房間並開啟"顯示發送者"，
             //   以免Line端眾不知何人發送。
@@ -149,19 +153,22 @@ function doPost(e) {
           }
         }
       } else { //已綁定群組中發話
-        var Line_id = ALL.data[n][RoomId] //目標LINE房間ID
+        var n = number
+        var Line_id = ALL.data[n]['RoomId'] //目標LINE房間ID
         if (ALL.data[n]["Display_name"]) {
           var last_name =''
           var first_name = estringa.message.from.first_name
           if (estringa.message.from.last_name) {
             last_name = estringa.message.from.last_name
           }
-          var by_name = last_name + first_name
+          var by_name = last_name + first_name +'：\n'
+        }else {
+          var by_name = ''
         }
         //以下處理發話
         if (estringa.message.text) {
           try {
-            if (estringa.message.reply_to_message.text) {
+            if (estringa.message.reply_to_message) {
               var rt = estringa.message.reply_to_message.text
               text = ct["For_this_reply"]["text"].format(rt, Stext);
               // ^ {0}\n^針對此回復^\n{1}
@@ -172,7 +179,7 @@ function doPost(e) {
             text = Stext;
           }
           if (ALL.data[n]["Display_name"]) {
-            text = by_name + '：\n' + text
+            text = by_name + text
           }
           TG_Send_text_To_Line(Line_id, text)
         } else if (estringa.message.photo) { //如果是照片
@@ -182,26 +189,29 @@ function doPost(e) {
           var photo_id = p[max].file_id
           TG_Send_Photo_To_Line(Line_id, photo_id)
           if (ALL.data[n]["Display_name"]) {
-            TG_Send_text_To_Line(Line_id,(ct["caption_der_form"]+by_name))
+            TG_Send_text_To_Line(Line_id,(ct["caption_der_form"]['text'].format(by_name)))
           }
           if (estringa.message.caption){//如有簡介則一同發出
             if (ALL.data[n]["Display_name"]) {
-              TG_Send_text_To_Line(Line_id,(ct["caption_der_form"]+by_name))
+              TG_Send_text_To_Line(Line_id,(ct["caption_der_form"]['text'].format(by_name)))
             }else {
-              var text = by_name + '：\n' + estringa.message.caption
+              var text = by_name + estringa.message.caption
               TG_Send_text_To_Line(Line_id, text)
             }
           }
-
-
           sendtext(chat_id, ct["sendPhoto_ed"]);
           // ^ "(圖片已發送!)"
         } else if (estringa.message.video) {
           //以下選擇telegram video並發到line
           var video_id = estringa.message.video.file_id
-          TG_Send_video_To_Line(Line_id, video_id, TG_token) //就你最特別,多吃一個TGtoken
-          if (ALL.data[n]["Display_name"]) {
-            TG_Send_text_To_Line(Line_id,(ct["caption_der_form"]+by_name))
+          TG_Send_video_To_Line(Line_id, video_id) //就你最特別,多吃一個TGtoken
+          if (estringa.message.caption){//如有簡介則一同發出
+            if (ALL.data[n]["Display_name"]) {
+              TG_Send_text_To_Line(Line_id,(ct["caption_der_form"]['text'].format(by_name)))
+            }else {
+              var text = by_name + estringa.message.caption
+              TG_Send_text_To_Line(Line_id, text)
+            }
           }
           sendtext(chat_id, ct["sendVideo_ed"]);
           // ^ "(影片已發送!)"
@@ -230,7 +240,7 @@ function doPost(e) {
           //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
           TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
           if (ALL.data[n]["Display_name"]) {
-            TG_Send_text_To_Line(Line_id,(ct["caption_der_form"]+by_name))
+            TG_Send_text_To_Line(Line_id,(ct["caption_der_form"]['text'].format(by_name)))
           }
         }
       }
@@ -329,12 +339,13 @@ function doPost(e) {
       ALL['wait_to_Bind'][Binding_number] = FastMatch2_number
       var r = JSON.stringify(ALL);
       doc.setText(r); //寫入
-      sendtext(Binding_number)
+      sendtext(chat_id, Binding_number)
       sendtext(chat_id, ct["plz_forward_verification_code"]);
       // ^ "請確認我在要綁定的群組中後，再轉發上方的驗證碼到那以進行綁定! \
       //   \n或按下 /unsetroom 取消升級"
-    } else if (mode == "/uproom") {
+    } else if (mode == "/uproom" && Stext != "/main" && Stext != "/debug") {
       if (Stext == "/unsetroom") {
+        delete ALL.FastMatch2[ALL.opposite.RoomId].Binding_number
         ALL.mode = 0
         var r = JSON.stringify(ALL);
         doc.setText(r); //寫入
@@ -382,9 +393,8 @@ function doPost(e) {
       keyboard_main(chat_id, ct["droproom_success"]["text"].format(JSON.stringify(ALL.data[number])), doc_key)
       // ^ "已降級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
     } else if ((mode == "♻ 移除關鍵字" || mode == "📎 新增關鍵字") && Stext == "/lookkeyword") {
-      text = get_all_keyword(ALL)
-      var notification = true
-      sendtext(text, notification);
+      text = ct["lookkeyword_result"]['text'].format( get_all_keyword(ALL))
+      sendtext(chat_id, text);
     } else if (mode == "📎 新增關鍵字" && Stext != "/main") {
       try {
         var addwkey = String(Stext)
@@ -404,8 +414,7 @@ function doPost(e) {
 
         write_ALL(ALL, doc)
         var li = get_all_keyword(ALL)
-        ct["add_keyword_success"]["text"] = ct["add_keyword_success"]["text"].format(li)
-        sendtext(chat_id, ct["add_keyword_success"]);
+        sendtext(chat_id, ct["add_keyword_success"]["text"].format(li));
         // ^ "已成功新增\n\n{0}\n\n如遇離開請按 /main\n或者繼續輸入新增",
       } catch (e) {
         ct["add_keyword_success"]["text"] = ct["add_keyword_success"]["text"].format(String(e))
@@ -435,8 +444,7 @@ function doPost(e) {
 
         write_ALL(ALL, doc)
         var li = get_all_keyword(ALL)
-        ct["delete_keyword_success"]["text"] = ct["delete_keyword_success"]["text"].format(li)
-        sendtext(chat_id, ct["delete_keyword_success"]);
+        sendtext(chat_id, ct["delete_keyword_success"]["text"].format(li));
         // ^ "已成功移除\n\n{0}\n\n如遇離開請按 /main\n或者繼續輸入移除",
       } catch (e) {
         ct["delete_keyword_fail"]["text"] = ct["delete_keyword_fail"]["text"].format(String(e))
@@ -447,9 +455,8 @@ function doPost(e) {
         return 0
       }
     } else if (mode == "⏰訊息時間啟用?") {
-      function mixT() {
-        ct["delete_keyword_fail"]["text"] = ct["delete_keyword_fail"]["text"].format(String(Stext))
-        keyboard_main(text, doc_key)
+      function mixT(chat_id) {
+        keyboard_main(chat_id, ct["change_message_time_func"]["text"].format(String(Stext)), doc_key)
         // ^ "已成功 " + Stext + " 訊息時間!"
       }
       if (Stext == ct["開啟"]["text"]) {
@@ -457,7 +464,7 @@ function doPost(e) {
         ALL.mode = 0
         var e = write_ALL(ALL, doc)
         if (e) {
-          mixT()
+          mixT(chat_id)
         } else {
           sendtext(chat_id, ct["w_error_status"]);
           // ^ 寫入失敗，詳情如下：
@@ -468,7 +475,7 @@ function doPost(e) {
         ALL.mode = 0
         var e = write_ALL(ALL, doc)
         if (e) {
-          mixT()
+          mixT(chat_id)
         } else {
           sendtext(chat_id, ct["w_error_status"]);
           // ^ 寫入失敗，詳情如下：
@@ -492,11 +499,16 @@ function doPost(e) {
           keyboard_main(chat_id, ct["🔮 開啟主選單"], doc_key)
           break;
         case ct['🔙 返回房間']["text"]:
+        if (ALL.mode != 0) {
+          ALL.mode = 0
+          var r = JSON.stringify(ALL);
+          doc.setText(r); //寫入
+        }
           var keyboard = ALL.RoomKeyboard;
           var resize_keyboard = true
           var one_time_keyboard = false
           var text = ct["請選擇聊天室"]
-          ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, ct)
+          ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
 
           break;
         case ct['🔭 訊息狀態']["text"]:
@@ -525,14 +537,14 @@ function doPost(e) {
           break;
         case ct['✔ 關閉鍵盤']["text"]:
           var text = ct['colse_Keyboard_ed']
-          ReplyKeyboardRemove(text)
+          ReplyKeyboardRemove(chat_id, text)
           // ^ "已關閉鍵盤，如欲再次開啟請按 /main"
           break;
         case ct['🚀 發送訊息']["text"]:
           ALL.mode = "🚀 發送訊息"
           var r = JSON.stringify(ALL);
           doc.setText(r); //寫入
-          ReplyKeyboardRemove(ct["sendtext_to_XXX"]["text"].format(ALL.opposite.Name))
+          ReplyKeyboardRemove(chat_id, ct["sendtext_to_XXX"]["text"].format(ALL.opposite.Name))
           // ^  "將對 {0} 發送訊息\n如欲離開請輸入 /exit \n請輸入訊息："
           break;
         case '/exit':
@@ -583,7 +595,7 @@ function doPost(e) {
                   t = get_time_txt(message_json.timestamp)
                   p += "\n" + t
                 }
-                sendtext(p);
+                sendtext(chat_id, p);
                 //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
                 //"text":"51"}
                 upMessageData(i, col, ed)
@@ -594,7 +606,7 @@ function doPost(e) {
                   t = get_time_txt(message_json.timestamp)
                   caption += "\n" + t
                 }
-                sendPhoto(url, notification, caption)
+                sendPhoto(chat_id, url, notification, caption)
                 //sendPhoto(url, notification)
                 //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
                 //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
@@ -606,15 +618,8 @@ function doPost(e) {
                   t = get_time_txt(message_json.timestamp)
                   caption += "\n" + t
                 }
-                sendPhoto(sticker_png_url, notification, caption)
+                sendPhoto(chat_id, sticker_png_url, notification, caption)
                 //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
-                /*
-                //下面是舊的方式 現在最近去爬line發現line的東西很好爬，異常好爬(怕.png
-                //是有方法可以直接發貼圖啦，但這樣速度會變慢 乾脆直接發圖。
-                text = "[" + message_json.type + "]\nstickerId:" + message_json.stickerId + "\npackageId:" + message_json.packageId
-                var notification = true
-                sendtext(text, notification);
-                */
                 //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
                 //"stickerId":"502","packageId":"2"}
                 upMessageData(i, col, ed)
@@ -624,26 +629,24 @@ function doPost(e) {
                   t = get_time_txt(message_json.timestamp)
                   url += "\n" + t
                 }
-                sendtext(url)
+                sendtext(chat_id, url)
                 // ^ "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
                 //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
                 //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
                 upMessageData(i, col, ed)
               } else if (message_json.type == "location") {
-                var notification = true
-                if (message_json.address) {
-                  var text = message_json.address
-                  sendtext(text, notification);
-                }
                 var latitude = message_json.latitude
                 var longitude = message_json.longitude
-                sendLocation(latitude, longitude, notification)
+                sendLocation(chat_id, latitude, longitude, notification)
                 var text = ct["is_from"]["text"].format(message_json.userName)
                 if (ALL.massage_time) {
                   t = get_time_txt(message_json.timestamp)
                   text += "\n" + t
                 }
-                sendtext(text, notification);
+                if (message_json.address) {
+                  text = message_json.address + '\n'+text
+                }
+                sendtext(chat_id, text);
                 //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
                 //"address":"260台灣宜蘭縣宜蘭市舊城西路107號",
                 //"latitude":24.759711,"longitude":121.750114}
@@ -655,7 +658,7 @@ function doPost(e) {
                   t = get_time_txt(message_json.timestamp)
                   caption += "\n" + t
                 }
-                sendVoice(url, notification, caption)
+                sendVoice(chat_id, url, notification, caption)
                 //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
                 //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
                 upMessageData(i, col, ed)
@@ -665,7 +668,7 @@ function doPost(e) {
                   t = get_time_txt(message_json.timestamp)
                   text += "\n" + t
                 }
-                sendtext(text, notification);
+                sendtext(chat_id, text);
                 //senddocument(url)
                 upMessageData(i, col, ed)
               }
@@ -685,7 +688,7 @@ function doPost(e) {
           ALL.mode = "🔖 重新命名"
           var r = JSON.stringify(ALL);
           doc.setText(r); //寫入
-          ReplyKeyboardRemove(ct["rename_room_text"]['text'].format(OName))
+          ReplyKeyboardRemove(chat_id, ct["rename_room_text"]['text'].format(OName))
           // ^ "將對 {0} 重新命名!!!\n如要取消命名請按 /main 取消\n請輸入新名子："
           break;
         case ct['🔥 刪除房間']["text"]:
@@ -776,6 +779,7 @@ function doPost(e) {
           var ydjdyf = REST_keyboard(); //強制等待，不知道為什麼有時候不會執行
           //還有sheet那邊的訊息區處理還未 (Amount)
           ALL.mode = 0
+          ALL.wait_to_Bind = {}
           var r = JSON.stringify(ALL);
           doc.setText(r); //寫入
           sendtext(chat_id, ct["debug_ed"]["text"].format(xfjhxgfh, ydjdyf));
@@ -816,7 +820,7 @@ function doPost(e) {
           // ^ '設定狀態：\n● 關鍵字提醒：{0}\n● 訊息時間啟用： {1}\n'
           var resize_keyboard = true
           var one_time_keyboard = false
-          ReplyKeyboardMakeup(more_keyboard, resize_keyboard, one_time_keyboard, text)
+          ReplyKeyboardMakeup(chat_id, more_keyboard, resize_keyboard, one_time_keyboard, text)
           break;
         case ct['⏰訊息時間啟用?']["text"]:
           ALL.mode = "⏰訊息時間啟用?"
@@ -834,7 +838,7 @@ function doPost(e) {
           // ^  "請選擇開啟或關閉"
           var resize_keyboard = true
           var one_time_keyboard = false
-          ReplyKeyboardMakeup(massage_time_q_keyboard, resize_keyboard, one_time_keyboard, text)
+          ReplyKeyboardMakeup(chat_id, massage_time_q_keyboard, resize_keyboard, one_time_keyboard, text)
           break;
         case ct["🔑設定關鍵字提醒"]["text"]:
           if (ALL.keyword_notice == undefined) { //這一次啟動時的重製
@@ -878,18 +882,18 @@ function doPost(e) {
           var all_word = get_all_keyword(ALL)
           var resize_keyboard = true
           var one_time_keyboard = false
-          ReplyKeyboardMakeup(keyword_keyboard, resize_keyboard, one_time_keyboard, all_word)
+          ReplyKeyboardMakeup(chat_id, keyword_keyboard, resize_keyboard, one_time_keyboard, all_word)
           break;
         case ct['📎 新增關鍵字']["text"]:
           ALL.mode = "📎 新增關鍵字"
-          ReplyKeyboardRemove(ct["add_keyword_ing"])
+          ReplyKeyboardRemove(chat_id,ct["add_keyword_ing"])
           // ^ "請輸入欲新增關鍵字\n新增多組關鍵字請用 ',' 或 '，' 號隔開\n如欲離開請按 /main"
           write_ALL(ALL, doc)
           break;
         case ct['♻ 移除關鍵字']["text"]:
           ALL.mode = "♻ 移除關鍵字"
           AllRead();
-          ReplyKeyboardRemove(ct["delete_keyword_ing"])
+          ReplyKeyboardRemove(chat_id,ct["delete_keyword_ing"])
           // ^ '請輸入欲移除關鍵字的**前方編號!!!**\n刪除多組關鍵字請用 "任意符號" 隔開(推薦用","或"，")\n如遇離開請按 /main'
           write_ALL(ALL, doc)
           break;
@@ -911,7 +915,7 @@ function doPost(e) {
           ]
           var resize_keyboard = true
           var one_time_keyboard = false
-          ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, ct)
+          ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
           break;
         case ct['暫停關鍵字提醒']["text"]:
           ALL.keyword_notice = false
@@ -931,12 +935,11 @@ function doPost(e) {
           ]
           var resize_keyboard = true
           var one_time_keyboard = false
-          ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, ct)
+          ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
           break;
         case '/lookkeyword':
-          text = get_all_keyword(ALL)
-          var notification = true
-          sendtext(text, notification);
+          text = ct["lookkeyword_result"]['text'].format( get_all_keyword(ALL))
+          sendtext(chat_id, text);
           break;
           //-------------------------------------------------------------------
         default:
@@ -997,7 +1000,7 @@ function doPost(e) {
             }
             var resize_keyboard = true
             var one_time_keyboard = false
-            ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, ct)
+            ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
 
           } else {
             sendtext(chat_id, ct["incorrect_operation"]);
@@ -1029,6 +1032,8 @@ function doPost(e) {
       var video_id = estringa.message.video.file_id
       var Line_id = ALL.opposite.RoomId;
       TG_Send_video_To_Line(Line_id, video_id)
+      if (estringa.message.caption)
+        TG_Send_text_To_Line(Line_id, estringa.message.caption)
       sendtext(chat_id, ct["sendVideo_ed"]);
       // ^ "(影片已發送!)"
     } else {
@@ -1180,18 +1185,18 @@ function doPost(e) {
   var doc = DocumentApp.openById(doc_key)
   var f = doc.getText();
   var ALL = JSON.parse(f);
+  var chat_id = Telegram_id
   //================================================================
   if (ALL.FastMatch2[Room_text] != undefined) { //以下處理已登記的
-    if (ALL.data[ALL.FastMatch2[Room_text]].status == "已升級房間" || (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId)) {
-      if (ALL.data[ALL.FastMatch2[Room_text]].status == "已升級房間") {
-        chkey(ALL.data[ALL.FastMatch2[Room_text]].botToken)
+    if (ALL.data[ALL.FastMatch2[Room_text]].status == "已升級房間2" || (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId)) {
+      if (ALL.data[ALL.FastMatch2[Room_text]].status == "已升級房間2") {
+        //切換成綁訂房間的chat_id
+        chat_id = ALL.data[ALL.FastMatch2[Room_text]].Bind_groud_chat_id
       }
-
       try {
         if (message_json.type == "text") {
-          var p = message_json.userName + "：\n" + message_json.text
-          //Logger.log("ppp = ", p)
-          sendtext(p);
+          text = ct['text_format']['text'].format(message_json.userName,message_json.text)
+          sendtext(chat_id, text);
           //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
           //"text":"51"}
         } else if (message_json.type == "image") {
@@ -1200,7 +1205,7 @@ function doPost(e) {
           var caption = ct["is_from"]["text"].format(message_json.userName)
           sendtext(chat_id, ct["sendPhoto_ing"]);
           // ^ (正在傳送圖片，請稍後...)
-          sendPhoto(url, notification, caption)
+          sendPhoto(chat_id, url, notification, caption)
           //sendPhoto(url, notification)
           //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
           //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNskkLZktW"}
@@ -1210,34 +1215,26 @@ function doPost(e) {
           var caption = ct["is_from"]["text"].format(message_json.userName)
           sendtext(chat_id, ct["sendSticker_ing"])
           // ^ (正在傳送貼圖，請稍後...)
-          sendPhoto(sticker_png_url, notification, caption)
+          sendPhoto(chat_id, sticker_png_url, notification, caption)
           //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
-          /*
-          //下面是舊的方式 現在最近去爬line發現line的東西很好爬，異常好爬(怕.png
-          //是有方法可以直接發貼圖啦，但這樣速度會變慢 乾脆直接發圖。
-          text = "[" + message_json.type + "]\nstickerId:" + message_json.stickerId + "\npackageId:" + message_json.packageId
-          var notification = true
-          sendtext(text, notification);
-          */
           //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
           //"stickerId":"502","packageId":"2"}
         } else if (message_json.type == "audio") {
           var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
-          sendtext(url)
+          sendtext(chat_id, url)
           // ^ "抱歉!請至該連結下載或聆聽!\n{0}\n\n{1}來自: "
           //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
           //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9KakE5Q"}
         } else if (message_json.type == "location") {
           var notification = false
-          if (message_json.address) {
-            var text = message_json.address
-            sendtext(text, notification);
-          }
           var latitude = message_json.latitude
           var longitude = message_json.longitude
-          sendLocation(latitude, longitude, notification)
+          sendLocation(chat_id, latitude, longitude, notification)
           var text = ct["is_from"]["text"].format(message_json.userName)
-          sendtext(text, notification);
+          if (message_json.address) {
+            text = message_json.address + '\n'+text
+          }
+          sendtext(chat_id, text);
           //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
           //"address":"260台灣宜蘭縣宜蘭市舊城西路107號",
           //"latitude":24.759711,"longitude":121.750114}
@@ -1245,19 +1242,17 @@ function doPost(e) {
           var url = message_json.DURL
           var notification = false
           var caption = ct["is_from"]["text"].format(message_json.userName)
-          sendVoice(url, notification, caption)
+          sendVoice(chat_id, url, notification, caption)
           //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
           //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1"}
         } else if (message_json.type == "file") {
           var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
-          sendtext(url);
+          sendtext(chat_id, url);
           //senddocument(url)
         }
       } catch (e) {
-        chkey(Telegram_bot_key)
-        sendtext(chat_id, ct["forget_talk_to_new_bot?"]);
-        // ^ "030....你是否忘記先跟新辦的bot說過話呢?\n請看下列錯誤回報以debug!"
-        sendtext(e); //傳錯誤訊息詳情
+        sendtext(chat_id, ct["send_to_TG_error"]['text'].format(e));
+        // ^ '傳送失敗...，原因如下\n\n{0}'
       }
     } else { //以下有登記，未"🚀 發送訊息"
       //以下處理sheet========================================================
@@ -1280,7 +1275,7 @@ function doPost(e) {
       //以下處理關鍵字通知====================================================
       var keyword_notice = ALL.keyword_notice
       //Logger.log("以下處理關鍵字通知")
-      if (keyword_notice) {
+      if (keyword_notice && text != "") {
         var txt = text
         var keys = ALL.keyword
         var keys_value = key_word_check(message_json.text, keys)
@@ -1292,7 +1287,7 @@ function doPost(e) {
             text2 += keys_value[i] + " "
           }
           text = ct["keyword_trigger"]["text"].format(text2, ALL.data[col - 1].Name, (col - 1))
-          sendtext(text);
+          sendtext(chat_id, text);
           // ^ "有關鍵字被提及！\n{0}\nby: {1}\n點擊以快速切換至該房間 /d{2}",
         }
       }
@@ -1355,12 +1350,13 @@ function doPost(e) {
     }
     text = "已有新ID登入!!! id =\n" + U + "\n請盡快重新命名。"
     var notification = false
-    sendtext(text, notification);
+    sendtext(chat_id, text, notification);
   }
 } else {
-  GmailApp.sendEmail("email", "telegram-line出事啦", d + "\n" + ee);
+  GmailApp.sendEmail(email, "telegram-line出事啦(可能有新類型通訊格式，或gs網址外洩)", d + "\n" + ee);
 }
 lock.releaseLock();
+return 0 ;
 }
 
 //以下各類函式支援
@@ -1696,10 +1692,11 @@ function TG_Send_Photo_To_Line(Line_id, photo_id) {
   UrlFetchApp.fetch(url, options);
 }
 //=================================================================================
-function TG_Send_video_To_Line(Line_id, video_id, Telegram_bot_key) {
+function TG_Send_video_To_Line(Line_id, video_id) {
   //為什麼就跟錄音跟影片要原本的TG_token?? 是說不用原本的就是TG出bug了吧?
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+  var Telegram_bot_key = base_json.Telegram_bot_key
   var G = TGdownloadURL(getpath(video_id, Telegram_bot_key), Telegram_bot_key)
 
   var url = 'https://api.line.me/v2/bot/message/push';
