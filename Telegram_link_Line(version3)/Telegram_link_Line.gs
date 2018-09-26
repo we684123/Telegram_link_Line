@@ -142,7 +142,7 @@ function doPost(e) {
             text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
             keyboard_main(Telegram_id, text, doc_key)
             // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
-            //   請記得去主控bot選擇這個房間並開啟"🐬 顯示發送者"，
+            //   請記得去主控bot選擇這個房間並開啟"☀ 顯示發送者"，
             //   以免Line端眾不知何人發送。
             lock.releaseLock();
             return 0;
@@ -772,6 +772,22 @@ function doPost(e) {
             sendtext(chat_id, ct["droproom_sure?"]["text"].format(ALL.opposite.Name));
             // ^ "您確定要降級 {0} 嗎?\n若是請按一下 /droproom \n若沒按下則不會降級!!!"
             break;
+          case ct['☀ 顯示發送者']["text"]:
+            var OName = ALL.opposite.Name
+            var FM = ALL.FastMatch[OName]
+            ALL.data[FM].Display_name = true;
+            ALL.mode = 0
+            var r = JSON.stringify(ALL);
+            doc.setText(r); //寫入
+            break;
+          case ct['☁ 不顯示發送者']["text"]:
+            var OName = ALL.opposite.Name
+            var FM = ALL.FastMatch[OName]
+            ALL.data[FM].Display_name = false;
+            ALL.mode = 0
+            var r = JSON.stringify(ALL);
+            doc.setText(r); //寫入
+            break;
           case '/debug':
             var xfjhxgfh = REST_FastMatch1and2(); //強制等待，不知道為什麼有時候不會執行
             var ydjdyf = REST_keyboard(); //強制等待，不知道為什麼有時候不會執行
@@ -986,18 +1002,21 @@ function doPost(e) {
                 }]
               ]
 
-              if (ALL.data[FM]. ["Bind_groud_chat_id"]) { //如果遇到已升級的則改"降級"
+              if (ALL.data[FM]["Bind_groud_chat_id"]) { //如果遇到已升級的則改"降級"
                 var keyboard2 = [
                   [{
                     'text': ct['💫 降級房間']["text"]
                   }, {
-                    'text': ct["🐬 顯示發送者"]["text"]
+                    'text': ct["☀ 顯示發送者"]["text"]
                   }],
                   [{
                     'text': ct["🔙 返回房間"]["text"]
                   }]
                 ]
                 keyboard = keyboard2
+              }
+              if (ALL.data[FM]["Display_name"]) { //改鍵盤人名顯示與否
+                keyboard[0][0][1]['text'] = '☁ 不顯示發送者'
               }
               var resize_keyboard = true
               var one_time_keyboard = false

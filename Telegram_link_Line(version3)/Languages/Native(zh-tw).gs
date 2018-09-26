@@ -555,9 +555,13 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "🐬 顯示發送者": {
+      "☀ 顯示發送者": {
         "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
-        "text": '🐬 顯示發送者',
+        "text": '☀ 顯示發送者',
+      },
+      "☁ 不顯示發送者": {
+        "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": '☁ 不顯示發送者',
       },
     }
   }
