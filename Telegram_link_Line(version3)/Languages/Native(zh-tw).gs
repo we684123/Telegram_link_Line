@@ -531,7 +531,7 @@ function language() {
       },
       "bing_success":{
         "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
-        "text": '{0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n請記得去主控bot選擇這個房間並開啟"顯示發送者"，以免Line端眾不知何人發送。',
+        "text": '{0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n請記得去這個房間並開啟"🐬 顯示發送者"，以免Line端眾不知何人發送。',
          // {0} = 房間名稱
         "notification": false,  //不通知? true or false
         "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
@@ -554,6 +554,10 @@ function language() {
         "text": '傳送失敗...，原因如下\n\n{0}', // {0} = 失敗原因
         "notification": false,  //不通知? true or false
         "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🐬 顯示發送者":{
+        "type": "command(Telegram)",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": '🐬 顯示發送者',
       },
     }
   }

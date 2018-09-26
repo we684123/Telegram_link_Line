@@ -140,10 +140,12 @@ function doPost(e) {
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
             text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
-            keyboard_main(chat_id, text, doc_key)
+            keyboard_main(Telegram_id, text, doc_key)
             // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
-            //   請記得去主控bot選擇這個房間並開啟"顯示發送者"，
+            //   請記得去主控bot選擇這個房間並開啟"🐬 顯示發送者"，
             //   以免Line端眾不知何人發送。
+            lock.releaseLock();
+            return 0;
           }else {
             ALL['TG_temporary_docking'][chat_id] += 1
             var r = JSON.stringify(ALL);
@@ -270,6 +272,8 @@ function doPost(e) {
       }
       var Line_id = ALL.opposite.RoomId;
       TG_Send_text_To_Line(Line_id, text)
+      lock.releaseLock();
+      return 0;
 
       //================================================================
     } else if (mode == "🔖 重新命名" && Stext != "/main") {
@@ -300,6 +304,8 @@ function doPost(e) {
         text = ct["rename_success"]
         keyboard_main(chat_id, text, doc_key)
       }
+      lock.releaseLock();
+      return 0;
       //================================================================
     } else if (mode == "🔥 刪除房間" && Stext == "/delete") {
       REST_FastMatch1and2();
@@ -330,6 +336,7 @@ function doPost(e) {
       text = ct["delete_room_success"].format(a1, a2, a3)
       // ^ "Line_leave：{0}\nREST_keyboard：{1}\n{2}\n已刪除此聊天室"
       keyboard_main(text, doc_key)
+      lock.releaseLock();
       return 0;
     } else if (mode == "⭐ 升級房間" && Stext == "/uproom") {
       ALL.mode = "/uproom"
@@ -343,6 +350,8 @@ function doPost(e) {
       sendtext(chat_id, ct["plz_forward_verification_code"]);
       // ^ "請確認我在要綁定的群組中後，再轉發上方的驗證碼到那以進行綁定! \
       //   \n或按下 /unsetroom 取消升級"
+      lock.releaseLock();
+      return 0;
     } else if (mode == "/uproom" && Stext != "/main" && Stext != "/debug") {
       if (Stext == "/unsetroom") {
         delete ALL.FastMatch2[ALL.opposite.RoomId].Binding_number
@@ -352,49 +361,35 @@ function doPost(e) {
 
         sendtext(chat_id, ct["unsetroom_ed"]);
         // ^ "已取消設定bot"
-        return 0
+        lock.releaseLock();
+        return 0;
       }
     } else if (mode == "💫 降級房間" && Stext == "/droproom") {
       var aims = ALL.opposite.RoomId
       var number = ALL.FastMatch2[aims]
-      var D_token = ALL.data[number].botToken
-      try {
-        var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + D_token + "/deleteWebhook");
-        var responseCode = response.getResponseCode()
-      } catch (e) {
-        ct["droproom_fail"]["text"] = ct["droproom_fail"]["text"].format(responseCode, e);
-        sendtext(chat_id, ct["rename_success"]);
-        // ^ "降級失敗! 詳情如下：\n" + "responseCode：" + responseCode + "\nerror：\n" + e
-        return 0;
-      }
-
+      var oppid = ALL.data[number]["Bind_groud_chat_id"]
 
       delete ALL.data[number].botToken
+      delete ALL.data[number]["Bind_groud_chat_id"]
+      delete ALL.data[number]["Bind_groud_chat_title"]
+      delete ALL.data[number]["Bind_groud_chat_type"]
+      delete ALL.data[number]["Display_name"]
+      delete ALL.FastMatch3[oppid]
       ALL.data[number].status = "normal"
       ALL.mode = 0 //讓mode回復正常
-
-      var k = "沒有找到"
-      for (var j = 0; j < ALL.TG_bot_updateID_array.length; j++) {
-        if (TG_bot_updateID_array[j].line_roomID == ALL.opposite.RoomId) {
-          k = j
-          break
-        }
-      }
-      if (k == "沒有找到") {
-        var d = new Date();
-        GmailApp.sendEmail(email, "telegram-line出事啦(沒有找到)", d + "\n\n" + ee + "\n\n" + e + "\n\n" + k);
-      } else {
-        ALL.TG_bot_updateID_array.splice(k, 1)
-      }
 
       var r = JSON.stringify(ALL);
       doc.setText(r); //寫入
 
       keyboard_main(chat_id, ct["droproom_success"]["text"].format(JSON.stringify(ALL.data[number])), doc_key)
       // ^ "已降級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
+      lock.releaseLock();
+      return 0;
     } else if ((mode == "♻ 移除關鍵字" || mode == "📎 新增關鍵字") && Stext == "/lookkeyword") {
       text = ct["lookkeyword_result"]['text'].format( get_all_keyword(ALL))
       sendtext(chat_id, text);
+      lock.releaseLock();
+      return 0;
     } else if (mode == "📎 新增關鍵字" && Stext != "/main") {
       try {
         var addwkey = String(Stext)
@@ -420,8 +415,9 @@ function doPost(e) {
         ct["add_keyword_success"]["text"] = ct["add_keyword_success"]["text"].format(String(e))
         sendtext(chat_id, ct["add_keyword_success"]);
         // ^ "新增失敗，原因如下：\n" + String(e)
-        return 0
       }
+      lock.releaseLock();
+      return 0;
     } else if (mode == "♻ 移除關鍵字" && Stext != "/main") {
       try { //移除關鍵字
         var rmwkey = String(Stext)
@@ -452,8 +448,9 @@ function doPost(e) {
         // ^ "移除失敗，如遇重新移除請先再次看過關鍵字名單再操作\n
         //    按下 /lookkeyword 可顯示名單\n
         //    移除失敗原因如下：\n{0}"
-        return 0
       }
+      lock.releaseLock();
+      return 0;
     } else if (mode == "⏰訊息時間啟用?") {
       function mixT(chat_id) {
         keyboard_main(chat_id, ct["change_message_time_func"]["text"].format(String(Stext)), doc_key)
@@ -485,7 +482,8 @@ function doPost(e) {
         sendtext(chat_id, ct["not_eat_this"]);
         // ^ 030...\n請不要給我吃怪怪的東西...
       }
-
+      lock.releaseLock();
+      return 0;
     } else {
       //以下指令分流
       switch (Stext) {
@@ -988,13 +986,15 @@ function doPost(e) {
               }]
             ]
 
-            if (ALL.data[FM].botToken) { //如果遇到已升級的則改"降級"
+            if (ALL.data[FM].["Bind_groud_chat_id"]) { //如果遇到已升級的則改"降級"
               var keyboard2 = [
                 [{
                   'text': ct['💫 降級房間']["text"]
                 }, {
-                  'text': ct["🔙 返回房間"]["text"]
-                }]
+                  'text': ct["🐬 顯示發送者"]["text"]
+                }],
+                [{'text': ct["🔙 返回房間"]["text"]
+              }]
               ]
               keyboard = keyboard2
             }
