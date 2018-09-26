@@ -505,58 +505,58 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "not_registered":{
-        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+      "not_registered": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
         "text": "您好!此群似乎還沒有與資料庫綁定，等主人綁定後我才能在此服務。\n若您想要一個自己的 Telegram_link_Line 機器人，請至https://github.com/we684123/Telegram_link_Line",
-        "notification": false,  //不通知? true or false
-        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "plz_forward_verification_code":{
-        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+      "plz_forward_verification_code": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
         "text": "請確認我在要綁定的群組中後，再轉發上方的驗證碼到那以進行綁定!\n或按下 /unsetroom 取消升級",
-        "notification": false,  //不通知? true or false
-        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "not_find_ctrl_id":{
-        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+      "not_find_ctrl_id": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
         "text": '由於是第一次做房間升級，請稍待系統準備。\n準備好後會再跟您介紹升級房間的功用。',
-        "notification": false,  //不通知? true or false
-        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "get_ctrl_id_error":{
-        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+      "get_ctrl_id_error": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
         "text": "抱歉綁定失敗QAQ，請稍後在試!\n失敗原因如下：{0}", // {0} = 失敗原因
-        "notification": false,  //不通知? true or false
-        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "bing_success":{
-        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+      "bing_success": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
         "text": '{0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n請記得去這個房間並開啟"🐬 顯示發送者"，以免Line端眾不知何人發送。',
-         // {0} = 房間名稱
-        "notification": false,  //不通知? true or false
-        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+        // {0} = 房間名稱
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "text_format":{
-        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+      "text_format": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
         "text": '{0}：\n{1} ',
-         // {0} = 發送者名稱 、 {1} = 所發送的訊息
-        "notification": false,  //不通知? true or false
-        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+        // {0} = 發送者名稱 、 {1} = 所發送的訊息
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "send_to_TG_error":{
-        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+      "send_to_TG_error": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
         "text": '傳送失敗...，原因如下\n\n{0}', // {0} = 失敗原因
-        "notification": false,  //不通知? true or false
-        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "lookkeyword_result":{
-        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+      "lookkeyword_result": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
         "text": '傳送失敗...，原因如下\n\n{0}', // {0} = 失敗原因
-        "notification": false,  //不通知? true or false
-        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "🐬 顯示發送者":{
-        "type": "command(Telegram)",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+      "🐬 顯示發送者": {
+        "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
         "text": '🐬 顯示發送者',
       },
     }
