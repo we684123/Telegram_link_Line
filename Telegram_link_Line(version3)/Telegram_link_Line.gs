@@ -308,30 +308,22 @@ function doPost(e) {
         return 0;
         //================================================================
       } else if (mode == "🔥 刪除房間" && Stext == "/delete") {
-        REST_FastMatch1and2();
         var aims = ALL.opposite.RoomId
         var number = ALL.FastMatch2[aims]
 
         //doc處理
         ALL.data.splice(number, 1) //刪除目標
-        for (var x = 0; x++; x < len(ALL.TG_bot_updateID_array)) {
-          if (ALL.TG_bot_updateID_array[x] == aims)
-            ALL.data.splice(x, 1)
-        }
         ALL.mode = 0
-        var r = JSON.stringify(ALL);
-        doc.setText(r); //重新寫入
-
         //sheet處理
         var SpreadSheet = SpreadsheetApp.openById(sheet_key);
         var Sheet = SpreadSheet.getSheetByName("Line訊息區");
         Sheet.deleteColumn(number + 1);
 
-        //從Line中離開
-        var a1 = Line_leave(room_or_groupID)
-
+        var a1 = Line_leave(room_or_groupID); //從Line中離開
         var a2 = REST_keyboard(); //重製快速鍵盤
         var a3 = REST_FastMatch1and2(); //重製快速索引
+        var r = JSON.stringify(ALL);
+        doc.setText(r); //重新寫入
 
         text = ct["delete_room_success"].format(a1, a2, a3)
         // ^ "Line_leave：{0}\nREST_keyboard：{1}\n{2}\n已刪除此聊天室"
