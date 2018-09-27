@@ -563,6 +563,12 @@ function language() {
         "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
         "text": '☁ 不顯示發送者',
       },
+      "Display_name_ch_ed": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": '{0} 已 {1}',
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
     }
   }
   /*

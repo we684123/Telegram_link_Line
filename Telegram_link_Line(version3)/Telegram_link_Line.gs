@@ -779,6 +779,20 @@ function doPost(e) {
             ALL.mode = 0
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
+            var keyboard = [
+              [{
+                'text': ct['💫 降級房間']["text"]
+              }, {
+                'text': ct["☁ 不顯示發送者"]["text"]
+              }],
+              [{
+                'text': ct["🔙 返回房間"]["text"]
+              }]
+            ]
+            text = ct['Display_name_ch_ed']['text'].format(OName, ct['☀ 顯示發送者']["text"])
+            // ^ {0} 已 {1}
+            var u = undefined
+            ReplyKeyboardMakeup(chat_id, keyboard, u, u, text)
             break;
           case ct['☁ 不顯示發送者']["text"]:
             var OName = ALL.opposite.Name
@@ -787,6 +801,20 @@ function doPost(e) {
             ALL.mode = 0
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
+            var keyboard = [
+              [{
+                'text': ct['💫 降級房間']["text"]
+              }, {
+                'text': ct["☀ 顯示發送者"]["text"]
+              }],
+              [{
+                'text': ct["🔙 返回房間"]["text"]
+              }]
+            ]
+            text = ct['Display_name_ch_ed']['text'].format(OName, ct['☁ 不顯示發送者']["text"])
+            // ^ {0} 已 {1}
+            var u = undefined
+            ReplyKeyboardMakeup(chat_id, keyboard, u, u, text)
             break;
           case '/debug':
             var xfjhxgfh = REST_FastMatch1and2(); //強制等待，不知道為什麼有時候不會執行
@@ -1016,7 +1044,7 @@ function doPost(e) {
                 keyboard = keyboard2
               }
               if (ALL.data[FM]["Display_name"]) { //改鍵盤人名顯示與否
-                keyboard[0][0][1]['text'] = '☁ 不顯示發送者'
+                keyboard2[0][1]['text'] = '☁ 不顯示發送者'
               }
               var resize_keyboard = true
               var one_time_keyboard = false
@@ -1452,6 +1480,13 @@ function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboa
     var text = String(ct)
   } else {
     var text = ct["text"]
+  }
+
+  if (resize_keyboard == undefined) {
+    resize_keyboard = true
+  }
+  if (one_time_keyboard = undefined) {
+    one_time_keyboard = false
   }
   //Logger.log("ReplyKeyboardMakeup->ct = ", text + "\n" + ct + "\n" + ct["text"])
   var ReplyKeyboardMakeup = {
