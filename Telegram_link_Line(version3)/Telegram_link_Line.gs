@@ -163,7 +163,7 @@ function doPost(e) {
           if (estringa.message.from.last_name) {
             last_name = estringa.message.from.last_name
           }
-          var by_name = last_name + first_name + '：\n'
+          var by_name = last_name + first_name + '\n'
         } else {
           var by_name = ''
         }
@@ -224,6 +224,9 @@ function doPost(e) {
           var duration = estringa.message.audio.duration
           var audio_id = estringa.message.audio.file_id
           TG_Send_audio_To_Line(Line_id, audio_id, duration)
+          if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
+            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
+          }
           if (estringa.message.caption)
             TG_Send_text_To_Line(Line_id, estringa.message.caption)
           sendtext(chat_id, ct["sendAudio_ed"]);
@@ -232,6 +235,9 @@ function doPost(e) {
           var duration = estringa.message.voice.duration
           var audio_id = estringa.message.voice.file_id
           TG_Send_audio_To_Line(Line_id, audio_id, duration)
+          if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
+            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
+          }
           if (estringa.message.caption)
             TG_Send_text_To_Line(Line_id, estringa.message.caption)
           sendtext(chat_id, ct["sendVoice_ed"]);
@@ -251,6 +257,15 @@ function doPost(e) {
           if (ALL.data[n]["Display_name"]) {
             TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
           }
+        }else if (estringa.message.animation) {
+          var file_id = estringa.message.animation.file_id
+          var duration = estringa.message.animation.duration
+          TG_Send_video_To_Line(Line_id, file_id)
+          if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
+            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
+          }
+          sendtext(chat_id, ct["sendGIF_ed"]);
+          // ^ "(GIF已發送!)"
         }
       }
       lock.releaseLock();
@@ -1156,9 +1171,20 @@ function doPost(e) {
         sendtext(chat_id, ct["incorrect_operation"]);
         // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
       }
+    } else if (estringa.message.animation) {
+      if (mode == "🚀 發送訊息") {
+        var file_id = estringa.message.animation.file_id
+        var duration = estringa.message.animation.duration
+        TG_Send_video_To_Line(Line_id, file_id)
+        sendtext(chat_id, ct["sendGIF_ed"]);
+        // ^ "(GIF已發送!)"
+      } else {
+        sendtext(chat_id, ct["incorrect_operation"]);
+        // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+      }
     }
 
-    //=====================================================================================================
+//=====================================================================================================
   } else if (estringa.events[0].timestamp) {
     //以下來自line
     var from = 'line';

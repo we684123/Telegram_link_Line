@@ -52,6 +52,12 @@ function language() {
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "sendGIF_ed": {
+        "type": "to_Telegram",
+        "text": "(GIF已發送!)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "not_support_sticker": {
         "type": "to_Telegram",
         "text": "(暫時不支援貼圖傳送喔!)",
@@ -292,7 +298,7 @@ function language() {
       },
       "caption_der_form": { //喔甘這個命名www
         "type": "to_Telegram(only_text)",
-        "text": "來自: {0}", // {0} = TG、LINE中發此訊息的人名
+        "text": "來自： {0}", // {0} = TG、LINE中發此訊息的人名
       },
       "sorry_plz_go_to_url": {
         "type": "to_Telegram",
