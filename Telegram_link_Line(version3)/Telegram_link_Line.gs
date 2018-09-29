@@ -221,31 +221,21 @@ function doPost(e) {
           sendtext(chat_id, ct["not_support_sticker"]);
           // ^ "(暫時不支援貼圖傳送喔!)"
         } else if (estringa.message.audio) {
-          if (mode == "🚀 發送訊息") {
-            var duration = estringa.message.audio.duration
-            var audio_id = estringa.message.audio.file_id
-            TG_Send_audio_To_Line(Line_id, audio_id, duration)
-            if (estringa.message.caption)
-              TG_Send_text_To_Line(Line_id, estringa.message.caption)
-            sendtext(chat_id, ct["sendAudio_ed"]);
-            // ^ "(音檔已發送!)"
-          } else {
-            sendtext(chat_id, ct["incorrect_operation"]);
-            // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-          }
+          var duration = estringa.message.audio.duration
+          var audio_id = estringa.message.audio.file_id
+          TG_Send_audio_To_Line(Line_id, audio_id, duration)
+          if (estringa.message.caption)
+            TG_Send_text_To_Line(Line_id, estringa.message.caption)
+          sendtext(chat_id, ct["sendAudio_ed"]);
+          // ^ "(音檔已發送!)"
         } else if (estringa.message.voice) {
-          if (mode == "🚀 發送訊息") {
-            var duration = estringa.message.voice.duration
-            var audio_id = estringa.message.voice.file_id
-            TG_Send_audio_To_Line(Line_id, audio_id, duration)
-            if (estringa.message.caption)
-              TG_Send_text_To_Line(Line_id, estringa.message.caption)
-            sendtext(chat_id, ct["sendVideo_ed"]);
-            // ^ "(錄音已發送!)"
-          } else {
-            sendtext(chat_id, ct["incorrect_operation"]);
-            // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-          }
+          var duration = estringa.message.voice.duration
+          var audio_id = estringa.message.voice.file_id
+          TG_Send_audio_To_Line(Line_id, audio_id, duration)
+          if (estringa.message.caption)
+            TG_Send_text_To_Line(Line_id, estringa.message.caption)
+          sendtext(chat_id, ct["sendVoice_ed"]);
+          // ^ "(錄音已發送!)"
         } else if (estringa.message.location) {
           var latitude = estringa.message.location.latitude
           var longitude = estringa.message.location.longitude
@@ -632,7 +622,7 @@ function doPost(e) {
                   //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
                   //"stickerId":"502","packageId":"2"}
                   upMessageData(i, col, ed)
-                } else if (message_json.type == "audio") {  //這裡看看能不能改
+                } else if (message_json.type == "audio") { //這裡看看能不能改
                   var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
@@ -1128,7 +1118,7 @@ function doPost(e) {
         TG_Send_audio_To_Line(Line_id, audio_id, duration)
         if (estringa.message.caption)
           TG_Send_text_To_Line(Line_id, estringa.message.caption)
-        sendtext(chat_id, ct["sendVideo_ed"]);
+        sendtext(chat_id, ct["sendVoice_ed"]);
         //sendtext(chat_id, ct["not_support_audio"]);
         // ^ "(暫時不支援audio傳送喔!)"
       } else {
