@@ -221,14 +221,31 @@ function doPost(e) {
           sendtext(chat_id, ct["not_support_sticker"]);
           // ^ "(暫時不支援貼圖傳送喔!)"
         } else if (estringa.message.audio) {
-          var duration = estringa.message.audio.duration
-          //var audio_id = estringa.message.audio.file_id
-          sendtext(chat_id, ct["not_support_audio"]);
-          // ^ "(暫時不支援audio傳送喔!)"
+          if (mode == "🚀 發送訊息") {
+            var duration = estringa.message.audio.duration
+            var audio_id = estringa.message.audio.file_id
+            TG_Send_audio_To_Line(Line_id, audio_id, duration)
+            if (estringa.message.caption)
+              TG_Send_text_To_Line(Line_id, estringa.message.caption)
+            sendtext(chat_id, ct["sendAudio_ed"]);
+            // ^ "(音檔已發送!)"
+          } else {
+            sendtext(chat_id, ct["incorrect_operation"]);
+            // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+          }
         } else if (estringa.message.voice) {
-          //var duration = estringa.message.voice.duration
-          sendtext(chat_id, ct["not_support_voice"]);
-          // ^  "(暫時不支援voice傳送喔!)"
+          if (mode == "🚀 發送訊息") {
+            var duration = estringa.message.voice.duration
+            var audio_id = estringa.message.voice.file_id
+            TG_Send_audio_To_Line(Line_id, audio_id, duration)
+            if (estringa.message.caption)
+              TG_Send_text_To_Line(Line_id, estringa.message.caption)
+            sendtext(chat_id, ct["sendVideo_ed"]);
+            // ^ "(錄音已發送!)"
+          } else {
+            sendtext(chat_id, ct["incorrect_operation"]);
+            // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+          }
         } else if (estringa.message.location) {
           var latitude = estringa.message.location.latitude
           var longitude = estringa.message.location.longitude
@@ -615,7 +632,7 @@ function doPost(e) {
                   //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
                   //"stickerId":"502","packageId":"2"}
                   upMessageData(i, col, ed)
-                } else if (message_json.type == "audio") {
+                } else if (message_json.type == "audio") {  //這裡看看能不能改
                   var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
@@ -1068,7 +1085,7 @@ function doPost(e) {
         sendtext(chat_id, ct["incorrect_operation"]);
         // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
       }
-    } else if (estringa.message.video) {
+    } else if (estringa.message.video) { //如果是影片
       if (mode == "🚀 發送訊息") {
         //以下選擇telegram video並發到line
         var video_id = estringa.message.video.file_id
@@ -1082,7 +1099,7 @@ function doPost(e) {
         sendtext(chat_id, ct["incorrect_operation"]);
         // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
       }
-    } else if (estringa.message.sticker) {
+    } else if (estringa.message.sticker) { //如果是貼圖
       if (mode == "🚀 發送訊息") {
         sendtext(chat_id, ct["not_support_sticker"]);
         // ^ "(暫時不支援貼圖傳送喔!)"
@@ -1090,28 +1107,35 @@ function doPost(e) {
         sendtext(chat_id, ct["incorrect_operation"]);
         // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
       }
-    } else if (estringa.message.audio) {
+    } else if (estringa.message.audio) { //如果是聲音
       if (mode == "🚀 發送訊息") {
         var duration = estringa.message.audio.duration
-        //var audio_id = estringa.message.audio.file_id
-        //TG_Send_audio_To_Line(Line_id, audio_id, duration)
-        sendtext(chat_id, ct["not_support_audio"]);
+        var audio_id = estringa.message.audio.file_id
+        TG_Send_audio_To_Line(Line_id, audio_id, duration)
+        if (estringa.message.caption)
+          TG_Send_text_To_Line(Line_id, estringa.message.caption)
+        sendtext(chat_id, ct["sendAudio_ed"]);
+        //sendtext(chat_id, ct["not_support_audio"]);
         // ^ "(暫時不支援audio傳送喔!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
         // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
       }
-    } else if (estringa.message.voice) {
+    } else if (estringa.message.voice) { //如果是錄音
       if (mode == "🚀 發送訊息") {
-        //var duration = estringa.message.voice.duration
-        //TG_Send_audio_To_Line(Line_id, audio_id, duration)
-        sendtext(chat_id, ct["not_support_voice"]);
-        // ^  "(暫時不支援voice傳送喔!)"
+        var duration = estringa.message.voice.duration
+        var audio_id = estringa.message.voice.file_id
+        TG_Send_audio_To_Line(Line_id, audio_id, duration)
+        if (estringa.message.caption)
+          TG_Send_text_To_Line(Line_id, estringa.message.caption)
+        sendtext(chat_id, ct["sendVideo_ed"]);
+        //sendtext(chat_id, ct["not_support_audio"]);
+        // ^ "(暫時不支援audio傳送喔!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
         // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
       }
-    } else if (estringa.message.location) {
+    } else if (estringa.message.location) { //如果是位置
       if (mode == "🚀 發送訊息") {
         var latitude = estringa.message.location.latitude
         var longitude = estringa.message.location.longitude
@@ -1773,7 +1797,6 @@ function TG_Send_video_To_Line(Line_id, video_id) {
 }
 //=================================================================================
 function TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key) {
-  //為什麼就跟錄音跟影片要原本的TG_token?? 是說不用原本的就是TG出bug了吧?
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
   var G = TGdownloadURL(getpath(audio_id, Telegram_bot_key), Telegram_bot_key)
@@ -1783,7 +1806,7 @@ function TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key) {
   var retMsg = [{
     "type": "audio",
     "originalContentUrl": G,
-    "duration": duration
+    "duration": duration * 1000
   }];
   var header = {
     'Content-Type': 'application/json; charset=UTF-8',

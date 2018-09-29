@@ -40,6 +40,18 @@ function language() {
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "sendAudio_ed": {
+        "type": "to_Telegram",
+        "text": "(音檔已發送!)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "sendVoice_ed": {
+        "type": "to_Telegram",
+        "text": "(錄音已發送!)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "not_support_sticker": {
         "type": "to_Telegram",
         "text": "(暫時不支援貼圖傳送喔!)",
