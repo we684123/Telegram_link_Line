@@ -218,8 +218,14 @@ function doPost(e) {
           sendtext(chat_id, ct["sendVideo_ed"]);
           // ^ "(影片已發送!)"
         } else if (estringa.message.sticker) {
-          sendtext(chat_id, ct["not_support_sticker"]);
-          // ^ "(暫時不支援貼圖傳送喔!)"
+          var file_id = estringa.message.sticker.file_id
+          var Line_id = ALL.opposite.RoomId;
+          TG_Send_Photo_To_Line(Line_id, file_id)
+          if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
+            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
+          }
+          sendtext(chat_id, ct["sendSticker_ed"]);
+          // ^ "(貼圖已發送!)"
         } else if (estringa.message.audio) {
           var duration = estringa.message.audio.duration
           var audio_id = estringa.message.audio.file_id
@@ -257,7 +263,7 @@ function doPost(e) {
           if (ALL.data[n]["Display_name"]) {
             TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
           }
-        }else if (estringa.message.animation) {
+        } else if (estringa.message.animation) {
           var file_id = estringa.message.animation.file_id
           var duration = estringa.message.animation.duration
           TG_Send_video_To_Line(Line_id, file_id)
@@ -1106,8 +1112,11 @@ function doPost(e) {
       }
     } else if (estringa.message.sticker) { //如果是貼圖
       if (mode == "🚀 發送訊息") {
-        sendtext(chat_id, ct["not_support_sticker"]);
-        // ^ "(暫時不支援貼圖傳送喔!)"
+        var file_id = estringa.message.sticker.file_id
+        var Line_id = ALL.opposite.RoomId;
+        TG_Send_Photo_To_Line(Line_id, file_id)
+        sendtext(chat_id, ct["sendSticker_ed"]);
+        // ^ "(貼圖已發送!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
         // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
@@ -1184,7 +1193,7 @@ function doPost(e) {
       }
     }
 
-//=====================================================================================================
+    //=====================================================================================================
   } else if (estringa.events[0].timestamp) {
     //以下來自line
     var from = 'line';
