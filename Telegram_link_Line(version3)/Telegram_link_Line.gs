@@ -353,9 +353,11 @@ function doPost(e) {
 
           sendtext(chat_id, ct["unsetroom_ed"]);
           // ^ "已取消設定bot"
-          lock.releaseLock();
-          return 0;
+        } else {
+          sendtext(chat_id, ct['in_uproom_but'])
         }
+        lock.releaseLock();
+        return 0;
       } else if (mode == "💫 降級房間" && Stext == "/droproom") {
         var aims = ALL.opposite.RoomId
         var number = ALL.FastMatch2[aims]
@@ -488,7 +490,7 @@ function doPost(e) {
             }
             keyboard_main(chat_id, ct["🔮 開啟主選單"], doc_key)
             break;
-          case ct['🔙 返回房間']["text"]:
+          case ct['🔙 返回大廳']["text"]:
             if (ALL.mode != 0) {
               ALL.mode = 0
               var r = JSON.stringify(ALL);
@@ -778,7 +780,7 @@ function doPost(e) {
                 'text': ct["☁ 不顯示發送者"]["text"]
               }],
               [{
-                'text': ct["🔙 返回房間"]["text"]
+                'text': ct["🔙 返回大廳"]["text"]
               }]
             ]
             text = ct['Display_name_ch_ed']['text'].format(OName, ct['☀ 顯示發送者']["text"])
@@ -800,7 +802,7 @@ function doPost(e) {
                 'text': ct["☀ 顯示發送者"]["text"]
               }],
               [{
-                'text': ct["🔙 返回房間"]["text"]
+                'text': ct["🔙 返回大廳"]["text"]
               }]
             ]
             text = ct['Display_name_ch_ed']['text'].format(OName, ct['☁ 不顯示發送者']["text"])
@@ -835,7 +837,7 @@ function doPost(e) {
                 'text': ct['⏰訊息時間啟用?']["text"]
               }],
               [{
-                'text': ct["🔙 返回房間"]["text"]
+                'text': ct["🔙 返回大廳"]["text"]
               }]
             ]
             if (ALL.keyword_notice == undefined) {
@@ -892,7 +894,7 @@ function doPost(e) {
               [{
                 'text': ct["暫停關鍵字提醒"]["text"]
               }, {
-                'text': ct["🔙 返回房間"]["text"]
+                'text': ct["🔙 返回大廳"]["text"]
               }]
             ]
             var keyword_keyboard2 = [
@@ -904,7 +906,7 @@ function doPost(e) {
               [{
                 'text': ct["啟動關鍵字提醒"]["text"]
               }, {
-                'text': ct["🔙 返回房間"]["text"]
+                'text': ct["🔙 返回大廳"]["text"]
               }]
             ]
             if (ALL.keyword_notice) {
@@ -944,7 +946,7 @@ function doPost(e) {
               [{
                 'text': ct["暫停關鍵字提醒"]["text"]
               }, {
-                'text': ct["🔙 返回房間"]["text"]
+                'text': ct["🔙 返回大廳"]["text"]
               }]
             ]
             var resize_keyboard = true
@@ -964,7 +966,7 @@ function doPost(e) {
               [{
                 'text': ct["啟動關鍵字提醒"]["text"]
               }, {
-                'text': ct["🔙 返回房間"]["text"]
+                'text': ct["🔙 返回大廳"]["text"]
               }]
             ]
             var resize_keyboard = true
@@ -1018,7 +1020,7 @@ function doPost(e) {
                 [{
                   'text': ct["🔥 刪除房間"]["text"]
                 }, {
-                  'text': ct["🔙 返回房間"]["text"]
+                  'text': ct["🔙 返回大廳"]["text"]
                 }]
               ]
 
@@ -1030,7 +1032,7 @@ function doPost(e) {
                     'text': ct["☀ 顯示發送者"]["text"]
                   }],
                   [{
-                    'text': ct["🔙 返回房間"]["text"]
+                    'text': ct["🔙 返回大廳"]["text"]
                   }]
                 ]
                 keyboard = keyboard2
@@ -1508,7 +1510,7 @@ function keyboard_main(chat_id, ct, doc_key) {
 }
 //=================================================================================
 function In(name) { //防止與命令衝突的命名
-  var arr = ["/main", "🔙 返回房間", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言",
+  var arr = ["/main", "🔙 返回大廳", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言",
     "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃 重新整理", "🔥 刪除房間", "/delete", "/debug",
     "/AllRead", "/allread", "/Allread", "/allRead", "⭐️ 升級房間", "💫 降級房間", "/uproom", "droproom",
     "/uproom_2", "/unsetroom", "♻ 移除關鍵字", "📎 新增關鍵字", "/lookkeyword", "⏰訊息時間啟用?", "🔧 更多設定",

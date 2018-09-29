@@ -220,9 +220,9 @@ function language() {
         "type": "command(Telegram)",
         "text": "🔃 重新整理"
       },
-      "🔙 返回房間": {
+      "🔙 返回大廳": {
         "type": "command(Telegram)",
-        "text": "🔙 返回房間"
+        "text": "🔙 返回大廳"
       },
       "請選擇聊天室": {
         "type": "to_Telegram",
@@ -568,6 +568,18 @@ function language() {
         "text": '{0} 已 {1}',
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "no_target": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": ' **您未在正常情況下使用指令 **',
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "in_uproom_but": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": '030... 您目前模式是"升級房間"喔\n如果沒有要升級請按 /unsetroom 來離開 \n或是如果這是意料之外的話請按下 /debug 修復 \n也可以按下 /main 來回到大廳',
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
       },
     }
   }
