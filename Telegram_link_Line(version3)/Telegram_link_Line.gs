@@ -219,7 +219,6 @@ function doPost(e) {
           // ^ "(影片已發送!)"
         } else if (estringa.message.sticker) {
           var file_id = estringa.message.sticker.file_id
-          var Line_id = ALL.opposite.RoomId;
           TG_Send_Photo_To_Line(Line_id, file_id)
           if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
             TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
@@ -272,6 +271,9 @@ function doPost(e) {
           }
           sendtext(chat_id, ct["sendGIF_ed"]);
           // ^ "(GIF已發送!)"
+        } else if (estringa.message.document) {
+          sendtext(chat_id, ct["not_support_document"]);
+          // "(暫時不支援document傳送喔!)"
         }
       }
       lock.releaseLock();
