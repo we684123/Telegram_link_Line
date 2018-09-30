@@ -281,7 +281,7 @@ function doPost(e) {
     if (estringa.message.text) { //如果是文字訊息
       if (mode == "🚀 發送訊息" && Stext != "/exit") {
         //以下準備接收telegram資訊並發到line
-        if (In(Stext) || Stext.substr(0, 2) == "/d") {
+        if (in_command(Stext) || Stext.substr(0, 2) == "/d") {
           sendtext(chat_id, ct["plz_exit_and_resend"]);
           // ^ "請先按下 /exit 離開後再下指令喔!"
           lock.releaseLock();
@@ -305,10 +305,10 @@ function doPost(e) {
 
         //================================================================
       } else if (mode == "🔖 重新命名" && Stext != "/main") {
-        if (ALL.FastMatch[Stext] != undefined) { //排除重名
+        if (in_name(ALL, (U + "✅")) || in_name(ALL, (U + "❎"))) { //排除重名
           sendtext(chat_id, ct["duplicate_name"]);
           // ^ "名子不可重複，請重新輸入一個!"
-        } else if (In(Stext)) { //排除與指令重複
+        } else if (in_command(Stext)) { //排除與指令重複
           sendtext(chat_id, ct["duplicate_command"]);
           // ^ "名子不可跟命令重複，請重新輸入一個!"
         } else {
@@ -347,7 +347,7 @@ function doPost(e) {
         var Sheet = SpreadSheet.getSheetByName("Line訊息區");
         Sheet.deleteColumn(number + 1);
 
-        var a1 = Line_leave(room_or_groupID); //從Line中離開
+        var a1 = Line_leave(aims); //從Line中離開
         var a2 = REST_keyboard(); //重製快速鍵盤
         var a3 = REST_FastMatch1and2(); //重製快速索引
         var r = JSON.stringify(ALL);
@@ -1493,94 +1493,24 @@ function Log(estringa, from, sheet_key, email) {
       GmailApp.sendEmail(email, "telegram-line出事啦", d + " " + ee);
   }
 }
-//=================================================================
-function ReplyKeyboardRemove(chat_id, ct) {
-  try {
-    var notification = ct["notification"]
-    var parse_mode = ct["parse_mode"]
-    if (notification == undefined || notification != true)
-      var notification = false
-    if (parse_mode == undefined)
-      var parse_mode = ""
-  } catch (e) {
-    var notification = false
-    var parse_mode = ""
-  }
-  if (ct["text"] == undefined) {
-    var text = String(ct)
-  } else {
-    var text = ct["text"]
-  }
-
-  var ReplyKeyboardRemove = {
-    'remove_keyboard': true,
-    'selective': false
-  }
-  var payload = {
-    "method": "sendMessage",
-    'chat_id': String(chat_id),
-    'text': text,
-    "parse_mode": parse_mode,
-    "notification": notification,
-    'reply_markup': JSON.stringify(ReplyKeyboardRemove)
-  }
-  start(payload);
-}
 //=================================================================================
-function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, ct) {
-  //Logger.log("ct = ",ct)
-  //Logger.log("ct str = ",String(ct))
-  try {
-    var notification = ct["notification"]
-    var parse_mode = ct["parse_mode"]
-    if (notification == undefined || notification != true)
-      var notification = false
-    if (parse_mode == undefined)
-      var parse_mode = ""
-  } catch (e) {
-    var notification = false
-    var parse_mode = ""
-  }
-  if (ct["text"] == undefined) {
-    var text = String(ct)
-  } else {
-    var text = ct["text"]
-  }
+function CP() {
+  var base_json = base()
+  var sheet_key = base_json.sheet_key
+  var doc_key = base_json.doc_key
+  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+  var Sheet = SpreadSheet.getSheetByName("JSON備份");
+  var LastRow = Sheet.getLastRow();
 
-  if (resize_keyboard == undefined) {
-    resize_keyboard = true
-  }
-  if (one_time_keyboard = undefined) {
-    one_time_keyboard = false
-  }
-  //Logger.log("ReplyKeyboardMakeup->ct = ", text + "\n" + ct + "\n" + ct["text"])
-  var ReplyKeyboardMakeup = {
-    'keyboard': keyboard,
-    'resize_keyboard': resize_keyboard,
-    'one_time_keyboard': one_time_keyboard,
-  }
-  var payload = {
-    "method": "sendMessage",
-    'chat_id': String(chat_id), // 這裡不改是突然想到非主控
-    'text': text,
-    'parse_mode': parse_mode,
-    'disable_notification': notification,
-    'reply_markup': JSON.stringify(ReplyKeyboardMakeup)
-  }
-  start(payload);
-}
-//=================================================================================
-function keyboard_main(chat_id, ct, doc_key) {
   var doc = DocumentApp.openById(doc_key)
   var f = doc.getText();
-  var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
-  var keyboard_main = ALL.RoomKeyboard
-  var resize_keyboard = false
-  var one_time_keyboard = false
-  ReplyKeyboardMakeup(chat_id, keyboard_main, resize_keyboard, one_time_keyboard, ct)
+  var d = new Date();
+  Sheet.getRange(LastRow + 1, 1).setValue(d);
+  Sheet.getRange(LastRow + 1, 2).setValue(f);
 }
 //=================================================================================
-function In(name) { //防止與命令衝突的命名
+//老方法，歷史遺物
+/*function In(name) { //防止與命令衝突的命名
   var arr = ["/main", "🔙 返回大廳", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言",
     "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃 重新整理", "🔥 刪除房間", "/delete", "/debug",
     "/AllRead", "/allread", "/Allread", "/allRead", "⭐️ 升級房間", "💫 降級房間", "/uproom", "droproom",
@@ -1593,122 +1523,7 @@ function In(name) { //防止與命令衝突的命名
   });
   return flag
 }
-//=================================================================================
-function REST_keyboard() {
-  var base_json = base()
-  var doc = DocumentApp.openById(base_json.doc_key)
-  var f = doc.getText();
-  var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
-  var keyboard = [];
-  var data_len = ALL.data.length;
-  var T = data_len - 2 //因為要分兩欄故-2
-
-  for (var i = 0; i <= T;) {
-
-    if (ALL.data[i].Name) { //讓ND=暱稱，沒有就=Roomid
-      var ND1 = ALL.data[i].Name
-    } else {
-      var ND1 = ALL.data[i].RoomId
-    }
-    if (ALL.data[i + 1].Name) { //讓ND=暱稱，沒有就=Roomid
-      var ND2 = ALL.data[i + 1].Name
-    } else {
-      var ND2 = ALL.data[i + 1].RoomId
-    }
-
-    var A = [{
-      'text': ND1
-    }, {
-      'text': ND2
-    }]
-
-    keyboard.splice(i, 0, A)
-    i = i + 2;
-  }
-  if (data_len % 2) {
-    var data_len2 = ALL.data.length - 1;
-    var keyboard_len = keyboard.length
-
-    if (ALL.data[data_len2].Name) { //讓ND=暱稱，沒有就=Roomid
-      ND1 = ALL.data[data_len2].Name
-    } else {
-      ND1 = ALL.data[data_len2].RoomId
-    }
-
-    keyboard.splice(keyboard_len, 0, [{
-      'text': ND1
-    }])
-  }
-
-  keyboard.splice(0, 0, [{
-    'text': "🔃 重新整理"
-  }, {
-    'text': '🔧 更多設定'
-  }, {
-    'text': "🔭 訊息狀態"
-  }]) //加入返回鍵
-  //=================================================
-  ALL.RoomKeyboard = keyboard //寫回RoomKeynoard
-  write_ALL(ALL, doc) //寫入
-  return "成功"
-}
-//=================================================================================
-function REST_FastMatch1and2() { //重製快速索引
-  var base_json = base()
-  var doc_key = base_json.doc_key
-  var doc = DocumentApp.openById(doc_key)
-  var f = doc.getText();
-  var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
-
-  var data_len = ALL.data.length
-  ALL.FastMatch = {}
-  ALL.FastMatch2 = {}
-  for (var i = 0; i < data_len; i++) {
-    var Name = String(ALL.data[i].Name)
-    ALL.FastMatch[Name] = i
-  }
-  for (var i = 0; i < data_len; i++) {
-    var RoomId = ALL.data[i].RoomId
-    ALL.FastMatch2[RoomId] = i
-  }
-
-  var r = JSON.stringify(ALL);
-  doc.setText(r); //寫入
-  return "成功"
-}
-//=================================================================================
-function AllRead() {
-  var base_json = base()
-  var sheet_key = base_json.sheet_key
-  var doc_key = base_json.doc_key
-  var FolderId = base_json.FolderId
-  var doc = DocumentApp.openById(doc_key)
-  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-  var Sheet = SpreadSheet.getSheetByName("Line訊息區");
-  var Folder = DriveApp.getFolderById(FolderId); //download_from_line
-
-  var doc = DocumentApp.openById(doc_key)
-  var f = doc.getText();
-  var ALL = JSON.parse(f);
-  var data_len = ALL.data.length
-  var row1 = []
-  for (var i = 0; i < data_len; i++) {
-    ALL.data[i].Amount = 0
-    row1.splice(i, 0, "[0,0]")
-  }
-  var LastCol = Sheet.getLastColumn();
-  Sheet.clear();
-  Sheet.appendRow(row1)
-
-  var r = JSON.stringify(ALL);
-  doc.setText(r); //寫入
-
-  var files = Folder.getFiles();
-  while (files.hasNext()) {
-    var file = files.next();
-    file.setTrashed(true)
-  }
-}
+*/
 //=================================================================================
 function getUserName(userId) {
   var base_json = base()
@@ -1967,8 +1782,15 @@ function Line_leave(room_or_groupID) {
     'method': 'post'
   }
   //--------------------------------------------------
-  UrlFetchApp.fetch(url, options);
-  return "成功"
+  try {
+    UrlFetchApp.fetch(url, options);
+    return "成功"
+  } catch (e) {
+    var url = 'https://api.line.me/v2/bot/room/group' + room_or_groupID + '/leave';
+    UrlFetchApp.fetch(url, options);
+    return "成功"
+  }
+
 }
 //=================================================================================
 function getpath(id, Telegram_bot_key) {
@@ -2062,14 +1884,6 @@ function get_extension(filename, reciprocal) {
   return extension
 }
 //=================================================================================
-function get_all_keyword(ALL) {
-  var all_word = ''
-  for (var i = 0; i < ALL.keyword.length; i++) {
-    all_word = all_word + (i + 1) + '. "' + ALL.keyword[i] + '"\n'
-  }
-  return all_word
-}
-//=================================================================================
 function ch_Name_and_Description() {
   var base_json = base()
   var FolderId = base_json.FolderId
@@ -2108,21 +1922,6 @@ function ch_Name_and_Description() {
     //Logger.log("NNNNNNN = ", file.getName())
     //Logger.log("NNNNNNN222 = ", get_extension(file.getName(), 0))
   }
-}
-//=================================================================================
-function CP() {
-  var base_json = base()
-  var sheet_key = base_json.sheet_key
-  var doc_key = base_json.doc_key
-  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-  var Sheet = SpreadSheet.getSheetByName("JSON備份");
-  var LastRow = Sheet.getLastRow();
-
-  var doc = DocumentApp.openById(doc_key)
-  var f = doc.getText();
-  var d = new Date();
-  Sheet.getRange(LastRow + 1, 1).setValue(d);
-  Sheet.getRange(LastRow + 1, 2).setValue(f);
 }
 //=================================================================================
 function sendtext(chat_id, ct) {
@@ -2224,12 +2023,239 @@ function sendLocation(chat_id, latitude, longitude, notification) {
   start(payload);
 }
 //=================================================================
+function ReplyKeyboardRemove(chat_id, ct) {
+  try {
+    var notification = ct["notification"]
+    var parse_mode = ct["parse_mode"]
+    if (notification == undefined || notification != true)
+      var notification = false
+    if (parse_mode == undefined)
+      var parse_mode = ""
+  } catch (e) {
+    var notification = false
+    var parse_mode = ""
+  }
+  if (ct["text"] == undefined) {
+    var text = String(ct)
+  } else {
+    var text = ct["text"]
+  }
+
+  var ReplyKeyboardRemove = {
+    'remove_keyboard': true,
+    'selective': false
+  }
+  var payload = {
+    "method": "sendMessage",
+    'chat_id': String(chat_id),
+    'text': text,
+    "parse_mode": parse_mode,
+    "notification": notification,
+    'reply_markup': JSON.stringify(ReplyKeyboardRemove)
+  }
+  start(payload);
+}
+//=================================================================================
+function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, ct) {
+  //Logger.log("ct = ",ct)
+  //Logger.log("ct str = ",String(ct))
+  try {
+    var notification = ct["notification"]
+    var parse_mode = ct["parse_mode"]
+    if (notification == undefined || notification != true)
+      var notification = false
+    if (parse_mode == undefined)
+      var parse_mode = ""
+  } catch (e) {
+    var notification = false
+    var parse_mode = ""
+  }
+  if (ct["text"] == undefined) {
+    var text = String(ct)
+  } else {
+    var text = ct["text"]
+  }
+
+  if (resize_keyboard == undefined) {
+    resize_keyboard = true
+  }
+  if (one_time_keyboard = undefined) {
+    one_time_keyboard = false
+  }
+  //Logger.log("ReplyKeyboardMakeup->ct = ", text + "\n" + ct + "\n" + ct["text"])
+  var ReplyKeyboardMakeup = {
+    'keyboard': keyboard,
+    'resize_keyboard': resize_keyboard,
+    'one_time_keyboard': one_time_keyboard,
+  }
+  var payload = {
+    "method": "sendMessage",
+    'chat_id': String(chat_id), // 這裡不改是突然想到非主控
+    'text': text,
+    'parse_mode': parse_mode,
+    'disable_notification': notification,
+    'reply_markup': JSON.stringify(ReplyKeyboardMakeup)
+  }
+  start(payload);
+}
+//=================================================================================
+function keyboard_main(chat_id, ct, doc_key) {
+  var doc = DocumentApp.openById(doc_key)
+  var f = doc.getText();
+  var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
+  var keyboard_main = ALL.RoomKeyboard
+  var resize_keyboard = false
+  var one_time_keyboard = false
+  ReplyKeyboardMakeup(chat_id, keyboard_main, resize_keyboard, one_time_keyboard, ct)
+}
+//=================================================================================
+function REST_keyboard() {
+  var base_json = base()
+  var doc = DocumentApp.openById(base_json.doc_key)
+  var f = doc.getText();
+  var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
+  var keyboard = [];
+  var data_len = ALL.data.length;
+  var T = data_len - 2 //因為要分兩欄故-2
+
+  for (var i = 0; i <= T;) {
+
+    if (ALL.data[i].Name) { //讓ND=暱稱，沒有就=Roomid
+      var ND1 = ALL.data[i].Name
+    } else {
+      var ND1 = ALL.data[i].RoomId
+    }
+    if (ALL.data[i + 1].Name) { //讓ND=暱稱，沒有就=Roomid
+      var ND2 = ALL.data[i + 1].Name
+    } else {
+      var ND2 = ALL.data[i + 1].RoomId
+    }
+
+    var A = [{
+      'text': ND1
+    }, {
+      'text': ND2
+    }]
+
+    keyboard.splice(i, 0, A)
+    i = i + 2;
+  }
+  if (data_len % 2) {
+    var data_len2 = ALL.data.length - 1;
+    var keyboard_len = keyboard.length
+
+    if (ALL.data[data_len2].Name) { //讓ND=暱稱，沒有就=Roomid
+      ND1 = ALL.data[data_len2].Name
+    } else {
+      ND1 = ALL.data[data_len2].RoomId
+    }
+
+    keyboard.splice(keyboard_len, 0, [{
+      'text': ND1
+    }])
+  }
+
+  keyboard.splice(0, 0, [{
+    'text': "🔃 重新整理"
+  }, {
+    'text': '🔧 更多設定'
+  }, {
+    'text': "🔭 訊息狀態"
+  }]) //加入返回鍵
+  //=================================================
+  ALL.RoomKeyboard = keyboard //寫回RoomKeynoard
+  write_ALL(ALL, doc) //寫入
+  return "成功"
+}
+//=================================================================================
+function REST_FastMatch1and2() { //重製快速索引
+  var base_json = base()
+  var doc_key = base_json.doc_key
+  var doc = DocumentApp.openById(doc_key)
+  var f = doc.getText();
+  var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
+
+  var data_len = ALL.data.length
+  ALL.FastMatch = {}
+  ALL.FastMatch2 = {}
+  for (var i = 0; i < data_len; i++) {
+    var Name = String(ALL.data[i].Name)
+    ALL.FastMatch[Name] = i
+  }
+  for (var i = 0; i < data_len; i++) {
+    var RoomId = ALL.data[i].RoomId
+    ALL.FastMatch2[RoomId] = i
+  }
+
+  var r = JSON.stringify(ALL);
+  doc.setText(r); //寫入
+  return "成功"
+}
+//=================================================================
 function TG_leaveChat(chat_id) {
   var payload = {
     "method": "leaveChat",
     "chat_id": String(chat_id)
   }
   start(payload);
+}
+//=================================================================================
+//喔乾，感謝 Kevin Tseng 開源這個用法
+//來源: https://kevintsengtw.blogspot.com/2011/09/javascript-stringformat.html?showComment=1536387871696#c7569907085658128584
+//可在Javascript中使用如同C#中的string.format (對jQuery String的擴充方法)
+//使用方式 : var fullName = 'Hello. My name is {0} {1}.'.format('FirstName', 'LastName');
+String.prototype.format = function() {
+  var txt = this.toString();
+  for (var i = 0; i < arguments.length; i++) {
+    var exp = getStringFormatPlaceHolderRegEx(i);
+    txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
+  }
+  return cleanStringFormatResult(txt);
+}
+//讓輸入的字串可以包含{}
+function getStringFormatPlaceHolderRegEx(placeHolderIndex) {
+  return new RegExp('({)?\\{' + placeHolderIndex + '\\}(?!})', 'gm')
+}
+//當format格式有多餘的position時，就不會將多餘的position輸出
+//ex:
+// var fullName = 'Hello. My name is {0} {1} {2}.'.format('firstName', 'lastName');
+// 輸出的 fullName 為 'firstName lastName', 而不會是 'firstName lastName {2}'
+function cleanStringFormatResult(txt) {
+  if (txt == null) return "";
+  return txt.replace(getStringFormatPlaceHolderRegEx("\\d+"), "");
+}
+//=================================================================================
+function AllRead() {
+  var base_json = base()
+  var sheet_key = base_json.sheet_key
+  var doc_key = base_json.doc_key
+  var FolderId = base_json.FolderId
+  var doc = DocumentApp.openById(doc_key)
+  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+  var Sheet = SpreadSheet.getSheetByName("Line訊息區");
+  var Folder = DriveApp.getFolderById(FolderId); //download_from_line
+
+  var doc = DocumentApp.openById(doc_key)
+  var f = doc.getText();
+  var ALL = JSON.parse(f);
+  var data_len = ALL.data.length
+  var row1 = []
+  for (var i = 0; i < data_len; i++) {
+    ALL.data[i].Amount = 0
+    row1.splice(i, 0, "[0,0]")
+  }
+  var LastCol = Sheet.getLastColumn();
+  Sheet.clear();
+  Sheet.appendRow(row1)
+
+  var r = JSON.stringify(ALL);
+  doc.setText(r); //寫入
+
+  var files = Folder.getFiles();
+  while (files.hasNext()) {
+    var file = files.next();
+    file.setTrashed(true)
+  }
 }
 //=================================================================================
 function write_ALL(ALL, doc) {
@@ -2261,31 +2287,6 @@ function key_word_check(txt, keys) {
   return keys_value
 }
 //=================================================================================
-//喔乾，感謝 Kevin Tseng 開源這個用法
-//來源: https://kevintsengtw.blogspot.com/2011/09/javascript-stringformat.html?showComment=1536387871696#c7569907085658128584
-//可在Javascript中使用如同C#中的string.format (對jQuery String的擴充方法)
-//使用方式 : var fullName = 'Hello. My name is {0} {1}.'.format('FirstName', 'LastName');
-String.prototype.format = function() {
-  var txt = this.toString();
-  for (var i = 0; i < arguments.length; i++) {
-    var exp = getStringFormatPlaceHolderRegEx(i);
-    txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
-  }
-  return cleanStringFormatResult(txt);
-}
-//讓輸入的字串可以包含{}
-function getStringFormatPlaceHolderRegEx(placeHolderIndex) {
-  return new RegExp('({)?\\{' + placeHolderIndex + '\\}(?!})', 'gm')
-}
-//當format格式有多餘的position時，就不會將多餘的position輸出
-//ex:
-// var fullName = 'Hello. My name is {0} {1} {2}.'.format('firstName', 'lastName');
-// 輸出的 fullName 為 'firstName lastName', 而不會是 'firstName lastName {2}'
-function cleanStringFormatResult(txt) {
-  if (txt == null) return "";
-  return txt.replace(getStringFormatPlaceHolderRegEx("\\d+"), "");
-}
-//=================================================================================
 function Random_text(codeLength) {
   var id = ""
   var selectChar = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
@@ -2315,6 +2316,14 @@ function in_name(ALL, text) {
     }
   }
   return false
+}
+//=================================================================================
+function get_all_keyword(ALL) {
+  var all_word = ''
+  for (var i = 0; i < ALL.keyword.length; i++) {
+    all_word = all_word + (i + 1) + '. "' + ALL.keyword[i] + '"\n'
+  }
+  return all_word
 }
 //=================================================================================
 function start(payload) {

@@ -605,6 +605,38 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "/allread": {
+        "type": "command(Telegram)",
+        "text": "/allread"
+      },
+      "/debug": {
+        "type": "command(Telegram)",
+        "text": "/debug"
+      },
+      "/exit": {
+        "type": "command(Telegram)",
+        "text": "/exit"
+      },
+      "/main": {
+        "type": "command(Telegram)",
+        "text": "/main"
+      },
+      "/delete": {
+        "type": "command(Telegram)",
+        "text": "/delete"
+      },
+      "/uproom": {
+        "type": "command(Telegram)",
+        "text": "/uproom"
+      },
+      "/unsetroom": {
+        "type": "command(Telegram)",
+        "text": "/unsetroom"
+      },
+      "/droproom": {
+        "type": "command(Telegram)",
+        "text": "/droproom"
+      },
     }
   }
   /*
