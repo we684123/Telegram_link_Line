@@ -361,7 +361,7 @@ function doPost(e) {
       } else if (mode == "⭐ 升級房間" && Stext == "/uproom") {
         ALL.mode = "/uproom"
         var FastMatch2_number = ALL.FastMatch2[ALL.opposite.RoomId]
-        var Binding_number = String(Random_text())
+        var Binding_number = String(Random_text(12))
         ALL.data[FastMatch2_number]['Binding_number'] = Binding_number //有點多餘但可確保
         ALL['wait_to_Bind'][Binding_number] = FastMatch2_number
         var r = JSON.stringify(ALL);
@@ -1201,15 +1201,15 @@ function doPost(e) {
 
     var cutSource = estringa.events[0].source; //好長 看的我都花了 縮減個
     if (cutSource.type == "user") { //舊格式整理
-      var Room_text = cutSource.userId; //Room_text = 要發送的地址
+      var line_roomID = cutSource.userId; //line_roomID = 要發送的地址
       var userId = cutSource.userId
     } else if (cutSource.type == "room") {
-      var Room_text = cutSource.roomId;
+      var line_roomID = cutSource.roomId;
       if (cutSource.userId) {
         var userId = cutSource.userId
       }
     } else {
-      var Room_text = cutSource.groupId;
+      var line_roomID = cutSource.groupId;
       if (cutSource.userId) {
         var userId = cutSource.userId
       }
@@ -1278,11 +1278,11 @@ function doPost(e) {
     var ALL = JSON.parse(f);
     var chat_id = Telegram_id
     //================================================================
-    if (ALL.FastMatch2[Room_text] != undefined) { //以下處理已登記的
-      if (ALL.data[ALL.FastMatch2[Room_text]].status == "已升級房間2" || (ALL.mode == "🚀 發送訊息" && Room_text == ALL.opposite.RoomId)) {
-        if (ALL.data[ALL.FastMatch2[Room_text]].status == "已升級房間2") {
+    if (ALL.FastMatch2[line_roomID] != undefined) { //以下處理已登記的
+      if (ALL.data[ALL.FastMatch2[line_roomID]].status == "已升級房間2" || (ALL.mode == "🚀 發送訊息" && line_roomID == ALL.opposite.RoomId)) {
+        if (ALL.data[ALL.FastMatch2[line_roomID]].status == "已升級房間2") {
           //切換成綁訂房間的chat_id
-          chat_id = ALL.data[ALL.FastMatch2[Room_text]].Bind_groud_chat_id
+          chat_id = ALL.data[ALL.FastMatch2[line_roomID]].Bind_groud_chat_id
         }
         try {
           if (message_json.type == "text") {
@@ -1347,7 +1347,7 @@ function doPost(e) {
         }
       } else { //以下有登記，未"🚀 發送訊息"
         //以下處理sheet========================================================
-        var col = ALL.FastMatch2[Room_text] + 1; //找欄位
+        var col = ALL.FastMatch2[line_roomID] + 1; //找欄位
         var LastRowM = SheetM.getRange(1, col).getDisplayValue();
         LastRowM = JSON.parse(LastRowM)
         SheetM.getRange(LastRowM[0] + 2, col).setValue(String(text)) //更新內容
@@ -1388,20 +1388,35 @@ function doPost(e) {
     } else { //以下處理未登記的(新資料)=======================
       var newcol = Object.keys(ALL.FastMatch2).length;
       //以下處理FastMatch2==================================
-      ALL.FastMatch2[Room_text] = newcol
+      ALL.FastMatch2[line_roomID] = newcol
       var r = JSON.stringify(ALL);
       doc.setText(r); //寫入
       //以下處理data========================================
       var data_len = ALL.data.length;
 
-      if (userName) {
+      if (userName) { // 初步選出房間名
         var U = userName
       } else {
-        var U = Room_text
+        var U = line_roomID
+      }
+
+      for (;;) { // 打死都不要重名
+        if (in_command(U)) {
+          U = U + String(Random_text(6))
+          continue;
+        } else if (in_name((U + "✅"))) {
+          U = U + String(Random_text(6))
+          continue;
+        } else if (in_name((U + "❎"))) {
+          U = U + String(Random_text(6))
+          continue;
+        } else {
+          break;
+        }
       }
 
       var N = {
-        "RoomId": Room_text,
+        "RoomId": line_roomID,
         "Name": (U + "✅"),
         "status": "normal",
         "Amount": 0,
@@ -1414,7 +1429,7 @@ function doPost(e) {
       if (userName) {
         var U = userName
       } else {
-        var U = Room_text
+        var U = line_roomID
       }
       var R = ',"' + U + '✅":' + newcol + "}"
       var r = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace("}", R));
@@ -1425,7 +1440,7 @@ function doPost(e) {
       //以下處理sheetM的數值===================================================
       SheetM.getRange(1, newcol + 1).setValue("[1,0]")
       //以下處理sheet(寫入訊息)========================================================
-      var col = ALL.FastMatch2[Room_text] + 1; //找欄位
+      var col = ALL.FastMatch2[line_roomID] + 1; //找欄位
       SheetM.getRange(2, col).setValue(String(text)) //更新內容
       //以下處理doc(寫入訊息)==========================================================
       ALL.data[col - 1].Amount = ALL.data[col - 1].Amount + 1 //!!!!!!!!!!!!!!!!!!!!!!
@@ -1437,7 +1452,7 @@ function doPost(e) {
       if (userName) {
         var U = userName
       } else {
-        var U = Room_text
+        var U = line_roomID
       }
       text = "已有新ID登入!!! id =\n" + U + "\n請盡快重新命名。"
       var notification = false
@@ -2235,15 +2250,35 @@ function cleanStringFormatResult(txt) {
   return txt.replace(getStringFormatPlaceHolderRegEx("\\d+"), "");
 }
 //=================================================================================
-function Random_text() {
+function Random_text(codeLength) {
   var id = ""
-  var codeLength = 12
   var selectChar = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
   for (var i = 0; i < codeLength; i++) {
     var charIndex = Math.floor(Math.random() * 36);
     id += selectChar[charIndex];
   }
   return id
+}
+//=================================================================================
+function in_command(text) {
+  var ct = language()["correspond_text"] //語言載入
+  var command_list = Object.keys(ct)
+  for (var i = 0; i < command_list.length; i++) {
+    if (text == command_list[i]) {
+      return true
+    }
+  }
+  return false
+}
+//=================================================================================
+function in_name(ALL, text) {
+  var ALL_list = Object.keys(ALL["FastMatch"])
+  for (var i = 0; i < ALL_list.length; i++) {
+    if (text == ALL_list[i]) {
+      return true
+    }
+  }
+  return false
 }
 //=================================================================================
 function start(payload) {
