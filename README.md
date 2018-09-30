@@ -12,7 +12,7 @@
 | 功能 | V1 | V2 | V3 |     
 |-------|:----:|:-----:|:-----:|     
 | 文字      |  ✓ |    ✓     |   ✓  |    
-| 貼圖      |     |            | 僅Line發給TG |      
+| 貼圖      |     |            | ✓(註1) |      
 | 照片      |     | 僅TG發給Line |    ✓  |       
 | 影片      |     |            |   ✓  |      
 | 錄音      |     |            | 僅Line發給TG |      
@@ -25,6 +25,7 @@
 | 關鍵字提醒 |     |           |    ✓  |      
 | 訊息時間   |     |           |    ✓  |      
 * V2、V3有時會不知道是誰發言是因為對方[版本](https://goo.gl/noYa7L)不夠新。
+* 註1：目前確定 "安卓8.5.3" 可以正常看貼圖，"Windows 5.10.0.1789" 則無法，其他未知
 
 ----
 
@@ -44,29 +45,32 @@
 
 ----
 
-# 準備
+
+#其他人的教學
  #### [企鵝](https://t.me/penguinF)做了一個非常詳細的[圖文教學](https://hackmd.io/s/Bkc6LwAP7#)(萬分感謝 m(_ \_)m )，可以去看看。
+ #### (但是此教學目前過期，不過創建LINEbot的部分是能用的，另外就是這個版本升級房間時不再使用新的bot，轉成用"新群組"替代)
 
 
-
-
+# 準備
  ##### 需要使用者申請 Telegram_bot跟Line_bot(Developer Trial)
 
  ##### 需有一google帳號並在其中創建：
 
+![Imgur](https://i.imgur.com/U1oJeU5.png)
 
 1.  一個doc檔，並將v3中的"doc.gs"內容複製上去。
 
 2.  一個sheet檔
     * 在sheet中新增5個分頁(page)：    
-  __"Debug"、"Log"、"紀錄發送的訊息"、"Line訊息區"、"JSON備份"__   
+  __"Debug"、"Log"、"紀錄發送的訊息"、"Line訊息區"、"JSON備份"__      
+    [說明圖](https://i.imgur.com/UD8X3KO.png)
     * 其中 "Line訊息區" 在其"A1"中填入 "[0,0]" (字串)，然後選取所有儲存格的格式設為字串(純文字)。      
     [說明圖](https://i.imgur.com/CnrhMB7.png)    
 
 
-3.  二個gs檔(google apps script)，並將v3其中的"Telegram_link_Line.gs"的內容複製在一開始給你的"程式碼"區內。    
+3.  三個gs檔(google apps script)，並將v3其中的"Telegram_link_Line.gs"的內容複製在一開始給你的"程式碼"區內。    
   ![Imgur](https://i.imgur.com/V3KF0rh.png)
-  複製完後按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱 -> 將"baseANDtest"內容複製上去並填上資訊(註一)__    
+  複製完後按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱(推薦叫"baseANDtest") -> 將"baseANDtest.gs"內容複製上去並填上資訊(註一)__    
   ![Imgur](https://i.imgur.com/tt2F4cj.png)
   ----    
   ![Imgur](https://i.imgur.com/ySQ5jJO.png)
@@ -74,6 +78,13 @@
   ![Imgur](https://i.imgur.com/MvEDdfk.png)
   ----    
   ![Imgur](https://i.imgur.com/WgT109q.png)
+
+  再一次
+  複製完後按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱(推薦叫"Languages") -> 將"Native(zh-tw).gs"內容複製上去__    
+
+  ![Imgur](https://i.imgur.com/KCwcCEz.png)
+
+
   然成後請如下操作：    
   * 接下來按下左上角的     
   * "發佈" ->     
