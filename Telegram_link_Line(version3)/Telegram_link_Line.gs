@@ -1389,8 +1389,8 @@ function doPost(e) {
       var newcol = Object.keys(ALL.FastMatch2).length;
       //以下處理FastMatch2==================================
       ALL.FastMatch2[line_roomID] = newcol
-      var r = JSON.stringify(ALL);
-      doc.setText(r); //寫入
+      //var r = JSON.stringify(ALL);
+      //doc.setText(r); //寫入
       //以下處理data========================================
       var data_len = ALL.data.length;
 
@@ -1403,60 +1403,67 @@ function doPost(e) {
       for (;;) { // 打死都不要重名
         if (in_command(U)) {
           U = U + String(Random_text(6))
+          //Logger.log("U1 = ",U)
           continue;
-        } else if (in_name((U + "✅"))) {
+        } else if (in_name(ALL, (U + "✅"))) {
           U = U + String(Random_text(6))
+          //Logger.log("U2 = ",U)
           continue;
-        } else if (in_name((U + "❎"))) {
-          U = U + String(Random_text(6))
+        } else if (in_name(ALL, (U + "❎"))) {
+          U = U + "_" + String(Random_text(6))
+          //Logger.log("U3 = ",U)
           continue;
         } else {
+          //Logger.log("YYYYYYY")
           break;
         }
       }
+      //Logger.log("U = ",U)
 
       var N = {
         "RoomId": line_roomID,
         "Name": (U + "✅"),
         "status": "normal",
-        "Amount": 0,
+        "Amount": 1,
         "Notice": true
       }
+      //Logger.log("NNNNNNNNN = ",N)
       ALL.data.splice(data_len, 0, N)
       //以下處理FastMatch===================================
       var data_len = ALL.data.length
       var Room_Name = ALL.data[data_len - 1].Name //這個已經有✅了!
-      if (userName) {
+      /*if (userName) {
         var U = userName
       } else {
         var U = line_roomID
-      }
-      var R = ',"' + U + '✅":' + newcol + "}"
-      var r = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace("}", R));
-      ALL.FastMatch = r; //打包好塞回去
+      }*/
 
-      var r = JSON.stringify(ALL);
-      doc.setText(r); //寫入
+      ALL.FastMatch[(U + "✅")] = newcol
+      //var R = ',"' + U + '✅":' + newcol + "}"
+      //var r = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace("}", R));
+      //ALL.FastMatch = r; //打包好塞回去
+      //var r = JSON.stringify(ALL);
+      //doc.setText(r); //寫入
       //以下處理sheetM的數值===================================================
       SheetM.getRange(1, newcol + 1).setValue("[1,0]")
       //以下處理sheet(寫入訊息)========================================================
       var col = ALL.FastMatch2[line_roomID] + 1; //找欄位
       SheetM.getRange(2, col).setValue(String(text)) //更新內容
       //以下處理doc(寫入訊息)==========================================================
-      ALL.data[col - 1].Amount = ALL.data[col - 1].Amount + 1 //!!!!!!!!!!!!!!!!!!!!!!
+      //ALL.data[col - 1].Amount += 1
+      //ALL.data[col - 1].Amount = ALL.data[col - 1].Amount + 1
       var r = JSON.stringify(ALL);
       doc.setText(r); //寫入
       //以下處理RoomKeyboard==================================================
       REST_keyboard()
       //以下通知有新的ID進來===================================================
-      if (userName) {
+      /*if (userName) {
         var U = userName
       } else {
         var U = line_roomID
-      }
+      }*/
       text = "已有新ID登入!!! id =\n" + U + "\n請盡快重新命名。"
-      var notification = false
-      sendtext(chat_id, text, notification);
+      sendtext(chat_id, text);
     }
   } else {
     GmailApp.sendEmail(email, "telegram-line出事啦(可能有新類型通訊格式，或gs網址外洩)", d + "\n" + ee);
@@ -1912,6 +1919,35 @@ function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_addres
     SheetD.getRange(LastRowD + 1, 2).setValue(e);
     //Logger.log("FFFFFFFFFFFF = ", e)
   }
+}
+//=================================================================================
+function TG_Send_Sticker_To_Line(Line_id, sticker_id) { //舊款function 先留著
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+  var G = TGdownloadURL(getpath(photo_id))
+
+  var url = 'https://api.line.me/v2/bot/message/push';
+  //--------------------------------------------------
+  var retMsg = [{
+    "type": "image",
+    "originalContentUrl": G,
+    "previewImageUrl": G
+  }];
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var payload = {
+    'to': Line_id,
+    'messages': retMsg
+  }
+  var options = {
+    'headers': header,
+    'method': 'post',
+    'payload': JSON.stringify(payload)
+  }
+  //--------------------------------------------------
+  UrlFetchApp.fetch(url, options);
 }
 //=================================================================================
 function Line_leave(room_or_groupID) {
