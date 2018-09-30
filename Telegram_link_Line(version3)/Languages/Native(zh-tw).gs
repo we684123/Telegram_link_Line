@@ -116,7 +116,7 @@ function language() {
       },
       "delete_room_success": {
         "type": "to_Telegram",
-        "text": "已刪除此聊天室",
+        "text": "Line_leave：{0}\nREST_keyboard：{1}\nREST_FastMatch1and2：{2}\n已刪除此聊天室",
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -479,8 +479,9 @@ function language() {
       },
       "select_room_text": {
         "type": "to_Telegram",
-        "text": "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?",
+        "text": "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n{3}房間狀態：{4}\n請問你要?",
         // {0} = 房間名稱 , {1} = 未讀數量 , {2} = 有沒有開啟聊天室的通知(true or false)
+        // {3} = 是否顯示(TorF) , {4} = n房間狀態
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -636,6 +637,12 @@ function language() {
       "/droproom": {
         "type": "command(Telegram)",
         "text": "/droproom"
+      },
+      "can_not_leave_from_line": {
+        "type": "to_Telegram",
+        "text": "bot無法離開，因為不是在group或room內",
+        "notification": false,  //不通知? true or false
+        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
       },
     }
   }

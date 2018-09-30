@@ -1,7 +1,7 @@
 function doPost(e) {
   //嘗試lock
   var lock = LockService.getScriptLock();
-  var success = lock.tryLock(10000);
+  var success = lock.tryLock(1200000);
 
   var base_json = base();
   var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
@@ -114,7 +114,6 @@ function doPost(e) {
           ALL['TG_temporary_docking'][chat_id] = 0
           var r = JSON.stringify(ALL);
           doc.setText(r); //寫入
-          Logger.log("chat_id = ", chat_id)
           sendtext(chat_id, ct['not_registered'])
           // ^ 您好!此群似乎還沒有與資料庫綁定，等主人綁定後我才能在此服務。...
           lock.releaseLock();
@@ -348,16 +347,22 @@ function doPost(e) {
         var SpreadSheet = SpreadsheetApp.openById(sheet_key);
         var Sheet = SpreadSheet.getSheetByName("Line訊息區");
         Sheet.deleteColumn(number + 1);
-
-        var a1 = Line_leave(aims); //從Line中離開
+        try {
+          var a1 = Line_leave(aims); //從Line中離開
+        } catch (e) {
+          sendtext(chat_id, ct['can_not_leave_from_line'])
+          var a1 = false
+        }
         var a2 = REST_keyboard(); //重製快速鍵盤
         var a3 = REST_FastMatch1and2(); //重製快速索引
-        var r = JSON.stringify(ALL);
-        doc.setText(r); //重新寫入
 
-        text = ct["delete_room_success"].format(a1, a2, a3)
-        // ^ "Line_leave：{0}\nREST_keyboard：{1}\n{2}\n已刪除此聊天室"
-        keyboard_main(text, doc_key)
+        //下兩行特留紀念 在寫入一次會是錯的結果
+        //var r = JSON.stringify(ALL);
+        ///doc.setText(r); //重新寫入
+
+        text = ct["delete_room_success"]['text'].format(a1, a2, a3)
+        // ^ "Line_leave：{0}\nREST_keyboard：{1}\nREST_FastMatch1and2：{2}\n已刪除此聊天室"
+        keyboard_main(chat_id, text, doc_key)
         lock.releaseLock();
         return 0;
       } else if (mode == "⭐ 升級房間" && Stext == "/uproom") {
@@ -455,11 +460,8 @@ function doPost(e) {
             if (isNaN(parseInt(rmwkey_array[i]))) {
               continue
             }
-            //Logger.log("TTTEEEE = ", i)
             var index = parseInt(rmwkey_array[i]) - 1
-            //Logger.log("TTTindex = ", index)
             ALL.keyword.splice(index, 1)
-            //Logger.log("TTTT222 = ", ALL.keyword)
           }
 
           write_ALL(ALL, doc)
@@ -536,25 +538,17 @@ function doPost(e) {
           case ct['🔭 訊息狀態']["text"]:
             data_len = ALL.data.length;
             text = ""
-            //Logger.log('HHHHH1111 = ',ct["unread_number"]["text"])
             for (var i = 0; i < data_len; i++) {
               if (ALL.data[i].Amount == 0) {
-                //Logger.log("IIIIII = ",i)
                 continue;
               }
-              //Logger.log("TTTTTT = ",text)
-              //Logger.log("BBBBBBBB = ",ALL.data[i].Name)
-              //Logger.log("BBBBB2222 = ",ALL.data[i].Amount)
               ct["unread_number"]["text"] = ct["unread_number"]["text"].format(text, ALL.data[i].Name, ALL.data[i].Amount)
               // ^ text + ALL.data[i].Name + '\n' + '未讀：' + ALL.data[i].Amount + '\n' + '-------------\n'
-              //Logger.log('HHHHH2222 = ',ct["unread_number"]["text"])
-              //Logger.log("TTTTTT22222 = ",text)
             }
 
             if (ct["unread_number"]["text"] == "{0}{1}\n未讀： {2}\n-------------\n") {
               ct["unread_number"]["text"] = ct["unread_number"]["text"] = "沒有任何未讀。"
             }
-            //Logger.log('HHHHHH22222 = ',ct["unread_number"]["text"])
             sendtext(chat_id, ct["unread_number"]);
             break;
           case ct['✔ 關閉鍵盤']["text"]:
@@ -590,8 +584,6 @@ function doPost(e) {
               Amount = JSON.parse(Amount)
               var st = Amount[1] + 2
               var ed = Amount[0] + 1
-              //Logger.log("ststst = ", st)
-              //Logger.log("ededed = ", ed)
 
               function upMessageData(i, col, ed) {
                 SheetM.getRange(i, col).setValue("")
@@ -607,12 +599,10 @@ function doPost(e) {
 
               for (var i = st; i <= ed; i++) {
                 text = SheetM.getRange(i, col).getDisplayValue()
-                //Logger.log("text = ", text)
                 var message_json = JSON.parse(text);
 
                 if (message_json.type == "text") {
                   var p = message_json.userName + "：\n" + message_json.text
-                  //Logger.log("ppp = ", p)
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp)
                     p += "\n" + t
@@ -841,13 +831,12 @@ function doPost(e) {
             ReplyKeyboardMakeup(chat_id, keyboard, u, u, text)
             break;
           case '/debug':
-            var xfjhxgfh = REST_FastMatch1and2(); //強制等待，不知道為什麼有時候不會執行
-            var ydjdyf = REST_keyboard(); //強制等待，不知道為什麼有時候不會執行
-            //還有sheet那邊的訊息區處理還未 (Amount)
             ALL.mode = 0
             ALL.wait_to_Bind = {}
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
+            var xfjhxgfh = REST_FastMatch1and2(); //強制等待，不知道為什麼有時候不會執行
+            var ydjdyf = REST_keyboard(); //強制等待，不知道為什麼有時候不會執行
             sendtext(chat_id, ct["debug_ed"]["text"].format(xfjhxgfh, ydjdyf));
             // ^ "已debug\nREST_FastMatch1and2() : {0}\nREST_keyboard() : {1}",
             break;
@@ -1023,15 +1012,20 @@ function doPost(e) {
               var OAmount = ALL.data[FM].Amount
               var OName = ALL.data[FM].Name
               var ORoomId = ALL.data[FM].RoomId
+              var Ostatus = ALL.data[FM].status
+              if (ALL.data[FM].Display_name) {
+                var ODisplay_name = "顯示人名：" + ALL.data[FM].Display_name + '\n'
+              } else {
+                var ODisplay_name = ""
+              }
               ALL.opposite.RoomId = ORoomId;
               ALL.opposite.Name = OName;
               var r = JSON.stringify(ALL);
               doc.setText(r); //寫入
               var Notice = ALL.data[FM].Notice
 
-              text = ct["select_room_text"]["text"].format(OName, OAmount, Notice)
+              text = ct["select_room_text"]["text"].format(OName, OAmount, Notice, ODisplay_name, Ostatus)
               // ^ "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?"
-              //Logger.log("select_room_text = ", text)
               var keyboard = [
                 [{
                   'text': ct['🚀 發送訊息']["text"]
@@ -1367,13 +1361,10 @@ function doPost(e) {
         }
         //以下處理關鍵字通知====================================================
         var keyword_notice = ALL.keyword_notice
-        //Logger.log("以下處理關鍵字通知")
         if (keyword_notice && text != "") {
           var txt = text
           var keys = ALL.keyword
           var keys_value = key_word_check(message_json.text, keys)
-          //Logger.log("TTTT = ",keys_value)
-          //Logger.log("Tkeys_value.length = ",keys_value.length)
           if (keys_value.length > 0) {
             var text2 = ""
             for (var i = 0; i < keys_value.length; i++) {
@@ -1405,22 +1396,17 @@ function doPost(e) {
       for (;;) { // 打死都不要重名
         if (in_command(U)) {
           U = U + String(Random_text(6))
-          //Logger.log("U1 = ",U)
           continue;
         } else if (in_name(ALL, (U + "✅"))) {
           U = U + String(Random_text(6))
-          //Logger.log("U2 = ",U)
           continue;
         } else if (in_name(ALL, (U + "❎"))) {
           U = U + "_" + String(Random_text(6))
-          //Logger.log("U3 = ",U)
           continue;
         } else {
-          //Logger.log("YYYYYYY")
           break;
         }
       }
-      //Logger.log("U = ",U)
 
       var N = {
         "RoomId": line_roomID,
@@ -1429,41 +1415,24 @@ function doPost(e) {
         "Amount": 1,
         "Notice": true
       }
-      //Logger.log("NNNNNNNNN = ",N)
       ALL.data.splice(data_len, 0, N)
       //以下處理FastMatch===================================
       var data_len = ALL.data.length
       var Room_Name = ALL.data[data_len - 1].Name //這個已經有✅了!
-      /*if (userName) {
-        var U = userName
-      } else {
-        var U = line_roomID
-      }*/
 
       ALL.FastMatch[(U + "✅")] = newcol
-      //var R = ',"' + U + '✅":' + newcol + "}"
-      //var r = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace("}", R));
-      //ALL.FastMatch = r; //打包好塞回去
-      //var r = JSON.stringify(ALL);
-      //doc.setText(r); //寫入
-      //以下處理sheetM的數值===================================================
+
+      //以下處理sheetM的數值=====================================================
       SheetM.getRange(1, newcol + 1).setValue("[1,0]")
-      //以下處理sheet(寫入訊息)========================================================
+      //以下處理sheet(寫入訊息)==================================================
       var col = ALL.FastMatch2[line_roomID] + 1; //找欄位
       SheetM.getRange(2, col).setValue(String(text)) //更新內容
-      //以下處理doc(寫入訊息)==========================================================
-      //ALL.data[col - 1].Amount += 1
-      //ALL.data[col - 1].Amount = ALL.data[col - 1].Amount + 1
+      //以下處理doc(寫入訊息)====================================================
       var r = JSON.stringify(ALL);
       doc.setText(r); //寫入
-      //以下處理RoomKeyboard==================================================
+      //以下處理RoomKeyboard====================================================
       REST_keyboard()
-      //以下通知有新的ID進來===================================================
-      /*if (userName) {
-        var U = userName
-      } else {
-        var U = line_roomID
-      }*/
+      //以下通知有新的ID進來=====================================================
       text = "已有新ID登入!!! id =\n" + U + "\n請盡快重新命名。"
       sendtext(chat_id, text);
     }
@@ -1495,7 +1464,7 @@ function Log(estringa, from, sheet_key, email) {
       GmailApp.sendEmail(email, "telegram-line出事啦", d + " " + ee);
   }
 }
-//=================================================================================
+//==============================================================================
 function CP() {
   var base_json = base()
   var sheet_key = base_json.sheet_key
@@ -1510,22 +1479,6 @@ function CP() {
   Sheet.getRange(LastRow + 1, 1).setValue(d);
   Sheet.getRange(LastRow + 1, 2).setValue(f);
 }
-//=================================================================================
-//老方法，歷史遺物
-/*function In(name) { //防止與命令衝突的命名
-  var arr = ["/main", "🔙 返回大廳", "🔭 訊息狀態", "✔️ 關閉鍵盤", "🚀 發送訊息", "/exit", "📬 讀取留言",
-    "🔖 重新命名", "🐳 開啟通知", "🔰 暫停通知", "🔃 重新整理", "🔥 刪除房間", "/delete", "/debug",
-    "/AllRead", "/allread", "/Allread", "/allRead", "⭐️ 升級房間", "💫 降級房間", "/uproom", "droproom",
-    "/uproom_2", "/unsetroom", "♻ 移除關鍵字", "📎 新增關鍵字", "/lookkeyword", "⏰訊息時間啟用?", "🔧 更多設定",
-    "🔑設定關鍵字提醒", "啟動關鍵字提醒", "暫停關鍵字提醒",
-  ];
-
-  var flag = arr.some(function(value, index, array) {
-    return value == name ? true : false;
-  });
-  return flag
-}
-*/
 //=================================================================================
 function getUserName(userId) {
   var base_json = base()
@@ -1565,10 +1518,6 @@ function newGetUserName(userId, groupId) {
   } catch (r) {
     var userName = "未知姓名"
   }
-  //Logger.log("TTTTTT = ",userName)
-  //var notification = false
-  //sendtext(profile, notification);
-  //sendtext(userName, notification);
 
   return userName
 }
@@ -1726,7 +1675,6 @@ function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_addres
     var SheetD = SpreadSheet.getSheetByName("Debug");
     var LastRowD = SheetD.getLastRow();
     SheetD.getRange(LastRowD + 1, 2).setValue(e);
-    Logger.log("FFFFFFFFFFFF = ", e)
   } catch (e) {
     var base_json = base()
     var sheet_key = base_json.sheet_key
@@ -1734,7 +1682,6 @@ function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_addres
     var SheetD = SpreadSheet.getSheetByName("Debug");
     var LastRowD = SheetD.getLastRow();
     SheetD.getRange(LastRowD + 1, 2).setValue(e);
-    //Logger.log("FFFFFFFFFFFF = ", e)
   }
 }
 //=================================================================================
@@ -1787,8 +1734,8 @@ function Line_leave(room_or_groupID) {
   try {
     UrlFetchApp.fetch(url, options);
     return "成功"
-  } catch (e) {
-    var url = 'https://api.line.me/v2/bot/room/group' + room_or_groupID + '/leave';
+  } catch (e) { //https://api.line.me/v2/bot/group/{groupId}/leave
+    var url = 'https://api.line.me/v2/bot/group/' + room_or_groupID + '/leave';
     UrlFetchApp.fetch(url, options);
     return "成功"
   }
@@ -1801,7 +1748,6 @@ function getpath(id, Telegram_bot_key) {
   url = "https://api.telegram.org/bot" + Telegram_bot_key + "/getFile?file_id=" + id
   var html = UrlFetchApp.fetch(url);
   html = JSON.parse(html);
-  //Logger.log("TTTTTT = ",html);
   var path = html.result.file_path
   return path;
 }
@@ -1852,8 +1798,6 @@ function getGdriveFileDownloadURL() {
     return 0;
   });
   var g_len = g.length - 1
-  //Logger.log("len = ",g_len)
-  //Logger.log("FDDDDD = ",g[g_len].fileDownloadURL)
   return g[g_len].fileDownloadURL
 }
 //=================================================================================
@@ -1905,7 +1849,6 @@ function ch_Name_and_Description() {
       var getMilliseconds = d.getMilliseconds(); // 234 毫秒
       file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds + ".mp3")
       file.setDescription(d.getTime());
-      //Logger.log("NNNNNNN = ", file.getName())
       break;
     } else if (get_extension(file.getName(), 0) == 'content') {
       var d = new Date();
@@ -1918,17 +1861,12 @@ function ch_Name_and_Description() {
       var getMilliseconds = d.getMilliseconds(); // 234 毫秒
       file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds)
       file.setDescription(d.getTime());
-      //Logger.log("NNNNNNN = ", file.getName())
       break;
     }
-    //Logger.log("NNNNNNN = ", file.getName())
-    //Logger.log("NNNNNNN222 = ", get_extension(file.getName(), 0))
   }
 }
 //=================================================================================
 function sendtext(chat_id, ct) {
-  Logger.log("sendtext =========\n", chat_id)
-  Logger.log("sendtext 22222222=\n", ct)
   try {
     var notification = ct["notification"]
     var parse_mode = ct["parse_mode"]
@@ -2059,8 +1997,6 @@ function ReplyKeyboardRemove(chat_id, ct) {
 }
 //=================================================================================
 function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, ct) {
-  //Logger.log("ct = ",ct)
-  //Logger.log("ct str = ",String(ct))
   try {
     var notification = ct["notification"]
     var parse_mode = ct["parse_mode"]
@@ -2084,7 +2020,6 @@ function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboa
   if (one_time_keyboard = undefined) {
     one_time_keyboard = false
   }
-  //Logger.log("ReplyKeyboardMakeup->ct = ", text + "\n" + ct + "\n" + ct["text"])
   var ReplyKeyboardMakeup = {
     'keyboard': keyboard,
     'resize_keyboard': resize_keyboard,
@@ -2274,18 +2209,14 @@ function key_word_check(txt, keys) {
   var keys_value = []
   for (var i = 0; i < keys.length; i++) {
     if (txt.search(String(keys[i])) > -1) {
-      //Logger.log("TTTTSSS = ",txt.search(String(keys[i])))
       for (var j = 0; j < keys_value.length; j++) {
-        //Logger.log("TTUU5555 = ",i," , ",j)
         if (keys_value[j] == keys[i]) {
-          //Logger.log("TTUU5555 = continue")
           continue
         }
       }
       keys_value.push(String(keys[i]))
     }
   }
-  //Logger.log(keys_value)
   return keys_value
 }
 //=================================================================================
@@ -2335,9 +2266,9 @@ function start(payload) {
     "method": "post",
     "payload": payload
   }
-  Logger.log("ZZZZ = ", payload)
+
   //UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
-  //*/  為了速度和穩定 不必要就算了
+  /*/  為了速度和穩定 不必要就算了
   var sheet_key = base_json.sheet_key
   var d = new Date();
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -2345,6 +2276,7 @@ function start(payload) {
   var LastRow = Sheet.getLastRow();
   Sheet.getRange(LastRow + 1, 1).setValue(d);
   Sheet.getRange(LastRow + 1, 3).setValue(data);
+  Logger.log("ZZZZ = ", payload)
   var returned = UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
   Sheet.getRange(LastRow + 1, 2).setValue(returned); //確認有發成功
   //*/
