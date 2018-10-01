@@ -56,6 +56,7 @@ function doPost(e) {
     var ff = f.substring(0, Dlen + 1)
     var r = ff;
     doc.setText(r); //寫入
+    var ALL = JSON.parse(f);
   }
 
   //以下正式開始================================================================
@@ -63,9 +64,9 @@ function doPost(e) {
     //以下來自telegram
     var from = 'telegram';
     Log(estringa, from, sheet_key, email); //log
-    var doc = DocumentApp.openById(doc_key)
-    var f = doc.getText();
-    var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
+    //var doc = DocumentApp.openById(doc_key)
+    //var f = doc.getText();
+    //var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
     var mode = ALL.mode;
     var Stext = estringa.message.text;
     var chat_id = estringa.message.chat.id
@@ -1196,8 +1197,8 @@ function doPost(e) {
     Log(estringa, from, sheet_key, email); //log
 
     for (var ev = 0; ev < estringa.events.length; ev++) {
-      Logger.log("cutSource = ",cutSource);
       var cutSource = estringa.events[ev].source; //好長 看的我都花了 縮減個
+      //Logger.log("cutSource = ",cutSource);
       if (cutSource.type == "user") { //舊格式整理
         var line_roomID = cutSource.userId; //line_roomID = 要發送的地址
         var userId = cutSource.userId
@@ -1271,18 +1272,15 @@ function doPost(e) {
 
       var SpreadSheet = SpreadsheetApp.openById(sheet_key);
       var SheetM = SpreadSheet.getSheetByName("Line訊息區");
-      var doc = DocumentApp.openById(doc_key)
-      var f = doc.getText();
-      var ALL = JSON.parse(f);
+      //var doc = DocumentApp.openById(doc_key)
+      //var f = doc.getText();
+      //var ALL = JSON.parse(f);
       var chat_id = Telegram_id
       //================================================================
       if (ALL.FastMatch2[line_roomID] != undefined) { //以下處理已登記的
-        Logger.log("這裡被執行了!1 ");
         if (ALL.data[ALL.FastMatch2[line_roomID]].status == "已升級房間2" || (ALL.mode == "🚀 發送訊息" && line_roomID == ALL.opposite.RoomId)) {
-          Logger.log("這裡被執行了! 2");
           if (ALL.data[ALL.FastMatch2[line_roomID]].status == "已升級房間2") {
             //切換成綁訂房間的chat_id
-            Logger.log("這裡被執行了! 3");
             chat_id = ALL.data[ALL.FastMatch2[line_roomID]].Bind_groud_chat_id
           }
           try {
@@ -2273,7 +2271,8 @@ function start(payload) {
     "payload": payload
   }
 
-  //UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
+  //*/  <- 只要刪除或增加最前面的"/"就能切換模式了喔(*´∀`)~♥
+  UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
   /*/  為了速度和穩定 不必要就算了
   var sheet_key = base_json.sheet_key
   var d = new Date();
