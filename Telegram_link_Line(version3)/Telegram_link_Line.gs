@@ -1,7 +1,7 @@
 function doPost(e) {
   //嘗試lock
   var lock = LockService.getScriptLock();
-  var success = lock.tryLock(30*1000);
+  var success = lock.tryLock(30 * 1000);
 
   var base_json = base();
   var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
@@ -14,12 +14,14 @@ function doPost(e) {
     var SheetD = SpreadSheet.getSheetByName("Debug");
     var e = SheetD.getRange(1, 2).getDisplayValue(); //讀取debug分頁中的模擬資訊
     var estringa = JSON.parse(e);
+    var ee = JSON.stringify(estringa);
   } else if (debug == 2) { //模擬Line
     var sheet_key = base_json.sheet_key
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
     var SheetD = SpreadSheet.getSheetByName("Debug");
     var e = SheetD.getRange(2, 2).getDisplayValue(); //讀取debug分頁中的模擬資訊
     var estringa = JSON.parse(e);
+    var ee = JSON.stringify(estringa);
   } else {
     var estringa = JSON.parse(e.postData.contents);
     var ee = JSON.stringify(estringa);
@@ -63,7 +65,7 @@ function doPost(e) {
   if (estringa.update_id) { //利用兩方json不同來判別
     //以下來自telegram
     var from = 'telegram';
-    Log(estringa, from, sheet_key, email); //log
+    Log(ee, from, sheet_key, email); //log
     //var doc = DocumentApp.openById(doc_key)
     //var f = doc.getText();
     //var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
@@ -1194,7 +1196,8 @@ function doPost(e) {
   } else if (estringa.events[0].timestamp) {
     //以下來自line
     var from = 'line';
-    Log(estringa, from, sheet_key, email); //log
+    // 下行防止再開啟第二次SpreadSheet
+    var SpreadSheet = Log(ee, from, sheet_key, email); //log
 
     for (var ev = 0; ev < estringa.events.length; ev++) {
       var cutSource = estringa.events[ev].source; //好長 看的我都花了 縮減個
@@ -1270,7 +1273,8 @@ function doPost(e) {
       }
       var text = JSON.stringify(message_json)
 
-      var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+      //下行在 log() 時已取得。
+      //var SpreadSheet = SpreadsheetApp.openById(sheet_key);
       var SheetM = SpreadSheet.getSheetByName("Line訊息區");
       //var doc = DocumentApp.openById(doc_key)
       //var f = doc.getText();
@@ -1449,23 +1453,29 @@ function doPost(e) {
 
 //以下各類函式支援
 //=====================================================================================================
-function Log(estringa, from, sheet_key, email) {
-  var ee = JSON.stringify(estringa);
+function Log(ee, from, sheet_key, email) {
   var d = new Date();
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
   var Sheet = SpreadSheet.getSheetByName("Log");
   var SheetLastRow = Sheet.getLastRow();
-  Sheet.getRange(SheetLastRow + 1, 1).setValue(d);
-  Sheet.getRange(SheetLastRow + 1, 3).setValue(ee);
+
   switch (from) {
     case 'telegram':
-      Sheet.getRange(SheetLastRow + 1, 2).setValue("Telegram");
+      var from = "Telegram"
       break;
     case 'line':
-      Sheet.getRange(SheetLastRow + 1, 2).setValue("Line");
+      var from = "Line"
       break;
     default:
-      GmailApp.sendEmail(email, "telegram-line出事啦", d + " " + ee);
+      GmailApp.sendEmail(email, "telegram-line出事啦(來源非TGorLine)", d + " " + ee);
+  }
+  var wt = [
+    [d, from, ee]
+  ]
+  Logger.log("wt = ", wt);
+  Sheet.getRange("A" + String(SheetLastRow + 1) + ":" + "C" + String(SheetLastRow + 1)).setValues(wt);
+  if (from == "Line") { //TG的話還真的不需要SpreadSheet
+    return SpreadSheet
   }
 }
 //==============================================================================
