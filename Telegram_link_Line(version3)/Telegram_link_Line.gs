@@ -4,7 +4,7 @@ function doPost(e) {
   var success = lock.tryLock(30 * 1000);
 
   var base_json = base();
-  var debug = 0; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
+  var debug = 1; // 0=沒有要debug、1=模擬Telegram、2=模擬Line
   //模擬Telegram的話記得把要模擬的東西複製到分頁debug中的B1
   //模擬Line的話記得把要模擬的東西複製到分頁debug中的B2
 
@@ -552,12 +552,12 @@ function doPost(e) {
               if (ALL.data[i].Amount == 0) {
                 continue;
               }
-              ct["unread_number"]["text"] = ct["unread_number"]["text"].format(text, ALL.data[i].Name, ALL.data[i].Amount)
+              text = ct["unread_number"]["text"].format(text, ALL.data[i].Name, ALL.data[i].Amount)
               // ^ text + ALL.data[i].Name + '\n' + '未讀：' + ALL.data[i].Amount + '\n' + '-------------\n'
             }
-
-            if (ct["unread_number"]["text"] == "{0}{1}\n未讀： {2}\n-------------\n") {
-              ct["unread_number"]["text"] = ct["unread_number"]["text"] = "沒有任何未讀。"
+            ct["unread_number"]["text"] = text // 覆蓋回去
+            if (text == "{0}{1}\n未讀： {2}\n-------------\n") {
+              ct["unread_number"]["text"] = "沒有任何未讀。"
             }
             sendtext(chat_id, ct["unread_number"]);
             break;
