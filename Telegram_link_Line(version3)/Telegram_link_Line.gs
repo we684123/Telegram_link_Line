@@ -37,7 +37,6 @@ function doPost(e) {
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
   var FolderId = base_json.FolderId
   var gsURL = base_json.gsURL
-  var GMT = base_json.GMT
   var ct = language()["correspond_text"] //語言載入
 
   /*/ debug用
@@ -70,6 +69,7 @@ function doPost(e) {
     //var f = doc.getText();
     //var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
     var mode = ALL.mode;
+    var GMT = ALL.GMT
     var Stext = estringa.message.text;
     var chat_id = estringa.message.chat.id
     var chat_type = estringa.message.chat.type
@@ -96,6 +96,9 @@ function doPost(e) {
     }
     if (ALL['wait_to_Bind'] == undefined) {
       ALL['wait_to_Bind'] = {}
+    }
+    if (ALL['GMT'] == undefined) {
+      ALL['GMY'] = "GMT+8"
     }
 
     //來源檢查==================================================================
