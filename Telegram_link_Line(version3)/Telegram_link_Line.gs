@@ -98,7 +98,7 @@ function doPost(e) {
       ALL['wait_to_Bind'] = {}
     }
     if (ALL['GMT'] == undefined) {
-      ALL['GMY'] = "GMT+8"
+      ALL['GMT'] = "GMT+8"
     }
 
     //來源檢查==================================================================
