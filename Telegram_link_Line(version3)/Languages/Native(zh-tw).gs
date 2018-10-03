@@ -26,7 +26,7 @@ function language() {
       },
       "For_this_reply": {
         "type": "to_Line",
-        "text": "{0}\n^針對此回復^\n{1}", // {0} = 要回覆的文字內容 , {1} = 回覆的文字內容
+        "text": "------\n{0}\n---^^^針對此回復^^^---\n{1}", // {0} = 要回覆的文字內容 , {1} = 回覆的文字內容
       },
       "sendPhoto_ed": {
         "type": "to_Telegram",
@@ -304,7 +304,7 @@ function language() {
       },
       "caption_der_form": { //喔甘這個命名www
         "type": "to_Telegram(only_text)",
-        "text": "來自： {0}", // {0} = TG、LINE中發此訊息的人名
+        "text": "來自: {0}", // {0} = TG、LINE中發此訊息的人名
       },
       "sorry_plz_go_to_url": {
         "type": "to_Telegram",
@@ -316,6 +316,16 @@ function language() {
       "is_from": {
         "type": "to_Telegram(only_text)",
         "text": "來自: {0}" // {0} = LINE中發此訊息的人名
+      },
+      "by_name": {
+        "type": "to_Telegram(only_text)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": "{1}{0}:\n"
+        // {0} = first_name {1} = last_name
+      },
+      "TG_name": {
+        "type": "to_Telegram(only_text)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "text": "{1}{0}"
+        // {0} = first_name {1} = last_name
       },
       "read_massage_ed": {
         "type": "to_Telegram",
@@ -641,8 +651,8 @@ function language() {
       "can_not_leave_from_line": {
         "type": "to_Telegram",
         "text": "bot無法離開，因為不是在group或room內",
-        "notification": false,  //不通知? true or false
-        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
     }
   }

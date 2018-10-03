@@ -159,13 +159,14 @@ function doPost(e) {
       } else { //已綁定群組中發話
         var n = number
         var Line_id = ALL.data[n]['RoomId'] //目標LINE房間ID
-        if (ALL.data[n]["Display_name"]) {
+        if (ALL.data[n]["Display_name"]) { //預先處理名稱問題
           var last_name = ''
           var first_name = estringa.message.from.first_name
           if (estringa.message.from.last_name) {
             last_name = estringa.message.from.last_name
           }
-          var by_name = last_name + first_name + '\n'
+          var by_name = ct['by_name']['text'].format(first_name, last_name)
+          var TG_name = ct['TG_name']['text'].format(first_name, last_name)
         } else {
           var by_name = ''
         }
@@ -193,15 +194,11 @@ function doPost(e) {
           var photo_id = p[max].file_id
           TG_Send_Photo_To_Line(Line_id, photo_id)
           if (ALL.data[n]["Display_name"]) {
-            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
+            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
           }
           if (estringa.message.caption) { //如有簡介則一同發出
-            if (ALL.data[n]["Display_name"]) {
-              TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
-            } else {
-              var text = by_name + estringa.message.caption
-              TG_Send_text_To_Line(Line_id, text)
-            }
+            var text = by_name + estringa.message.caption
+            TG_Send_text_To_Line(Line_id, text)
           }
           sendtext(chat_id, ct["sendPhoto_ed"]);
           // ^ "(圖片已發送!)"
@@ -209,13 +206,12 @@ function doPost(e) {
           //以下選擇telegram video並發到line
           var video_id = estringa.message.video.file_id
           TG_Send_video_To_Line(Line_id, video_id) //就你最特別,多吃一個TGtoken
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+          }
           if (estringa.message.caption) { //如有簡介則一同發出
-            if (ALL.data[n]["Display_name"]) {
-              TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
-            } else {
-              var text = by_name + estringa.message.caption
-              TG_Send_text_To_Line(Line_id, text)
-            }
+            var text = by_name + estringa.message.caption
+            TG_Send_text_To_Line(Line_id, text)
           }
           sendtext(chat_id, ct["sendVideo_ed"]);
           // ^ "(影片已發送!)"
@@ -223,7 +219,7 @@ function doPost(e) {
           var file_id = estringa.message.sticker.file_id
           TG_Send_Photo_To_Line(Line_id, file_id)
           if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
-            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
+            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
           }
           sendtext(chat_id, ct["sendSticker_ed"]);
           // ^ "(貼圖已發送!)"
@@ -231,22 +227,26 @@ function doPost(e) {
           var duration = estringa.message.audio.duration
           var audio_id = estringa.message.audio.file_id
           TG_Send_audio_To_Line(Line_id, audio_id, duration)
-          if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
-            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
           }
-          if (estringa.message.caption)
-            TG_Send_text_To_Line(Line_id, estringa.message.caption)
+          if (estringa.message.caption) { //如有簡介則一同發出
+            var text = by_name + estringa.message.caption
+            TG_Send_text_To_Line(Line_id, text)
+          }
           sendtext(chat_id, ct["sendAudio_ed"]);
           // ^ "(音檔已發送!)"
         } else if (estringa.message.voice) {
           var duration = estringa.message.voice.duration
           var audio_id = estringa.message.voice.file_id
           TG_Send_audio_To_Line(Line_id, audio_id, duration)
-          if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
-            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
           }
-          if (estringa.message.caption)
-            TG_Send_text_To_Line(Line_id, estringa.message.caption)
+          if (estringa.message.caption) { //如有簡介則一同發出
+            var text = by_name + estringa.message.caption
+            TG_Send_text_To_Line(Line_id, text)
+          }
           sendtext(chat_id, ct["sendVoice_ed"]);
           // ^ "(錄音已發送!)"
         } else if (estringa.message.location) {
@@ -262,14 +262,18 @@ function doPost(e) {
           //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
           TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
           if (ALL.data[n]["Display_name"]) {
-            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
+            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
           }
         } else if (estringa.message.animation) {
           var file_id = estringa.message.animation.file_id
           var duration = estringa.message.animation.duration
           TG_Send_video_To_Line(Line_id, file_id)
-          if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
-            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(by_name)))
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+          }
+          if (estringa.message.caption) { //如有簡介則一同發出
+            var text = by_name + estringa.message.caption
+            TG_Send_text_To_Line(Line_id, text)
           }
           sendtext(chat_id, ct["sendGIF_ed"]);
           // ^ "(GIF已發送!)"
