@@ -556,7 +556,7 @@ function doPost(e) {
               // ^ text + ALL.data[i].Name + '\n' + '未讀：' + ALL.data[i].Amount + '\n' + '-------------\n'
             }
             ct["unread_number"]["text"] = text // 覆蓋回去
-            if (text == "{0}{1}\n未讀： {2}\n-------------\n") {
+            if (text == "") {
               ct["unread_number"]["text"] = "沒有任何未讀。"
             }
             sendtext(chat_id, ct["unread_number"]);
