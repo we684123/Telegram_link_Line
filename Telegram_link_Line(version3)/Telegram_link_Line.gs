@@ -363,12 +363,15 @@ function doPost(e) {
           sendtext(chat_id, ct['can_not_leave_from_line'])
           var a1 = false
         }
-        var a2 = REST_keyboard(); //重製快速鍵盤
-        var a3 = REST_FastMatch1and2(); //重製快速索引
+        var y1 = REST_keyboard(ALL); //重製快速鍵盤
+        var a2 = y1[0]
+        var y2 = REST_FastMatch1and2(y1[1]); //重製快速索引
+        var a3 = y2[0]
+        ALL = y2[1]
 
-        //下兩行特留紀念 在寫入一次會是錯的結果
-        //var r = JSON.stringify(ALL);
-        ///doc.setText(r); //重新寫入
+        //寫入ALL
+        var r = JSON.stringify(ALL);
+        doc.setText(r); //重新寫入
 
         text = ct["delete_room_success"]['text'].format(a1, a2, a3)
         // ^ "Line_leave：{0}\nREST_keyboard：{1}\nREST_FastMatch1and2：{2}\n已刪除此聊天室"
@@ -1752,15 +1755,25 @@ function Line_leave(room_or_groupID) {
     'method': 'post'
   }
   //--------------------------------------------------
+  var n = 0
   try {
     UrlFetchApp.fetch(url, options);
     return "成功"
   } catch (e) { //https://api.line.me/v2/bot/group/{groupId}/leave
+    n += 1
+  }
+  try {
     var url = 'https://api.line.me/v2/bot/group/' + room_or_groupID + '/leave';
     UrlFetchApp.fetch(url, options);
     return "成功"
+  } catch (e) {
+    n += 1
   }
-
+  if (n == 2) {
+    return '無法'
+  } else {
+    return "成功"
+  }
 }
 //=================================================================================
 function getpath(id, Telegram_bot_key) {
@@ -2067,11 +2080,7 @@ function keyboard_main(chat_id, ct, doc_key) {
   ReplyKeyboardMakeup(chat_id, keyboard_main, resize_keyboard, one_time_keyboard, ct)
 }
 //=================================================================================
-function REST_keyboard() {
-  var base_json = base()
-  var doc = DocumentApp.openById(base_json.doc_key)
-  var f = doc.getText();
-  var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
+function REST_keyboard(ALL) {
   var keyboard = [];
   var data_len = ALL.data.length;
   var T = data_len - 2 //因為要分兩欄故-2
@@ -2122,17 +2131,10 @@ function REST_keyboard() {
   }]) //加入返回鍵
   //=================================================
   ALL.RoomKeyboard = keyboard //寫回RoomKeynoard
-  write_ALL(ALL, doc) //寫入
-  return "成功"
+  return ['成功', ALL]
 }
 //=================================================================================
-function REST_FastMatch1and2() { //重製快速索引
-  var base_json = base()
-  var doc_key = base_json.doc_key
-  var doc = DocumentApp.openById(doc_key)
-  var f = doc.getText();
-  var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
-
+function REST_FastMatch1and2(ALL) { //重製快速索引
   var data_len = ALL.data.length
   ALL.FastMatch = {}
   ALL.FastMatch2 = {}
@@ -2144,10 +2146,7 @@ function REST_FastMatch1and2() { //重製快速索引
     var RoomId = ALL.data[i].RoomId
     ALL.FastMatch2[RoomId] = i
   }
-
-  var r = JSON.stringify(ALL);
-  doc.setText(r); //寫入
-  return "成功"
+  return ["成功", ALL]
 }
 //=================================================================
 function TG_leaveChat(chat_id) {
