@@ -332,11 +332,11 @@ function doPost(e) {
           ALL.FastMatch = y;
 
           ALL.mode = 0
+          //以下處理RoomKeyboard==================================================
+          ALL = REST_keyboard(ALL)[1] //重新編排keyborad
           var r = JSON.stringify(ALL);
           doc.setText(r); //寫入
 
-          //以下處理RoomKeyboard==================================================
-          REST_keyboard(doc_key) //重新編排keyborad
           //=====================================================================
           //var text = "🔖 重新命名完成~\n" + OName + " \n->\n " + Stext + "\n🔮 開啟主選單"
           ct["rename_success"]["text"] = ct["rename_success"]["text"].format(ct["🔖 重新命名"]["text"], OName, Stext, ct["🔮 開啟主選單"]["text"]);
@@ -732,12 +732,13 @@ function doPost(e) {
             var y = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace(OName, OName.slice(0, OName.length - 1) + "✅"));
             ALL.FastMatch = y;
             ALL.opposite.Name = u;
+            ALL = REST_keyboard(ALL)[1] //重新編排keyborad
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
             sendtext(chat_id, ct["enabled_notification_ed"]["text"].format(OName));
             // ^ "已開啟 {0} 的通知"
             //以下處理RoomKeyboard==================================================
-            REST_keyboard(doc_key) //重新編排keyborad
+
             break;
           case ct['🔰 暫停通知']["text"]:
             var OName = ALL.opposite.Name
@@ -748,12 +749,13 @@ function doPost(e) {
             var y = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace(OName, OName.slice(0, OName.length - 1) + "❎"));
             ALL.FastMatch = y;
             ALL.opposite.Name = u;
+            ALL = REST_keyboard(doc_key)[1] //重新編排keyborad
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
             sendtext(chat_id, ct["disabled_notification_ed"]["text"].format(OName));
             // ^ "已暫停 {0} 的通知"
             //以下處理RoomKeyboard==================================================
-            REST_keyboard(doc_key) //重新編排keyborad
+
             break;
           case ct['⭐ 升級房間']["text"]:
             if (!ALL.ctrl_bot_id) {
@@ -846,11 +848,11 @@ function doPost(e) {
           case '/debug':
             ALL.mode = 0
             ALL.wait_to_Bind = {}
-            var r = JSON.stringify(ALL);
+            var xfjhxgfh = REST_FastMatch1and2(ALL); //強制等待，不知道為什麼有時候不會執行
+            var ydjdyf = REST_keyboard(xfjhxgfh[1]); //強制等待，不知道為什麼有時候不會執行
+            var r = JSON.stringify(ydjdyf[1]);
             doc.setText(r); //寫入
-            var xfjhxgfh = REST_FastMatch1and2(); //強制等待，不知道為什麼有時候不會執行
-            var ydjdyf = REST_keyboard(); //強制等待，不知道為什麼有時候不會執行
-            sendtext(chat_id, ct["debug_ed"]["text"].format(xfjhxgfh, ydjdyf));
+            sendtext(chat_id, ct["debug_ed"]["text"].format(xfjhxgfh[0], ydjdyf[0]));
             // ^ "已debug\nREST_FastMatch1and2() : {0}\nREST_keyboard() : {1}",
             break;
           case '/AllRead':
@@ -1444,11 +1446,11 @@ function doPost(e) {
         //以下處理sheet(寫入訊息)==================================================
         var col = ALL.FastMatch2[line_roomID] + 1; //找欄位
         SheetM.getRange(2, col).setValue(String(text)) //更新內容
+        //以下處理RoomKeyboard====================================================
+        ALL = REST_keyboard(ALL)[1]
         //以下處理doc(寫入訊息)====================================================
         var r = JSON.stringify(ALL);
         doc.setText(r); //寫入
-        //以下處理RoomKeyboard====================================================
-        REST_keyboard()
         //以下通知有新的ID進來=====================================================
         text = "已有新ID登入!!! id =\n" + U + "\n請盡快重新命名。"
         sendtext(chat_id, text);
