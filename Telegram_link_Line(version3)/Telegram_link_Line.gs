@@ -749,7 +749,7 @@ function doPost(e) {
             var y = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace(OName, OName.slice(0, OName.length - 1) + "❎"));
             ALL.FastMatch = y;
             ALL.opposite.Name = u;
-            ALL = REST_keyboard(doc_key)[1] //重新編排keyborad
+            ALL = REST_keyboard(ALL)[1] //重新編排keyborad
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
             sendtext(chat_id, ct["disabled_notification_ed"]["text"].format(OName));
