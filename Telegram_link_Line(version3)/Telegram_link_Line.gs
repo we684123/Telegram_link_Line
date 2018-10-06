@@ -1505,6 +1505,37 @@ function CP() {
   Sheet.getRange(LastRow + 1, 1).setValue(d);
   Sheet.getRange(LastRow + 1, 2).setValue(f);
 }
+//==============================================================================
+function mv_all_uproom() {
+  CP()
+  var base_json = base()
+  var doc_key = base_json.doc_key
+  var doc = DocumentApp.openById(doc_key)
+  var f = doc.getText()
+  var ALL = JSON.parse(f);
+
+  for (var i = 0; i < ALL['data'].length; i++) {
+    if (ALL['data'][i].status == "已升級房間") {
+      ALL['data'][i].status = "normal"
+      var tk = ALL['data'][i].botToken
+      delete ALL['data'][i].botToken
+      try {
+        UrlFetchApp.fetch("https://api.telegram.org/bot" + tk + "/deleteWebhook");
+      } catch (e) {}
+    }
+  }
+
+  try {
+    delete ALL.TG_control_bot_updateID
+  } catch (e) {}
+  try {
+    delete ALL.TG_bot_updateID_array
+  } catch (e) {}
+
+  var r = JSON.stringify(ALL);
+  doc.setText(r); //寫入
+
+}
 //=================================================================================
 function getUserName(userId) {
   var base_json = base()
