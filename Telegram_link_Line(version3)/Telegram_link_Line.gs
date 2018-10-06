@@ -1181,16 +1181,6 @@ function doPost(e) {
         sendtext(chat_id, ct["incorrect_operation"]);
         // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
       }
-    } else if (estringa.message.document) {
-      if (mode == "🚀 發送訊息") {
-        //var duration = estringa.message.voice.duration
-        //TG_Send_audio_To_Line(Line_id, audio_id, duration)
-        sendtext(chat_id, ct["not_support_document"]);
-        // "(暫時不支援document傳送喔!)"
-      } else {
-        sendtext(chat_id, ct["incorrect_operation"]);
-        // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-      }
     } else if (estringa.message.animation) {
       if (mode == "🚀 發送訊息") {
         var file_id = estringa.message.animation.file_id
@@ -1198,6 +1188,16 @@ function doPost(e) {
         TG_Send_video_To_Line(Line_id, file_id)
         sendtext(chat_id, ct["sendGIF_ed"]);
         // ^ "(GIF已發送!)"
+      } else {
+        sendtext(chat_id, ct["incorrect_operation"]);
+        // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+      }
+    } else if (estringa.message.document) {
+      if (mode == "🚀 發送訊息") {
+        //var duration = estringa.message.voice.duration
+        //TG_Send_audio_To_Line(Line_id, audio_id, duration)
+        sendtext(chat_id, ct["not_support_document"]);
+        // "(暫時不支援document傳送喔!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
         // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
