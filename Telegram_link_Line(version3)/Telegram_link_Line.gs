@@ -2083,6 +2083,7 @@ function keyboard_main(chat_id, ct, doc_key) {
 }
 //=================================================================================
 function REST_keyboard(ALL) {
+  var ct = language()["correspond_text"] //語言載入
   var keyboard = [];
   var data_len = ALL.data.length;
   var T = data_len - 2 //因為要分兩欄故-2
@@ -2125,11 +2126,11 @@ function REST_keyboard(ALL) {
   }
 
   keyboard.splice(0, 0, [{
-    'text': "🔃 重新整理"
+    'text': ct["🔃 重新整理"]['text']
   }, {
-    'text': '🔧 更多設定'
+    'text': ct['🔧 更多設定']['text']
   }, {
-    'text': "🔭 訊息狀態"
+    'text': ct["🔭 訊息狀態"]['text']
   }]) //加入返回鍵
   //=================================================
   ALL.RoomKeyboard = keyboard //寫回RoomKeynoard
