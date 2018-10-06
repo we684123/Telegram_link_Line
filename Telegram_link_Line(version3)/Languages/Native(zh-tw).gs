@@ -116,7 +116,7 @@ function language() {
       },
       "delete_room_success": {
         "type": "to_Telegram",
-        "text": "Line_leave：{0}\nREST_keyboard：{1}\nREST_FastMatch1and2：{2}\n已刪除此聊天室",
+        "text": "Line_leave：{0}\nREST_keyboard：{1}\nREST_FastMatch1and2and3：{2}\n已刪除此聊天室",
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -406,8 +406,8 @@ function language() {
       },
       "debug_ed": {
         "type": "to_Telegram",
-        "text": "已debug\nREST_FastMatch1and2() : {0}\nREST_keyboard() : {1}",
-        // {0} = REST_FastMatch1and2()的回傳結果 , {1} = REST_keyboard()的回傳結果
+        "text": "已debug\nREST_FastMatch1and2and3() : {0}\nREST_keyboard() : {1}",
+        // {0} = REST_FastMatch1and2and3()的回傳結果 , {1} = REST_keyboard()的回傳結果
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },

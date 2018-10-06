@@ -365,7 +365,7 @@ function doPost(e) {
         }
         var y1 = REST_keyboard(ALL); //重製快速鍵盤
         var a2 = y1[0]
-        var y2 = REST_FastMatch1and2(y1[1]); //重製快速索引
+        var y2 = REST_FastMatch1and2and3(y1[1]); //重製快速索引
         var a3 = y2[0]
         ALL = y2[1]
 
@@ -374,7 +374,7 @@ function doPost(e) {
         doc.setText(r); //重新寫入
 
         text = ct["delete_room_success"]['text'].format(a1, a2, a3)
-        // ^ "Line_leave：{0}\nREST_keyboard：{1}\nREST_FastMatch1and2：{2}\n已刪除此聊天室"
+        // ^ "Line_leave：{0}\nREST_keyboard：{1}\nREST_FastMatch1and2and3：{2}\n已刪除此聊天室"
         keyboard_main(chat_id, text, doc_key)
         lock.releaseLock();
         return 0;
@@ -848,12 +848,12 @@ function doPost(e) {
           case '/debug':
             ALL.mode = 0
             ALL.wait_to_Bind = {}
-            var xfjhxgfh = REST_FastMatch1and2(ALL); //強制等待，不知道為什麼有時候不會執行
+            var xfjhxgfh = REST_FastMatch1and2and3(ALL); //強制等待，不知道為什麼有時候不會執行
             var ydjdyf = REST_keyboard(xfjhxgfh[1]); //強制等待，不知道為什麼有時候不會執行
             var r = JSON.stringify(ydjdyf[1]);
             doc.setText(r); //寫入
             sendtext(chat_id, ct["debug_ed"]["text"].format(xfjhxgfh[0], ydjdyf[0]));
-            // ^ "已debug\nREST_FastMatch1and2() : {0}\nREST_keyboard() : {1}",
+            // ^ "已debug\nREST_FastMatch1and2and3() : {0}\nREST_keyboard() : {1}",
             break;
           case '/AllRead':
           case '/Allread':
@@ -2168,10 +2168,11 @@ function REST_keyboard(ALL) {
   return ['成功', ALL]
 }
 //=================================================================================
-function REST_FastMatch1and2(ALL) { //重製快速索引
+function REST_FastMatch1and2and3(ALL) { //重製快速索引
   var data_len = ALL.data.length
   ALL.FastMatch = {}
   ALL.FastMatch2 = {}
+  ALL.FastMatch3 = {}
   for (var i = 0; i < data_len; i++) {
     var Name = String(ALL.data[i].Name)
     ALL.FastMatch[Name] = i
@@ -2179,6 +2180,12 @@ function REST_FastMatch1and2(ALL) { //重製快速索引
   for (var i = 0; i < data_len; i++) {
     var RoomId = ALL.data[i].RoomId
     ALL.FastMatch2[RoomId] = i
+  }
+  for (var i = 0; i < data_len; i++) {
+    var Bind_groud_chat_id = ALL.data[i].Bind_groud_chat_id
+    if (Bind_groud_chat_id) {
+      ALL.FastMatch3[Bind_groud_chat_id] = i
+    }
   }
   return ["成功", ALL]
 }
