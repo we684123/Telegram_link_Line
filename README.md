@@ -2,7 +2,7 @@
 >用Telegram來收發Line的訊息。
 >use telegram to Send and receive messages(from Line).
 *****
-舊版的在v1、v2分支，此為針對v3的README。    
+舊版的在 v1、v2 分支，此為針對 v3.1 的README。    
 如果是 Telegram_Bot 新手推薦看完 [這個影片](https://youtu.be/On9yeMtG2Wg)後在來使用。    
 
 如果想要獲取更新資訊，可以加入這個頻道  https://t.me/TG_link_Line
@@ -26,6 +26,7 @@
 | 關鍵字提醒 |     |            |    ✓  |  ✓  |    
 | 訊息時間   |     |            |    ✓  |  ✓  |    
 | 自訂語言包 |     |            |       |  ✓  |    
+| 自訂時區  |     |            |       |  ✓  |    
 * V2、V3有時會不知道是誰發言是因為對方[版本](https://goo.gl/noYa7L)不夠新。
 * 註1：目前確定 "安卓8.5.3" 可以正常看貼圖，"Windows 5.10.0.1789" 則無法，其他未知
 * 註2：LINE發送到TG僅會收到GIF的第一格的畫面
@@ -51,7 +52,9 @@
 ![Imgur](https://i.imgur.com/BrbLaRE.png)
 
 **自訂語言包：**    
-在 "Telegram_link_Line(version3)/Languages" 中有 "Native(zh-tw).gs" 這個原生繁中語言包，其中可修改的內容有畫圖反白區域    
+在 "Telegram_link_Line(version3)/Languages" 中有 "Native(zh-tw).gs" 這個原生繁中語言包，其中 **可修改** 的內容如圖反白區域。     
+**(修改後記得按下 "新增發布" 且在TG端 /debug 才能變更成功)**    
+對了 如果你覺得你自訂的語言包不錯，可以pm我或自行pull請求來上傳。    
 ![Imgur](https://imgur.com/QPbPgcl.png)    
 
 其屬性及內容：
@@ -63,10 +66,13 @@
       "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
     },
 
-像是這個    
+
+像是這個 {0}的用法     
 ![Imgur](https://imgur.com/gubGDbT.png)    
 
 
+鍵盤內容也可自訂    
+![Imgur](https://imgur.com/bZnoT6P.png)    
 
 ----
 
@@ -105,7 +111,7 @@
   ![Imgur](https://i.imgur.com/WgT109q.png)
 
   再一次
-  複製完後按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱(推薦叫"Languages") -> 將"Native(zh-tw).gs"內容複製上去__    
+  複製完後按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱(推薦叫"Languages") -> 將"[Native(zh-tw).gs](https://github.com/we684123/Telegram_link_Line/blob/redev2/Telegram_link_Line(version3)/Languages/Native(zh-tw).gs)"內容複製上去__    
 
   ![Imgur](https://i.imgur.com/KCwcCEz.png)
 
@@ -136,6 +142,8 @@
   * 貼上上方指令並送出  ->    
   * 完成！    
   ps' /allread、/debug這兩個指令也可以移到bot的About裡面     
+  ![bot的About](https://imgur.com/Alpog9l.png)    
+
 ----
 - 註一
 
@@ -229,25 +237,12 @@
       "FastMatch2": {
         "zzz": 0
       },
-      "TG_control_bot_updateID": 610460242,
-      "TG_bot_updateID_array": [{
-          "update_id": 873054250,
-          "TG_token": "437876669:AAE4bwnipQZiKdJEO9LndVdAqH76I0__ito(修過了 不用試了)",
-          "line_roomID": "U9d16309b78be9a02acf3bcfb06b28df3(修過了 不用試了)",
-          "Room_Name": "永格天@李孟哲✅"
-        }, {
-          "update_id": 488717600,
-          "TG_token": "394777564:AAE9M7-e9vq74sfsByMg9RaIBdO4NYYwfQ4(修過了 不用試了)",
-          "line_roomID": "C56858d2726373c094e030152171b2e23(修過了 不用試了)",
-          "Room_Name": "吃飯團✅"
-        }, {
-          "update_id": 444300614,
-          "TG_token": "437876669:AAE4bwnipQZiKdJEO9LndVdAqH76I0__ito(修過了 不用試了)",
-          "line_roomID": "Ua117f5dc6861315c9f7a0184c1ff4154(修過了 不用試了)",
-          "Room_Name": "XXA班✅"
-        },
-        "keyword_notice": false,
-        "massage_time": false
+      "FastMatch3": {},
+      "keyword_notice": false,
+      "massage_time": false,
+      "TG_temporary_docking": {},
+      "wait_to_Bind": {},
+      "GMT": "GMT+8"
     }
 
 data = 存放房間資訊
@@ -270,11 +265,7 @@ FastMatch = 快速索引用
 
 FastMatch2 = 快速索引用
 
-TG_control_bot_updateID =
-因為現在是多個bot對同一個程式post(獨立房間功能)，所以要知道哪個bot是主控bot(中控台的概念)
-
-TG_bot_updateID_array =
-有連線的bot(獨立房間)
+FastMatch3 = 快速索引用(給已升級房間用)
 
 keyword_notice =
 是否開啟關鍵字通知(預設為"關閉")
@@ -282,20 +273,44 @@ keyword_notice =
 massage_time =
 是否開啟訊息時間(預設為"關閉")
 
+TG_temporary_docking =
+如果bot被邀進群組則會登記於此，一旦bot在該群組中收到的前4則訊息，沒有包含綁定的隨機碼就會離開該群組以減少流量負荷。
+
+wait_to_Bind =
+當TG端按下升級房間時，則會將待綁定的房間資料塞入此處等待綁定，會被 /debug 或 /unsetroom 指令消除。
+
+GMT =
+此預設 GMT+8 若不再該時區可自行調整(預計下一版會可以在TG端調整)
+
+
+---
 # 版本資訊
-  2018/05/28 -     
-    提升穩定性，加入"關鍵字提醒"、"訊息時間"兩功能    
-    溫馨提醒! 預設兩項功能皆是"關閉"，請自行開啟謝謝!    
 
-請手動更新 Telegram_link_Line.gs，在 __"更新後"__，還需要手動執行 REST_keyboard 函式[(如圖示範)](https://imgur.com/ekyByn5)，若擔心資料崩潰可先執行 CP 函式，這樣就算壞了也能手動回朔。     
-而在 __"更新前"__ 請盡量看過所有內容後按下 /allread 指令，較不會有意外發生。    
+  ##### 2018/10/06 -     
+   * GIF、錄音 可從 Telegram 傳 Line。    
+   * Telegram 貼圖可傳至 Line (部分Line裝置無法觀看)。
+   * 新增自訂語言包功能，對於不習慣我的bot講話風格者可自訂自己的bot風格。
+   * 可自行調整時區(GMT)，預設 GMT+8，預計下次更新可以在 Telegram 中調時區。
+   * **TG群_link_Line群 功能開啟** ，升級房間的功能變更，改成用"新群組"的方式來升級房間。(不知為何有些人開的群組bot收不到訊息，必須升級至超級群組並給bot管理員權限才OK)。
+   * 刪除房間的功能不再只是刪除在doc端的資料，現在開始會嘗試離開，但如果是bot與他人1對1的"房間"則無法離開。
+   * 修正 /debug 指令失效問題。
+   * 修正登記新房間後會有機率撞名導致開啟房間錯亂的問題。
+   * 修正把房間全刪後無法新增新房間的問題。(算你狠wwwww
 
 
-  2018/03/16 -     
-    有效提升穩定性、現在發圖片時的"簡介"也會一同被發出去了    
-    修正發送"位置"、"文檔"的錯誤    
+  ##### 2018/05/28 -     
+  * 提升穩定性，加入"關鍵字提醒"、"訊息時間"兩功能    
+  * 溫馨提醒! 預設兩項功能皆是"關閉"，請自行開啟謝謝!    
 
-  2017/09/28 - V3初次發布!
+  請手動更新 Telegram_link_Line.gs，在 __"更新後"__，還需要手動執行 REST_keyboard 函式[(如圖示範)](https://imgur.com/ekyByn5)，若擔心資料崩潰可先執行 CP 函式，這樣就算壞了也能手動回朔。     
+  而在 __"更新前"__ 請盡量看過所有內容後按下 /allread 指令，較不會有意外發生。    
+
+
+  ##### 2018/03/16 -     
+  * 有效提升穩定性、現在發圖片時的"簡介"也會一同被發出去了    
+  * 正發送"位置"、"文檔"的錯誤    
+
+  ##### 2017/09/28 - V3初次發布!
 
 # Author
 [永格天](https://we684123.carrd.co/)
