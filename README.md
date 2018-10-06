@@ -40,7 +40,7 @@
 ![Imgur](https://i.imgur.com/FDVa131.png)
 ----
 **獨立房間：**
-![Imgur](https://i.imgur.com/vlcHMHT.png)
+![Imgur](https://github.com/we684123/Telegram_link_Line/blob/redev2/%E5%9C%96%E5%BA%8A/s3.gif?raw=true)
 
 **關鍵字提及：**    
 ![Imgur](https://i.imgur.com/NdYFcNY.png)    
