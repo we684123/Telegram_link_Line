@@ -77,7 +77,8 @@
 ----
 
 
-#其他人的教學
+# 其他人的教學
+
  #### [企鵝](https://t.me/penguinF)做了一個非常詳細的[圖文教學](https://hackmd.io/s/Bkc6LwAP7#)(萬分感謝 m(_ \_)m )，可以去看看。
  #### (但是此教學目前過期，不過創建LINEbot的部分是能用的，另外就是這個版本升級房間時不再使用新的bot，轉成用"新群組"替代)
 
@@ -111,7 +112,7 @@
   ![Imgur](https://i.imgur.com/WgT109q.png)
 
   再一次
-  複製完後按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱(推薦叫"Languages") -> 將"[Native(zh-tw).gs](https://github.com/we684123/Telegram_link_Line/blob/redev2/Telegram_link_Line(version3)/Languages/Native(zh-tw).gs)"內容複製上去__    
+  按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱(推薦叫"Languages") -> 將"[Native(zh-tw).gs](https://github.com/we684123/Telegram_link_Line/blob/redev2/Telegram_link_Line(version3)/Languages/Native(zh-tw).gs)"內容複製上去__    
 
   ![Imgur](https://i.imgur.com/KCwcCEz.png)
 
@@ -134,15 +135,15 @@
       debug - 重生資料(bot壞掉時用)(不會讓房間不見)
       allread - 全部已讀
 
-  * 跟 @BotFather 對話  ->    
+  * 跟 [@BotFather](https://t.me/BotFather) 對話  ->    
   * 然後 /mybots  ->    
-  * 選你的bot  ->    
+  * 選你的 bot  ->    
   * 在進去 "edit Bot"  ->    
   * "edit commands"  ->    
   * 貼上上方指令並送出  ->    
   * 完成！    
   ps' /allread、/debug這兩個指令也可以移到bot的About裡面     
-  ![bot的About](https://imgur.com/Alpog9l.png)    
+  ![bot的About](https://imgur.com/ypwUAtg.png)    
 
 ----
 - 註一
@@ -296,6 +297,11 @@ GMT =
    * 修正 /debug 指令失效問題。
    * 修正登記新房間後會有機率撞名導致開啟房間錯亂的問題。
    * 修正把房間全刪後無法新增新房間的問題。(算你狠wwwww
+
+此次更新前請務必將所有房間降級後再來更新，如覺得太多房間要降覺得麻煩可以先將 Telegram_link_Line.gs 的內容貼上，然後 **儲存但不發佈** 後執行 "mv_all_uproom()" 這個函式來一鍵全降級。
+(記得先"CP()"過，如果真的出狀況還可以去sheet中"JSON備份"內找到備份還原回去)。
+     
+一樣在 __"更新前"__ 請盡量看過所有內容後按下 /allread 指令，較不會有意外發生。    
 
 
   ##### 2018/05/28 -     
