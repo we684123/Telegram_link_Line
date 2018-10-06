@@ -301,12 +301,12 @@ GMT =
 
 此次更新前請務必將所有房間降級後再來更新，如覺得太多房間要降覺得麻煩可以先將 Telegram_link_Line.gs 的內容貼上，然後 **儲存但不發佈** 後執行 "mv_all_uproom()" 這個函式來一鍵全降級。
 (記得先"CP()"過，如果真的出狀況還可以去sheet中"JSON備份"內找到備份還原回去)。
-
+    
 一樣在 __"更新前"__ 請盡量看過所有內容後按下 /allread 指令，較不會有意外發生。    
 
-更新內容：
-1.Telegram_link_Line.gs 修改
-2.Languages.gs 新增(看readme
+更新內容：    
+1.Telegram_link_Line.gs 修改    
+2.Languages.gs 新增(看readme    
 
   ##### 2018/05/28 -     
   * 提升穩定性，加入"關鍵字提醒"、"訊息時間"兩功能    
