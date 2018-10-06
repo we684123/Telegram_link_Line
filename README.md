@@ -39,14 +39,34 @@
 ----
 ![Imgur](https://i.imgur.com/FDVa131.png)
 ----
-**獨立房間：**
-![Imgur](https://github.com/we684123/Telegram_link_Line/blob/redev2/%E5%9C%96%E5%BA%8A/s3.gif?raw=true)
+**獨立房間(升級房間) + ☀️ 顯示發送者：**    
+![Imgur](https://github.com/we684123/Telegram_link_Line/blob/redev2/%E5%9C%96%E5%BA%8A/s3.gif?raw=true)    
 
 **關鍵字提及：**    
+(在 "🔧 更多設定" 內)    
 ![Imgur](https://i.imgur.com/NdYFcNY.png)    
 
 **訊息時間：**    
+(在 "🔧 更多設定" 內)    
 ![Imgur](https://i.imgur.com/BrbLaRE.png)
+
+**自訂語言包：**    
+在 "Telegram_link_Line(version3)/Languages" 中有 "Native(zh-tw).gs" 這個原生繁中語言包，其中可修改的內容有畫圖反白區域    
+![Imgur](https://imgur.com/QPbPgcl.png)    
+
+其屬性及內容：
+
+    "":{ //物件名稱
+      "type": "to_Telegram",     // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+      "text": "",   // 自定義文字內容 如有像 {0} 這種東西代表會有引入的文字 你也可以完全不引入
+      "notification": false,  //不通知? true or false
+      "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+    },
+
+像是這個    
+![Imgur](https://imgur.com/gubGDbT.png)    
+
+
 
 ----
 

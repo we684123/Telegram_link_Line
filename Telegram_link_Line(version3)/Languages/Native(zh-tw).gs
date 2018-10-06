@@ -318,12 +318,12 @@ function language() {
         "text": "來自: {0}" // {0} = LINE中發此訊息的人名
       },
       "by_name": {
-        "type": "to_Telegram(only_text)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "to_Telegram(only_text)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "{1}{0}:\n"
         // {0} = first_name {1} = last_name
       },
       "TG_name": {
-        "type": "to_Telegram(only_text)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "to_Telegram(only_text)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "{1}{0}"
         // {0} = first_name {1} = last_name
       },
@@ -541,77 +541,77 @@ function language() {
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "not_registered": {
-        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "您好!此群似乎還沒有與資料庫綁定，等主人綁定後我才能在此服務。\n若您想要一個自己的 Telegram_link_Line 機器人，請至https://github.com/we684123/Telegram_link_Line",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "plz_forward_verification_code": {
-        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "請確認我在要綁定的群組中後，再轉發上方的驗證碼到那以進行綁定!\n或按下 /unsetroom 取消升級",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "not_find_ctrl_id": {
-        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": '由於是第一次做房間升級，請稍待系統準備。\n準備好後會再跟您介紹升級房間的功用。',
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "get_ctrl_id_error": {
-        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "抱歉綁定失敗QAQ，請稍後在試!\n失敗原因如下：{0}", // {0} = 失敗原因
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "bing_success": {
-        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": '{0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n請記得去這個房間並開啟"☀ 顯示發送者"，以免Line端眾不知何人發送。',
         // {0} = 房間名稱
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "text_format": {
-        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": '{0}：\n{1} ',
         // {0} = 發送者名稱 、 {1} = 所發送的訊息
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "send_to_TG_error": {
-        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": '傳送失敗...，原因如下\n\n{0}', // {0} = 失敗原因
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "lookkeyword_result": {
-        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": '傳送失敗...，原因如下\n\n{0}', // {0} = 失敗原因
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "☀ 顯示發送者": {
-        "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": '☀ 顯示發送者',
       },
       "☁ 不顯示發送者": {
-        "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": '☁ 不顯示發送者',
       },
       "Display_name_ch_ed": {
-        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
-        "text": '{0} 已 {1}',
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": '{0} 已 {1}', // {0} = 房間名稱  {1} = 改變的狀態
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "no_target": {
-        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": ' **您未在正常情況下使用指令 **',
         "notification": false, //不通知? true or false
         "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "in_uproom_but": {
-        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": '030... 您目前模式是"升級房間"喔\n如果沒有要升級請按 /unsetroom 來離開 \n或是如果這是意料之外的話請按下 /debug 修復 \n也可以按下 /main 來回到大廳',
         "notification": false, //不通知? true or false
         "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
@@ -658,8 +658,8 @@ function language() {
   }
   /*
     "":{
-      "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(just_text)"
-      "text": "",
+      "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+      "text": "", // 自定義文字內容
       "notification": false,  //不通知? true or false
       "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
     },
