@@ -99,8 +99,9 @@
     * 其中 "Line訊息區" 在其"A1"中填入 "[0,0]" (字串)，然後選取所有儲存格的格式設為字串(純文字)。      
     [說明圖](https://i.imgur.com/CnrhMB7.png)    
 
+3.  一個資料夾(用來放來自Line的媒體)，推薦名稱叫 "download_from_line"
 
-3.  三個gs檔(google apps script)，並將v3其中的"Telegram_link_Line.gs"的內容複製在一開始給你的"程式碼"區內。    
+4.  三個gs檔(google apps script)，並將v3其中的"Telegram_link_Line.gs"的內容複製在一開始給你的"程式碼"區內。    
   ![Imgur](https://i.imgur.com/V3KF0rh.png)
   複製完後按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱(推薦叫"baseANDtest") -> 將"baseANDtest.gs"內容複製上去並填上資訊(註一)__    
   ![Imgur](https://i.imgur.com/tt2F4cj.png)
@@ -300,7 +301,7 @@ GMT =
 
 此次更新前請務必將所有房間降級後再來更新，如覺得太多房間要降覺得麻煩可以先將 Telegram_link_Line.gs 的內容貼上，然後 **儲存但不發佈** 後執行 "mv_all_uproom()" 這個函式來一鍵全降級。
 (記得先"CP()"過，如果真的出狀況還可以去sheet中"JSON備份"內找到備份還原回去)。
-     
+
 一樣在 __"更新前"__ 請盡量看過所有內容後按下 /allread 指令，較不會有意外發生。    
 
 
