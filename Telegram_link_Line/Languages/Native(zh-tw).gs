@@ -251,7 +251,7 @@ function language() {
       "請選擇聊天室": {
         "type": "to_Telegram",
         "text": "請選擇聊天室",
-        "notification": false, //不通知? true or false
+        "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "🔭 訊息狀態": {
