@@ -312,6 +312,7 @@ GMT =
 - Bot Settings
 - Group Privacy
 - turn off
+    
 此時上面的文字應該是會改成向類似這樣
 "Privacy mode  is disabled for (bot 名稱) (bot的username)."
 
@@ -335,7 +336,7 @@ GMT =
   * 正發送"位置"、"文檔"的錯誤    
 
   ##### 2017/09/28 - V3初次發布!
-    
+
 ----
 
 # Author
