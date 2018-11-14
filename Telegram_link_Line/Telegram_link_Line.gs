@@ -58,7 +58,7 @@ function doPost(e) {
     var r = ff;
     doc.setText(r); //寫入
     var ALL = JSON.parse(f);
-  }
+  } //NU$ WTF???! v3.1反而會崩，需要log來監控狀況
 
   //以下正式開始================================================================
   if (estringa.update_id) { //利用兩方json不同來判別
@@ -125,33 +125,34 @@ function doPost(e) {
           lock.releaseLock();
           return 0;
         } else {
-          if (ALL['wait_to_Bind'][Stext] != undefined) {
+          if (ALL['wait_to_Bind'][Stext] != undefined) { //出現綁定隨機碼，備份並綁定。
             CP();
             sendtext(Telegram_id, ct["backed_up_ing"])
             // ^ "已備份舊資料，更新doc資料庫中..."
-            var n = ALL['wait_to_Bind'][Stext] //Stext是驗證碼
+            var n = ALL['wait_to_Bind'][Stext] //這邊的Stext是驗證碼
+			//下面"升級房間2"用的資料新入
             var chat_title = estringa.message.chat.chat_title
             ALL.data[n]["Bind_groud_chat_id"] = chat_id
             ALL.data[n]["Bind_groud_chat_title"] = chat_title
             ALL.data[n]["Bind_groud_chat_type"] = chat_type
-            ALL.data[n].status = "已升級房間2"
+            ALL.data[n].status = "已升級房間2" //NU$ #1(連鎖) 可以做出"已升級房間2(未設定完全)"的狀態來處理是否要 1.更換群組照片(須為貫=管理員) 2.傾倒留言
             ALL.data[n]["Display_name"] = false
             ALL.FastMatch3[chat_id] = n //快速存取3寫入
             //下面收拾善後
             delete ALL.data[n]["Binding_number"]
             delete ALL['TG_temporary_docking'][chat_id]
-            ALL['wait_to_Bind'] = {}
+            ALL['wait_to_Bind'] = {} //NU$ 這裡會有如果同時升級兩個會導致另一個失敗的問題?
             ALL.mode = 0
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
             text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
-            keyboard_main(Telegram_id, text, doc_key)
+            keyboard_main(Telegram_id, text, doc_key)  //NU$ #1(連鎖) 這裡可以加新功能?
             // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
             //   請記得去主控bot選擇這個房間並開啟"☀ 顯示發送者"，
             //   以免Line端眾不知何人發送。
             lock.releaseLock();
             return 0;
-          } else {
+          } else { //還是等隨機碼驗證中...
             ALL['TG_temporary_docking'][chat_id] += 1
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
@@ -160,9 +161,10 @@ function doPost(e) {
           }
         }
       } else { //已綁定群組中發話
+		//NU$ #1(連鎖) 於此處理"已升級房間2(未設定完全)"?
         var n = number
         var Line_id = ALL.data[n]['RoomId'] //目標LINE房間ID
-        if (ALL.data[n]["Display_name"]) { //預先處理名稱問題
+        if (ALL.data[n]["Display_name"]) { //預先處理名稱問題  //NU$ 暱稱功能加入?
           var last_name = ''
           var first_name = estringa.message.from.first_name
           if (estringa.message.from.last_name) {
@@ -177,7 +179,7 @@ function doPost(e) {
         if (estringa.message.text) {
           try {
             if (estringa.message.reply_to_message) {
-              var rt = estringa.message.reply_to_message.text
+              var rt = estringa.message.reply_to_message.text //NU$ 作字串處理 回覆最多3行 須連帶改LG
               text = ct["For_this_reply"]["text"].format(rt, Stext);
               // ^ {0}\n^針對此回復^\n{1}
             } else {
@@ -193,7 +195,7 @@ function doPost(e) {
         } else if (estringa.message.photo) { //如果是照片
           //以下選擇telegram照片並發到line
           var p = estringa.message.photo
-          var max = p.length - 1;
+          var max = p.length - 1; //挑品質最好的 //NU$ 須注意照片大小以免傳送失敗 
           var photo_id = p[max].file_id
           TG_Send_Photo_To_Line(Line_id, photo_id)
           if (ALL.data[n]["Display_name"]) {
@@ -208,7 +210,7 @@ function doPost(e) {
         } else if (estringa.message.video) {
           //以下選擇telegram video並發到line
           var video_id = estringa.message.video.file_id
-          TG_Send_video_To_Line(Line_id, video_id) //就你最特別,多吃一個TGtoken
+          TG_Send_video_To_Line(Line_id, video_id)
           if (ALL.data[n]["Display_name"]) {
             TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
           }
@@ -223,6 +225,7 @@ function doPost(e) {
           TG_Send_Photo_To_Line(Line_id, file_id)
           if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
             TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
+			// ^ "來自: {0}"
           }
           sendtext(chat_id, ct["sendSticker_ed"]);
           // ^ "(貼圖已發送!)"
@@ -289,6 +292,7 @@ function doPost(e) {
       return 0;
     }
     //============================================================================
+	//以下是私人1對1的時候
     if (estringa.message.text) { //如果是文字訊息
       if (mode == "🚀 發送訊息" && Stext != "/exit") {
         //以下準備接收telegram資訊並發到line
