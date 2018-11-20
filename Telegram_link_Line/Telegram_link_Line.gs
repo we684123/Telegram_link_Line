@@ -2334,6 +2334,16 @@ function get_all_keyword(ALL) {
   return all_word
 }
 //=================================================================================
+function up_room_start(ALL) {
+  var FM3_keys = Object.keys(ALL["FastMatch3"])
+  for (var i = 0; i < FM3_keys.length; i++) {
+    var n = ALL["FastMatch3"][FM3_keys[i]]
+    var Name = ALL.data[n]["Name"]
+    ALL.data[n]["Name"] = Name.substr(0, Name.length - 1) + "⭐"
+  }
+  return ALL
+}
+//=================================================================================
 function start(payload) {
   var base_json = base()
   var Telegram_bot_key = base_json.Telegram_bot_key
