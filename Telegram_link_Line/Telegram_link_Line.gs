@@ -79,11 +79,11 @@ function doPost(e) {
     //擁有者檢查=================================================================
     if (Telegram_id != chat_id && chat_type == "private") {
       //如果不是 發一段話即結束
+      lock.releaseLock(); //先結束不影響
       var text = "您好!這是私人用的bot，不對他人開放\
       \n若您想要一個自己的 Telegram_link_Line 機器人，請至 \n" +
         "https://github.com/we684123/Telegram_link_Line "
       sendtext(chat_id, text)
-      lock.releaseLock();
       return 0;
     }
 
@@ -130,14 +130,17 @@ function doPost(e) {
             sendtext(Telegram_id, ct["backed_up_ing"])
             // ^ "已備份舊資料，更新doc資料庫中..."
             var n = ALL['wait_to_Bind'][Stext] //這邊的Stext是驗證碼
-			//下面"升級房間2"用的資料新入
+            //下面"升級房間2"用的資料新入
             var chat_title = estringa.message.chat.chat_title
+            var Name = ALL.data[n]["Name"]
+            ALL.data[n]["Name"] = Name.substr(0, Name.length - 1) + "⭐"
             ALL.data[n]["Bind_groud_chat_id"] = chat_id
             ALL.data[n]["Bind_groud_chat_title"] = chat_title
             ALL.data[n]["Bind_groud_chat_type"] = chat_type
             ALL.data[n].status = "已升級房間2" //NU$ #1(連鎖) 可以做出"已升級房間2(未設定完全)"的狀態來處理是否要 1.更換群組照片(須為貫=管理員) 2.傾倒留言
             ALL.data[n]["Display_name"] = false
             ALL.FastMatch3[chat_id] = n //快速存取3寫入
+
             //下面收拾善後
             delete ALL.data[n]["Binding_number"]
             delete ALL['TG_temporary_docking'][chat_id]
@@ -146,7 +149,7 @@ function doPost(e) {
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
             text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
-            keyboard_main(Telegram_id, text, doc_key)  //NU$ #1(連鎖) 這裡可以加新功能?
+            keyboard_main(Telegram_id, text, doc_key) //NU$ #1(連鎖) 這裡可以加新功能?
             // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
             //   請記得去主控bot選擇這個房間並開啟"☀ 顯示發送者"，
             //   以免Line端眾不知何人發送。
@@ -161,7 +164,7 @@ function doPost(e) {
           }
         }
       } else { //已綁定群組中發話
-		//NU$ #1(連鎖) 於此處理"已升級房間2(未設定完全)"?
+        //NU$ #1(連鎖) 於此處理"已升級房間2(未設定完全)"?
         var n = number
         var Line_id = ALL.data[n]['RoomId'] //目標LINE房間ID
         if (ALL.data[n]["Display_name"]) { //預先處理名稱問題  //NU$ 暱稱功能加入?
@@ -195,7 +198,7 @@ function doPost(e) {
         } else if (estringa.message.photo) { //如果是照片
           //以下選擇telegram照片並發到line
           var p = estringa.message.photo
-          var max = p.length - 1; //挑品質最好的 //NU$ 須注意照片大小以免傳送失敗 
+          var max = p.length - 1; //挑品質最好的 //NU$ 須注意照片大小以免傳送失敗
           var photo_id = p[max].file_id
           TG_Send_Photo_To_Line(Line_id, photo_id)
           if (ALL.data[n]["Display_name"]) {
@@ -225,7 +228,7 @@ function doPost(e) {
           TG_Send_Photo_To_Line(Line_id, file_id)
           if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
             TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
-			// ^ "來自: {0}"
+            // ^ "來自: {0}"
           }
           sendtext(chat_id, ct["sendSticker_ed"]);
           // ^ "(貼圖已發送!)"
@@ -292,7 +295,7 @@ function doPost(e) {
       return 0;
     }
     //============================================================================
-	//以下是私人1對1的時候
+    //以下是私人1對1的時候
     if (estringa.message.text) { //如果是文字訊息
       if (mode == "🚀 發送訊息" && Stext != "/exit") {
         //以下準備接收telegram資訊並發到line
@@ -414,6 +417,13 @@ function doPost(e) {
         var aims = ALL.opposite.RoomId
         var number = ALL.FastMatch2[aims]
         var oppid = ALL.data[number]["Bind_groud_chat_id"]
+        var Name = ALL.data[number]["Name"]
+
+        if (ALL.data[number]["Notice"]) { //回復符號
+          ALL.data[number]["Name"] = Name.substr(0, Name.length - 1) + "✅"
+        } else {
+          ALL.data[number]["Name"] = Name.substr(0, Name.length - 1) + "❎"
+        }
 
         delete ALL.data[number].botToken
         delete ALL.data[number]["Bind_groud_chat_id"]
