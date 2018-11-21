@@ -179,12 +179,22 @@ function doPost(e) {
         } else {
           var by_name = ''
         }
+
+        //優先處理格式化字串，不然下面要寫一堆
+        if (estringa.message['entities']) {
+          //處理 text 格式化字串連結
+          var entities = estringa.message['entities']
+          Stext = entities_conversion(Stext, entities, ct)
+        }
+        if (estringa.message['caption_entities']) {
+          //處理 caption 格式化字串連結
+          var entities = estringa.message['caption_entities']
+          var caption = estringa.message.caption
+          estringa.message.caption = entities_conversion(caption, entities, ct)
+        }
+
         //以下處理發話
         if (estringa.message.text) {
-          if (estringa.message['entities']) { //處理格式化字串連結
-            var entities = estringa.message['entities']
-            Stext = entities_conversion(Stext, entities, ct)
-          }
           try {
             if (estringa.message.reply_to_message) {
               var rt = estringa.message.reply_to_message.text //NU$ 作字串處理 回覆最多3行 須連帶改LG
@@ -1966,7 +1976,7 @@ function ch_Name_and_Description() {
   }
 }
 //=================================================================================
-function sendtext(chat_id, ct) {
+function sendtext(chat_id, ct, reply_to_message_id) {
   try {
     var notification = ct["notification"]
     var parse_mode = ct["parse_mode"]
@@ -1989,7 +1999,8 @@ function sendtext(chat_id, ct) {
     'chat_id': String(chat_id),
     'text': text,
     'disable_notification': notification,
-    "parse_mode": parse_mode
+    "parse_mode": parse_mode,
+    'reply_to_message_id': reply_to_message_id
   }
   return start(payload);
 }
