@@ -2417,17 +2417,17 @@ function entities_conversion(text, entities, ct) { //用來處理格式化的網
   var index = 0
   // 下先分解
   for (var i = entities.length - 1; i >= 0; i--) {
-    Logger.log('i = ', i)
-    Logger.log(entities[i]["type"])
+    //Logger.log('i = ', i)
+    //Logger.log(entities[i]["type"])
     if (entities[i]["type"] == 'text_link') {
       var k1 = parseInt(entities[i]["offset"]) //+ index
       var k2 = parseInt(entities[i]["length"])
-      Logger.log('k1 = ', k1)
-      Logger.log('k2 = ', k2)
+      //Logger.log('k1 = ', k1)
+      //Logger.log('k2 = ', k2)
       index = k1 + k2
       var y = text.nslice(index)
       text = y[0]
-      Logger.log('y = ', y)
+      //Logger.log('y = ', y)
       EC_text.unshift(y[1])
       text_link.unshift(entities[i]["url"])
     }
@@ -2436,7 +2436,7 @@ function entities_conversion(text, entities, ct) { //用來處理格式化的網
   //組合
   var assemble_text = ''
   var assemble_link = ''
-  Logger.log('EC_text = ', EC_text)
+  //Logger.log('EC_text = ', EC_text)
   for (var j = 0; j < EC_text.length; j++) { // #NU 未來考慮連結短網址服務
     assemble_text += ct["entities_conversion_text"]['text'].format(EC_text[j], String(j))
     assemble_link += ct["entities_conversion_link"]['text'].format(String(j), text_link[j])
