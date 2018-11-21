@@ -181,7 +181,7 @@ function doPost(e) {
         }
         //以下處理發話
         if (estringa.message.text) {
-          if (estringa.message['entities']) {
+          if (estringa.message['entities']) { //處理格式化字串連結
             var entities = estringa.message['entities']
             Stext = entities_conversion(Stext, entities, ct)
           }
@@ -2416,7 +2416,7 @@ function entities_conversion(text, entities, ct) { //用來處理格式化的網
   var text_link = []
   var index = 0
   // 下先分解
-  for (var i = entities.length - 1; i > 0; i--) {
+  for (var i = entities.length - 1; i >= 0; i--) {
     Logger.log('i = ', i)
     Logger.log(entities[i]["type"])
     if (entities[i]["type"] == 'text_link') {
