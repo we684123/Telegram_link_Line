@@ -519,6 +519,12 @@ function language() {
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "sendVideo_ing": {
+        "type": "to_Telegram",
+        "text": "(正在傳送影片，請稍後...)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "you_have_new_massage": {
         "type": "to_Telegram",
         "text": "你有新訊息!\n來自：{0}\n點擊以快速切換至該房間 /d{1}",

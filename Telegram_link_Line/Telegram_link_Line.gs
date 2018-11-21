@@ -1371,7 +1371,13 @@ function doPost(e) {
               var url = message_json.DURL
               var notification = false
               var caption = ct["is_from"]["text"].format(message_json.userName)
+              var send_ed = sendtext(chat_id, ct["sendVideo_ing"])
+              // ^ (正在傳送影片，請稍後...)
               sendVoice(chat_id, url, notification, caption)
+
+              //刪除"正在傳送XXX" 整潔舒爽!
+              deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
+
               //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1"}
             } else if (message_json.type == "file") {
