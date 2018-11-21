@@ -710,7 +710,7 @@ function doPost(e) {
                     text += "\n" + t
                   }
                   sendtext(chat_id, text);
-                  //senddocument(url)
+                  //sendDocument(url)
                   upMessageData(i, col, ed)
                 }
               }
@@ -1325,19 +1325,26 @@ function doPost(e) {
               var url = message_json.DURL
               var notification = false
               var caption = ct["is_from"]["text"].format(message_json.userName)
-              sendtext(chat_id, ct["sendPhoto_ing"]);
+              var send_ed = sendtext(chat_id, ct["sendPhoto_ing"]);
               // ^ (正在傳送圖片，請稍後...)
               sendPhoto(chat_id, url, notification, caption)
-              //sendPhoto(url, notification)
+
+              //刪除"正在傳送XXX" 整潔舒爽!
+              deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
+
               //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNskkLZktW"}
             } else if (message_json.type == "sticker") {
               var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
               var notification = false
               var caption = ct["is_from"]["text"].format(message_json.userName)
-              sendtext(chat_id, ct["sendSticker_ing"])
+              var send_ed = sendtext(chat_id, ct["sendSticker_ing"])
               // ^ (正在傳送貼圖，請稍後...)
               sendPhoto(chat_id, sticker_png_url, notification, caption)
+
+              //刪除"正在傳送XXX" 整潔舒爽!
+              deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
+
               //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
               //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
               //"stickerId":"502","packageId":"2"}
@@ -1370,7 +1377,7 @@ function doPost(e) {
             } else if (message_json.type == "file") {
               var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
               sendtext(chat_id, url);
-              //senddocument(url)
+              //sendDocument(url)
             }
           } catch (e) {
             sendtext(chat_id, ct["send_to_TG_error"]['text'].format(e));
@@ -1974,7 +1981,7 @@ function sendtext(chat_id, ct) {
     'disable_notification': notification,
     "parse_mode": parse_mode
   }
-  start(payload);
+  return start(payload);
 }
 //=================================================================
 function sendPhoto(chat_id, url, notification, caption) {
@@ -1988,7 +1995,7 @@ function sendPhoto(chat_id, url, notification, caption) {
     'disable_notification': notification,
     'caption': caption
   }
-  start(payload);
+  return start(payload);
 }
 //=================================================================================
 function sendAudio(chat_id, url, notification, caption) {
@@ -2002,7 +2009,7 @@ function sendAudio(chat_id, url, notification, caption) {
     'disable_notification': notification,
     'caption': caption
   }
-  start(payload);
+  return start(payload);
 }
 //=================================================================
 function sendVoice(chat_id, url, notification, caption) {
@@ -2016,17 +2023,39 @@ function sendVoice(chat_id, url, notification, caption) {
     'disable_notification': notification,
     'caption': caption
   }
-  start(payload);
+  return start(payload);
 }
 //=================================================================
-function senddocument(chat_id, url, notification, caption) {
+function sendDocument(chat_id, url, notification, caption) {
   if (notification == undefined)
     notification = false
   caption = caption || ""
   var payload = {
-    "method": "senddocument",
+    "method": "sendDocument",
     'chat_id': String(chat_id),
     'document': url,
+    'disable_notification': notification,
+    'caption': caption
+  }
+  return start(payload);
+}
+//=================================================================================
+function sendAnimation(chat_id, url, notification, caption) {
+  /* Use this method to send animation files
+   * (GIF or H.264/MPEG-4 AVC video without sound).
+   *  On success, the sent Message is returned.
+   * Bots can currently send animation files of up to 50 MB in size,
+   *  this limit may be changed in the future.
+   */
+  // 頭痛... 為什麼ts沒辦法用，為什麼ES3沒有支援原生函式預設值qwq
+  // TG bot api 又更新啦 2018/11/21
+  if (notification == undefined)
+    notification = false
+  caption = caption || ""
+  var payload = {
+    "method": "sendAnimation",
+    'chat_id': String(chat_id),
+    'animation': url,
     'disable_notification': notification,
     'caption': caption
   }
@@ -2043,7 +2072,24 @@ function sendLocation(chat_id, latitude, longitude, notification) {
     "longitude": longitude,
     'disable_notification': notification
   }
-  start(payload);
+  return start(payload);
+}
+//=================================================================
+function deleteMessage(chat_id, message_id) {
+  var payload = {
+    "method": "deleteMessage",
+    "chat_id": String(chat_id),
+    "message_id": String(message_id)
+  }
+  return start(payload);
+}
+//=================================================================
+function TG_leaveChat(chat_id) {
+  var payload = {
+    "method": "leaveChat",
+    "chat_id": String(chat_id)
+  }
+  return start(payload);
 }
 //=================================================================
 function ReplyKeyboardRemove(chat_id, ct) {
@@ -2076,7 +2122,7 @@ function ReplyKeyboardRemove(chat_id, ct) {
     "notification": notification,
     'reply_markup': JSON.stringify(ReplyKeyboardRemove)
   }
-  start(payload);
+  return start(payload);
 }
 //=================================================================================
 function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, ct) {
@@ -2116,7 +2162,7 @@ function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboa
     'disable_notification': notification,
     'reply_markup': JSON.stringify(ReplyKeyboardMakeup)
   }
-  start(payload);
+  return start(payload);
 }
 //=================================================================================
 function keyboard_main(chat_id, ct, doc_key) {
@@ -2212,14 +2258,7 @@ function REST_FastMatch1and2and3(ALL) { //重製快速索引
   }
   return ["成功", ALL]
 }
-//=================================================================
-function TG_leaveChat(chat_id) {
-  var payload = {
-    "method": "leaveChat",
-    "chat_id": String(chat_id)
-  }
-  start(payload);
-}
+
 //=================================================================================
 //喔乾，感謝 Kevin Tseng 開源這個用法
 //來源: https://kevintsengtw.blogspot.com/2011/09/javascript-stringformat.html?showComment=1536387871696#c7569907085658128584
@@ -2362,7 +2401,7 @@ function start(payload) {
   }
 
   //*/  <- 只要刪除或增加最前面的"/"就能切換模式了喔(*´∀`)~♥
-  UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
+  return UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
   /*/  為了速度和穩定 不必要就算了
   var sheet_key = base_json.sheet_key
   var d = new Date();
