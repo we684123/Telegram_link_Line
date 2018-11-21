@@ -181,6 +181,10 @@ function doPost(e) {
         }
         //以下處理發話
         if (estringa.message.text) {
+          if (estringa.message['entities']) {
+            var entities = estringa.message['entities']
+            Stext = entities_conversion(Stext, entities, ct)
+          }
           try {
             if (estringa.message.reply_to_message) {
               var rt = estringa.message.reply_to_message.text //NU$ 作字串處理 回覆最多3行 須連帶改LG
@@ -2291,6 +2295,15 @@ function cleanStringFormatResult(txt) {
   return txt.replace(getStringFormatPlaceHolderRegEx("\\d+"), "");
 }
 //=================================================================================
+// 我印象中有找到一種方式來分割字串的，但不知道是哪個指令...
+// 用法是 text.xxxx(10) -> 回傳 [字串前10個字 , 後10個到底的字]
+String.prototype.nslice = function() {
+  var txt = this.toString();
+  var t1 = txt.substr(0, arguments[0])
+  var t2 = txt.slice(arguments[0])
+  return [t1, t2];
+}
+//=================================================================================
 function AllRead() {
   var base_json = base()
   var sheet_key = base_json.sheet_key
@@ -2396,6 +2409,39 @@ function up_room_start(ALL) {
     ALL.data[n]["Name"] = Name.substr(0, Name.length - 1) + "⭐"
   }
   return ALL
+}
+//=================================================================================
+function entities_conversion(text, entities, ct) { //用來處理格式化的網址
+  var EC_text = []
+  var text_link = []
+  var index = 0
+  // 下先分解
+  for (var i = entities.length - 1; i > 0; i--) {
+    Logger.log('i = ', i)
+    Logger.log(entities[i]["type"])
+    if (entities[i]["type"] == 'text_link') {
+      var k1 = parseInt(entities[i]["offset"]) //+ index
+      var k2 = parseInt(entities[i]["length"])
+      Logger.log('k1 = ', k1)
+      Logger.log('k2 = ', k2)
+      index = k1 + k2
+      var y = text.nslice(index)
+      text = y[0]
+      Logger.log('y = ', y)
+      EC_text.unshift(y[1])
+      text_link.unshift(entities[i]["url"])
+    }
+  }
+
+  //組合
+  var assemble_text = ''
+  var assemble_link = ''
+  Logger.log('EC_text = ', EC_text)
+  for (var j = 0; j < EC_text.length; j++) { // #NU 未來考慮連結短網址服務
+    assemble_text += ct["entities_conversion_text"]['text'].format(EC_text[j], String(j))
+    assemble_link += ct["entities_conversion_link"]['text'].format(String(j), text_link[j])
+  }
+  return text + ct["entities_conversion_ALL"]['text'].format(assemble_text, assemble_link)
 }
 //=================================================================================
 function start(payload) {

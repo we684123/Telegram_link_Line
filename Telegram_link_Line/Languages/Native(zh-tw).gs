@@ -2,7 +2,7 @@ function language() {
   var language = { //多包一層看以後有沒有打算擴充...............
     "language_name": "Native(zh-tw)",
     "language_version": 0.2,
-    "match_version": 3.1,
+    "match_version": 3.2,
     "update_time": 1538635728802,
     "author": "永格天",
     "correspond_text": {
@@ -659,6 +659,28 @@ function language() {
         "text": "bot無法離開，因為不是在group或room內",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "entities_conversion_text": {
+        "type": "to_Line", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "[{1}]{0}"
+        // {0} = 文字本體 , {1} = 網址的編號
+        // 例如 "Youtube [1] " 然後最下面依序放連結
+        // 跟 "entities_conversion_link" 有關連。
+        // 跟 "entities_conversion_ALL" 有關連。
+      },
+      "entities_conversion_link": {
+        "type": "to_Line", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "網址[{0}]：\n{1}\n"
+        // {0} = 網址的編號 , {1} = 網址
+        // 跟 "entities_conversion_text" 有關連。
+        // 跟 "entities_conversion_ALL" 有關連。
+      },
+      "entities_conversion_ALL": {
+        "type": "to_Line", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "{0}\n\n{1}"
+        // {0} = entities_conversion_text , {1} = entities_conversion_link
+        // 跟 "entities_conversion_text" 有關連。
+        // 跟 "entities_conversion_link" 有關連。
       },
     }
   }
