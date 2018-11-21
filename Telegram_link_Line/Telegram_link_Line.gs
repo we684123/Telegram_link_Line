@@ -146,7 +146,8 @@ function doPost(e) {
             delete ALL['TG_temporary_docking'][chat_id]
             ALL['wait_to_Bind'] = {} //NU$ 這裡會有如果同時升級兩個會導致另一個失敗的問題?
             ALL.mode = 0
-            var r = JSON.stringify(ALL);
+            var REST_result = REST_keyboard(REST_FastMatch1and2and3(ALL)[1])
+            var r = JSON.stringify(REST_result[1]);
             doc.setText(r); //寫入
             text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
             keyboard_main(Telegram_id, text, doc_key) //NU$ #1(連鎖) 這裡可以加新功能?
@@ -433,8 +434,9 @@ function doPost(e) {
         delete ALL.FastMatch3[oppid]
         ALL.data[number].status = "normal"
         ALL.mode = 0 //讓mode回復正常
+        var REST_result = REST_keyboard(REST_FastMatch1and2and3(ALL)[1])
 
-        var r = JSON.stringify(ALL);
+        var r = JSON.stringify(REST_result[1]);
         doc.setText(r); //寫入
 
         keyboard_main(chat_id, ct["droproom_success"]["text"].format(JSON.stringify(ALL.data[number])), doc_key)
@@ -2127,6 +2129,13 @@ function keyboard_main(chat_id, ct, doc_key) {
   ReplyKeyboardMakeup(chat_id, keyboard_main, resize_keyboard, one_time_keyboard, ct)
 }
 //=================================================================================
+
+/**
+ * REST_keyboard - 重新整理主鍵盤
+ *
+ * @param  {Object} ALL ALL資料
+ * @return {Array}     ['成功', ALL]
+ */
 function REST_keyboard(ALL) {
   var ct = language()["correspond_text"] //語言載入
   var keyboard = [];
