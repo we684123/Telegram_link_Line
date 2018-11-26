@@ -411,6 +411,12 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "allRead_ing": {
+        "type": "to_Telegram",
+        "text": "已接收指令!",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "allRead_ed": {
         "type": "to_Telegram",
         "text": "已全已讀",

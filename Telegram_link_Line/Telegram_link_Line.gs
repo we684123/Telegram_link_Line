@@ -889,6 +889,8 @@ function doPost(e) {
           case '/Allread':
           case '/allRead':
           case '/allread':
+            sendtext(chat_id, ct["allRead_ing"]["text"]);
+            // ^ "已接收指令!"
             AllRead();
             sendtext(chat_id, ct["allRead_ed"]["text"]);
             // ^ "已全已讀"
