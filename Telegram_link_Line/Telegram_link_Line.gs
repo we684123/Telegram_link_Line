@@ -27,6 +27,7 @@ function up_version() {
   }
   if (ALL['code_version'] < 3.2) {
     ALL = up_room_start(ALL)
+    ALL['code_version'] = 3.2
   }
 
   // 寫入結果
