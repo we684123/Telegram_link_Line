@@ -1,3 +1,35 @@
+function up_version(){
+  // 每次進行程式版本更新時，若有提到要要執行這個 function 請照做一次
+
+  // 以下為了簡化程式複雜度(不想一直try_error)，故先行檢查、修復ALL物件的完整性
+  var base_json = base();
+  var doc_key = base_json.doc_key
+  var doc = DocumentApp.openById(doc_key)
+  var ALL = JSON.parse(doc.getText());
+
+  // 下面是 V3.1 所需
+  if (ALL.FastMatch3 == undefined) {
+    ALL.FastMatch3 = {}
+  }
+  if (ALL['TG_temporary_docking'] == undefined) {
+    ALL['TG_temporary_docking'] = {}
+  }
+  if (ALL['wait_to_Bind'] == undefined) {
+    ALL['wait_to_Bind'] = {}
+  }
+  if (ALL['GMT'] == undefined) {
+    ALL['GMT'] = "GMT+8"
+  }
+
+  //下面是 V3.2 所需
+  if (ALL['code_version'] == undefined ) {
+    ALL['code_version'] = 3.1
+  }
+  if (ALL['code_version'] < 3.2 ) {
+    ALL = up_room_start(ALL)
+  }
+
+}
 function doPost(e) {
   //嘗試lock
   var lock = LockService.getScriptLock();
@@ -87,19 +119,6 @@ function doPost(e) {
       return 0;
     }
 
-    //以下為了簡化程式複雜度(不想一直try_error)，故先行檢查、修復ALL物件的完整性=====
-    if (ALL.FastMatch3 == undefined) {
-      ALL.FastMatch3 = {}
-    }
-    if (ALL['TG_temporary_docking'] == undefined) {
-      ALL['TG_temporary_docking'] = {}
-    }
-    if (ALL['wait_to_Bind'] == undefined) {
-      ALL['wait_to_Bind'] = {}
-    }
-    if (ALL['GMT'] == undefined) {
-      ALL['GMT'] = "GMT+8"
-    }
 
     //來源檢查==================================================================
     if (chat_type == "supergroup" || chat_type == "group") { //現在只剩 群組、超級群組 的可能
