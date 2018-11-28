@@ -224,7 +224,7 @@ function doPost(e) {
               var rt = estringa.message.reply_to_message.text
               var rt_text = rt_text_reduce(rt)
               var rt_date = estringa.message.reply_to_message.date
-              var date = get_time_txt(rt_date*1000, GMT)
+              var date = get_time_txt(rt_date * 1000, GMT)
               text = ct["For_this_reply"]["text"].format(rt_text, date, Stext);
               // ^ {0}\n^針對此回復^\n{1}
             } else {
@@ -1292,8 +1292,10 @@ function doPost(e) {
         }
         if (cutSource.type == "user") {
           var userName = getUserName(u); //如果有則用
+        } else if (cutSource.type == "room") {
+          var userName = newGetUserName(u, 'room', g);
         } else {
-          var userName = newGetUserName(u, g);
+          var userName = newGetUserName(u, 'group', g);
         }
       }
 
@@ -1624,7 +1626,7 @@ function getUserName(userId) {
   return userName
 }
 //=================================================================================
-function newGetUserName(userId, groupId) {
+function newGetUserName(userId, rq_mode, groupId) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
   var header = {
@@ -1636,7 +1638,7 @@ function newGetUserName(userId, groupId) {
     'method': 'get'
   }
   try {
-    var profile = UrlFetchApp.fetch("https://api.line.me/v2/bot/group/" + groupId + "/member/" + userId, options)
+    var profile = UrlFetchApp.fetch("https://api.line.me/v2/bot/" + rq_mode + "/" + groupId + "/member/" + userId, options)
     profile = JSON.parse(profile)
     var userName = profile.displayName
   } catch (r) {

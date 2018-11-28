@@ -415,7 +415,7 @@ function language() {
       },
       "allRead_ing": {
         "type": "to_Telegram",
-        "text": "已接收指令!",
+        "text": "已接收指令!\n處理中請稍後...",
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
