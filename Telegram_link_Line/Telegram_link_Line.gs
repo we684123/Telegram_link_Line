@@ -224,7 +224,7 @@ function doPost(e) {
               var rt = estringa.message.reply_to_message.text
               var rt_text = rt_text_reduce(rt)
               var rt_date = estringa.message.reply_to_message.date
-              var date = get_time_txt(rt_date, GMT)
+              var date = get_time_txt(rt_date*1000, GMT)
               text = ct["For_this_reply"]["text"].format(rt_text, date, Stext);
               // ^ {0}\n^針對此回復^\n{1}
             } else {
