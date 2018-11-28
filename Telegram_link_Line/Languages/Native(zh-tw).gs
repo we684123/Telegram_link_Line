@@ -1,7 +1,7 @@
 function language() {
   var language = { //多包一層看以後有沒有打算擴充...............
     "language_name": "Native(zh-tw)",
-    "language_version": 0.2,
+    "language_version": 1.0,
     "match_version": 3.2,
     "update_time": 1538635728802,
     "author": "永格天",
@@ -26,7 +26,7 @@ function language() {
       },
       "For_this_reply": {
         "type": "to_Line",
-        "text": "{0}...\n{1}\n████針對回復████\n{2}", 
+        "text": "{0}...\n{1}\n████針對回復████\n{2}",
         // {0} = 要回覆的文字內容 , {1} = 時間日期
         // {2} = 回覆的文字內容
       },
