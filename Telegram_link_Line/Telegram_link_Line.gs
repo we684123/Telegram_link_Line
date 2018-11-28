@@ -365,7 +365,7 @@ function doPost(e) {
 
         //================================================================
       } else if (mode == "🔖 重新命名" && Stext != "/main") {
-        if (in_name(ALL, (U + "✅")) || in_name(ALL, (U + "❎"))) { //排除重名
+        if (in_name(ALL, (U + "✅")) || in_name(ALL, (U + "❎")) || in_name(ALL, (U + "⭐️"))) { //排除重名
           sendtext(chat_id, ct["duplicate_name"]);
           // ^ "名子不可重複，請重新輸入一個!"
         } else if (in_command(Stext)) { //排除與指令重複
@@ -1491,6 +1491,8 @@ function doPost(e) {
           } else if (in_name(ALL, (U + "❎"))) {
             U = U + "_" + String(Random_text(6))
             continue;
+          } else if (in_name(ALL, (U + "⭐️"))) {
+            U = U + "_" + String(Random_text(6))
           } else {
             break;
           }
