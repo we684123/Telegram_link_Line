@@ -21,7 +21,7 @@ function up_version() {
     ALL['GMT'] = "GMT+8"
   }
 
-  //下面是 V3.2 所需
+  // 下面是 V3.2 所需
   if (ALL['code_version'] == undefined) {
     ALL['code_version'] = 3.1
   }
@@ -29,6 +29,9 @@ function up_version() {
     ALL = up_room_start(ALL)
   }
 
+  // 寫入結果
+  var r = JSON.stringify(ALL);
+  doc.setText(r); //寫入
 }
 //==============================================================================
 function doPost(e) {
