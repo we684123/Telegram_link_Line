@@ -1,4 +1,4 @@
-function up_version(){
+function up_version() {
   // 每次進行程式版本更新時，若有提到要要執行這個 function 請照做一次
 
   // 以下為了簡化程式複雜度(不想一直try_error)，故先行檢查、修復ALL物件的完整性
@@ -22,14 +22,15 @@ function up_version(){
   }
 
   //下面是 V3.2 所需
-  if (ALL['code_version'] == undefined ) {
+  if (ALL['code_version'] == undefined) {
     ALL['code_version'] = 3.1
   }
-  if (ALL['code_version'] < 3.2 ) {
+  if (ALL['code_version'] < 3.2) {
     ALL = up_room_start(ALL)
   }
 
 }
+//==============================================================================
 function doPost(e) {
   //嘗試lock
   var lock = LockService.getScriptLock();
@@ -216,8 +217,11 @@ function doPost(e) {
         if (estringa.message.text) {
           try {
             if (estringa.message.reply_to_message) {
-              var rt = estringa.message.reply_to_message.text //NU$ 作字串處理 回覆最多3行 須連帶改LG
-              text = ct["For_this_reply"]["text"].format(rt, Stext);
+              var rt = estringa.message.reply_to_message.text
+              var rt_text = rt_text_reduce(rt)
+              var rt_date = estringa.message.reply_to_message.date
+              var date = get_time_txt(rt_date, GMT)
+              text = ct["For_this_reply"]["text"].format(rt_text, date, Stext);
               // ^ {0}\n^針對此回復^\n{1}
             } else {
               text = Stext;
@@ -654,11 +658,6 @@ function doPost(e) {
                 //SheetM.getRange(1, col).setValue(Amount);
               }
 
-              function get_time_txt(timestamp) {
-                var formattedDate = Utilities.formatDate(new Date(timestamp), GMT, "yyyy-MM-dd' 'HH:mm:ss");
-                return formattedDate;
-              }
-
               for (var i = st; i <= ed; i++) {
                 text = SheetM.getRange(i, col).getDisplayValue()
                 var message_json = JSON.parse(text);
@@ -666,7 +665,7 @@ function doPost(e) {
                 if (message_json.type == "text") {
                   var p = message_json.userName + "：\n" + message_json.text
                   if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp)
+                    t = get_time_txt(message_json.timestamp, GMT)
                     p += "\n" + t
                   }
                   sendtext(chat_id, p);
@@ -677,7 +676,7 @@ function doPost(e) {
                   var url = message_json.DURL
                   var caption = ct["is_from"]["text"].format(message_json.userName)
                   if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp)
+                    t = get_time_txt(message_json.timestamp, GMT)
                     caption += "\n" + t
                   }
                   sendPhoto(chat_id, url, notification, caption)
@@ -689,7 +688,7 @@ function doPost(e) {
                   var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
                   var caption = ct["is_from"]["text"].format(message_json.userName)
                   if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp)
+                    t = get_time_txt(message_json.timestamp, GMT)
                     caption += "\n" + t
                   }
                   sendPhoto(chat_id, sticker_png_url, notification, caption)
@@ -700,7 +699,7 @@ function doPost(e) {
                 } else if (message_json.type == "audio") { //這裡看看能不能改
                   var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
                   if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp)
+                    t = get_time_txt(message_json.timestamp, GMT)
                     url += "\n" + t
                   }
                   sendtext(chat_id, url)
@@ -714,7 +713,7 @@ function doPost(e) {
                   sendLocation(chat_id, latitude, longitude, notification)
                   var text = ct["is_from"]["text"].format(message_json.userName)
                   if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp)
+                    t = get_time_txt(message_json.timestamp, GMT)
                     text += "\n" + t
                   }
                   if (message_json.address) {
@@ -729,7 +728,7 @@ function doPost(e) {
                   var url = message_json.DURL
                   var caption = ct["is_from"]["text"].format(message_json.userName)
                   if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp)
+                    t = get_time_txt(message_json.timestamp, GMT)
                     caption += "\n" + t
                   }
                   sendVoice(chat_id, url, notification, caption)
@@ -739,7 +738,7 @@ function doPost(e) {
                 } else if (message_json.type == "file") {
                   var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
                   if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp)
+                    t = get_time_txt(message_json.timestamp, GMT)
                     text += "\n" + t
                   }
                   sendtext(chat_id, text);
@@ -1961,6 +1960,11 @@ function get_extension(filename, reciprocal) {
   return extension
 }
 //=================================================================================
+function get_time_txt(timestamp, GMT) {
+  var formattedDate = Utilities.formatDate(new Date(timestamp), GMT, "yyyy-MM-dd' 'HH:mm:ss");
+  return formattedDate;
+}
+//=================================================================================
 function ch_Name_and_Description() {
   var base_json = base()
   var FolderId = base_json.FolderId
@@ -1998,6 +2002,9 @@ function ch_Name_and_Description() {
 }
 //=================================================================================
 function sendtext(chat_id, ct, reply_to_message_id) {
+  if (reply_to_message_id === void 0) {
+    reply_to_message_id = '';
+  }
   try {
     var notification = ct["notification"]
     var parse_mode = ct["parse_mode"]
@@ -2474,6 +2481,14 @@ function entities_conversion(text, entities, ct) { //用來處理格式化的網
     assemble_link += ct["entities_conversion_link"]['text'].format(String(j), text_link[j])
   }
   return text + ct["entities_conversion_ALL"]['text'].format(assemble_text, assemble_link)
+}
+//=================================================================================
+function rt_text_reduce(text) {
+  var max_chat = 14
+  if (text.length > max_chat) {
+    text = text.nslice(max_chat)[0]
+  }
+  return text
 }
 //=================================================================================
 function start(payload) {
