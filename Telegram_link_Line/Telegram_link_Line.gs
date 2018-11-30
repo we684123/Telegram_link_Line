@@ -3,6 +3,7 @@ function up_version() {
 
   // 以下為了簡化程式複雜度(不想一直try_error)，故先行檢查、修復ALL物件的完整性
   var base_json = base();
+  var FolderId = base_json.FolderId
   var doc_key = base_json.doc_key
   var doc = DocumentApp.openById(doc_key)
   var ALL = JSON.parse(doc.getText());
@@ -26,11 +27,23 @@ function up_version() {
     ALL['code_version'] = 3.1
   }
   if (ALL['code_version'] < 3.2) {
-    ALL = up_room_start(ALL)
+    var Folder = DriveApp.getFolderById(FolderId);
+    clear_folders(Folder); // 清目標資料夾下所有資料夾
+    clear_files(Folder); // 清目標資料夾下所有檔案
+    var Description = "{'version': 3.2}"
+    create_Folder(Folder, 'Telegram_貼圖', Description)
+    create_Folder(Folder, 'Line_貼圖', Description)
+    create_Folder(Folder, '臨時停放區', Description)
+    create_Folder(Folder, '檔案保存區', Description)
+    var list = list_folder(Folder)
+    for (var i = 0; i < list.length; i++) {
+      ALL[list[i]['FolderName']] = list[i]
+    }
+    ALL = up_room_start(ALL) // 將房間已升級的符號改變成星星
     ALL['code_version'] = 3.2
   }
 
-  // 寫入結果
+  // 寫入ALL
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
 }
@@ -116,7 +129,7 @@ function doPost(e) {
     //擁有者檢查=================================================================
     if (Telegram_id != chat_id && chat_type == "private") {
       //如果不是 發一段話即結束
-      lock.releaseLock(); //先結束不影響
+      lock.releaseLock(); //先結束鎖不影響
       var text = "您好!這是私人用的bot，不對他人開放\
       \n若您想要一個自己的 Telegram_link_Line 機器人，請至 \n" +
         "https://github.com/we684123/Telegram_link_Line "
@@ -137,6 +150,7 @@ function doPost(e) {
           lock.releaseLock();
           return 0;
         } else if (ALL['TG_temporary_docking'][chat_id] == undefined) {
+          // 初入群的時候
           if (estringa.message.left_chat_member) {
             lock.releaseLock();
             return 0;
@@ -1555,7 +1569,7 @@ function Log(ee, from, sheet_key, email) {
   var wt = [
     [d, from, ee]
   ]
-  Logger.log("wt = ", wt);
+  //Logger.log("wt = ", wt);
   Sheet.getRange("A" + String(SheetLastRow + 1) + ":" + "C" + String(SheetLastRow + 1)).setValues(wt);
   if (from == "Line") { //TG的話還真的不需要SpreadSheet
     return SpreadSheet
@@ -1922,6 +1936,132 @@ function list2() { //顯示指定資料夾資料
   var k = JSON.stringify(file_array_json)
   return k
 }
+//=================================================================================
+
+/**
+ * create_Folder - 創資料夾
+ *
+ * @param  {Folder} Folder        創建地點的Folder引入
+ * @param  {String} Name          新Folder名稱
+ * @param  {String} Description   新Folder說明
+ * @return {Folder}               新創的Folder
+ */
+function create_Folder(Folder, Name, Description) {
+  //前置檢查跟預設
+  if (Folder === void 0)
+    throw new Error("Folder未給")
+  if (Name === void 0)
+    throw new Error("Name未給")
+  Description === void 0 ? '' : Description
+
+  return Folder.createFolder(Name).setDescription(Description)
+}
+//=================================================================================
+
+/**
+ * get_folder_info - 得到目標資料夾的詳細資料
+ *
+ * @param  {type} Folder 欲得到的目標資料夾
+ * @return {type}        目標資料夾的詳細資料
+ */
+function get_folder_info(Folder) {
+  if (Folder === void 0)
+    throw new Error("Folder未給")
+
+  var folder_info = {
+    "FolderName": Folder.getName(),
+    "FolderId": Folder.getId(),
+    "FolderUrl": Folder.getUrl(),
+    "FoldersDescription": Folder.getDescription()
+  }
+  return folder_info
+}
+//=================================================================================
+
+/**
+ * list_folder - 得到目標資料夾下所有資料夾的詳細資料
+ *
+ * @param  {Folder} Description_Folder  目標資料夾
+ * @return {Array}           詳細資料陣列
+ */
+function list_folder(Description_Folder) {
+  if (Description_Folder === void 0)
+    throw new Error("Description_Folder未給")
+
+  var Folders = Description_Folder.getFolders();
+  var Folders_list = []
+  while (Folders.hasNext()) {
+    var Folder = Folders.next();
+    Folders_list.push(get_folder_info(Folder))
+  }
+  return Folders_list
+}
+//=================================================================================
+
+/**
+ * clear_folders - 目標資料夾下所有資料夾塞入垃圾桶
+ *
+ * @param  {Folder} Description_Folder 目標資料夾
+ * @return {Array}                   結果陣列
+ */
+function clear_folders(Description_Folder) {
+  if (Description_Folder === void 0)
+    throw new Error("Description_Folder未給")
+
+  var Folders = Description_Folder.getFolders();
+  while (Folders.hasNext()) {
+    try {
+      Folders.next().setTrashed(true);
+    } catch (e) {
+      return [false, e]
+    }
+  }
+  return [true]
+}
+//=================================================================================
+
+/**
+ * clear_files - 目標資料夾下所有檔案塞入垃圾桶
+ *
+ * @param  {Folder} Description_Folder 目標資料夾
+ * @return {Array}                    結果陣列
+ */
+function clear_files(Description_Folder) {
+  if (Description_Folder === void 0)
+    throw new Error("Description_Folder未給")
+
+  var files = Description_Folder.getFiles();
+  while (files.hasNext()) {
+    try {
+      files.next().setTrashed(true);
+    } catch (e) {
+      return [false, e]
+    }
+  }
+  return [true]
+}
+//=================================================================================
+
+/**
+ * copy_file - 複製檔案到目標資料夾
+ *
+ * @param  {file} file               目標檔案
+ * @param  {Folder} destination_folder 目標資料夾
+ * @return {Array}                    結果陣列
+ */
+function copy_file(file, destination_folder) {
+  if (file === void 0)
+    throw new Error("file未給")
+  if (Description_Folder === void 0)
+    throw new Error("destination_folder未給")
+
+  try {
+    file.makeCopy(destination_folder)
+  } catch (e) {
+    return [false, e]
+  }
+  return [true]
+}
 //==========================================================================
 function getGdriveFileDownloadURL() {
   var y = list2()
@@ -2010,9 +2150,8 @@ function ch_Name_and_Description() {
 }
 //=================================================================================
 function sendtext(chat_id, ct, reply_to_message_id) {
-  if (reply_to_message_id === void 0) {
-    reply_to_message_id = '';
-  }
+  reply_to_message_id === void 0 ? reply_to_message_id : ''
+
   try {
     var notification = ct["notification"]
     var parse_mode = ct["parse_mode"]
