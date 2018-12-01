@@ -8,6 +8,7 @@ function up_version() {
   var doc = DocumentApp.openById(doc_key)
   var ALL = JSON.parse(doc.getText());
 
+
   // 下面是 V3.1 所需
   if (ALL.FastMatch3 == undefined) {
     ALL.FastMatch3 = {}
@@ -31,10 +32,10 @@ function up_version() {
     clear_folders(Folder); // 清目標資料夾下所有資料夾
     clear_files(Folder); // 清目標資料夾下所有檔案
     var Description = "{'version': 3.2}"
-    create_Folder(Folder, 'Telegram_貼圖', Description)
-    create_Folder(Folder, 'Line_貼圖', Description)
-    create_Folder(Folder, '臨時停放區', Description)
-    create_Folder(Folder, '檔案保存區', Description)
+    // 下面2個註解提醒一下自己之後要完美支援貼圖，希望下次改本能成啦!
+    //create_Folder(Folder, 'Telegram_貼圖', Description)
+    //create_Folder(Folder, 'Line_貼圖', Description)
+    create_Folder(Folder, '檔案放置區', Description)
     var list = list_folder(Folder)
     for (var i = 0; i < list.length; i++) {
       ALL[list[i]['FolderName']] = list[i]
@@ -88,6 +89,7 @@ function doPost(e) {
   var FolderId = base_json.FolderId
   var gsURL = base_json.gsURL
   var ct = language()["correspond_text"] //語言載入
+  var download_folder_name = '檔案放置區'
 
   /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -1315,43 +1317,34 @@ function doPost(e) {
 
       if (!userName)
         userName = "";
-      var cutMessage = estringa.events[ev].message; //好長 看的我都花了 縮減個
+      var cutM = estringa.events[ev].message; //好長 看的我都花了 縮減個
 
       var message_json = { //前面先寫 後面替換
         "type": "type",
-        "message_id": cutMessage.id,
+        "message_id": cutM.id,
         "userName": userName,
         "timestamp": parseInt(estringa.events[ev].timestamp)
       }
 
-      if (cutMessage.type == "text") { //文字
-        message_json.type = "text"
-        message_json.text = String(cutMessage.text)
-      } else if (cutMessage.type == "image") { //圖片
-        message_json.type = "image"
-        downloadFromLine(cutMessage.id)
-        message_json.DURL = getGdriveFileDownloadURL()
-      } else if (cutMessage.type == "sticker") { //貼圖
-        message_json.type = "sticker"
-        message_json.stickerId = cutMessage.stickerId
-        message_json.packageId = cutMessage.packageId
-      } else if (cutMessage.type == "audio") { //錄音
-        message_json.type = "audio"
-        downloadFromLine(cutMessage.id)
-        message_json.DURL = getGdriveFileDownloadURL()
-      } else if (cutMessage.type == "location") { //位置
-        message_json.type = "location"
-        message_json.address = cutMessage.address
-        message_json.latitude = cutMessage.latitude
-        message_json.longitude = cutMessage.longitude
-      } else if (cutMessage.type == "video") { //影片
-        message_json.type = "video"
-        downloadFromLine(cutMessage.id)
-        message_json.DURL = getGdriveFileDownloadURL()
-      } else if (cutMessage.type == "file") { //文件
-        message_json.type = "file"
-        downloadFromLine(cutMessage.id)
-        message_json.DURL = getGdriveFileDownloadURL()
+      // 以下處理資料，分不需要下載跟需要下載處理
+      // 以下不需要下載
+      if (cutM.type == "text") { //文字
+        message_json.text = String(cutM.text)
+      } else if (cutM.type == "location") { //位置
+        message_json.address = cutM.address
+        message_json.latitude = cutM.latitude
+        message_json.longitude = cutM.longitude
+      } else if (cutM.type == "sticker") { //貼圖
+        message_json.stickerId = cutM.stickerId
+        message_json.packageId = cutM.packageId
+      } else {
+        // 以下需要下載
+        // 先開資料夾
+        var Folder = DriveApp.getFolderById(ALL[download_folder_name]);
+        //處理文件
+        message_json.type = cutM.type
+        message_json.DURL = downloadFromLine(
+          CHANNEL_ACCESS_TOKEN, cutM.id, cutM.fileName, Folder)
       }
       var text = JSON.stringify(message_json)
 
@@ -2079,16 +2072,19 @@ function getGdriveFileDownloadURL() {
   return g[g_len].fileDownloadURL
 }
 //=================================================================================
-function downloadFromLine(linkId) {
+
+/**
+ * downloadFromLine - 下載Line的東西。
+ *
+ * @param  {type} CHANNEL_ACCESS_TOKEN Line的token
+ * @param  {type} Id                   下載的id
+ * @param  {type} Folder               下載的後放哪個資料夾
+ * @return {type}                      description
+ */
+function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
   //讓我們感謝河馬大大!m(_ _)m
   //https://riverhippo.blogspot.tw/2016/02/google-drive-direct-link.html
-  var base_json = base()
-  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-  var FolderId = base_json.FolderId;
-  var Folder = DriveApp.getFolderById(FolderId); //download_from_line
-
-  var id = linkId;
-  var url = 'https://api.line.me/v2/bot/message/' + id + '/content';
+  var url = 'https://api.line.me/v2/bot/message/' + Id + '/content';
   //--------------------------------------------------
   var header = {
     'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN
@@ -2099,8 +2095,8 @@ function downloadFromLine(linkId) {
   }
   //--------------------------------------------------
   var blob = UrlFetchApp.fetch(url, options);
-  Folder.createFile(blob)
-  ch_Name_and_Description()
+  var f = Folder.createFile(blob).setName(fileName)
+  return ("https://drive.google.com/uc?export=download&id=" + file.getId())
 }
 //=================================================================================
 function get_extension(filename, reciprocal) {
@@ -2113,40 +2109,19 @@ function get_time_txt(timestamp, GMT) {
   return formattedDate;
 }
 //=================================================================================
-function ch_Name_and_Description() {
-  var base_json = base()
-  var FolderId = base_json.FolderId
-  var Folder = DriveApp.getFolderById(FolderId); //download_from_line
-  var files = Folder.getFiles();
+function ch_Name_and_Description(file) {
 
-  while (files.hasNext()) {
-    var file = files.next();
-    if (file.getName() == 'content') {
-      var d = new Date();
-      var getFullYear = d.getFullYear(); // 2016 年
-      var getMonth = d.getMonth(); // 12 月
-      var getDate = d.getDate(); // 22 日(號)
-      var getHours = d.getHours(); // 16 時(0~23.0)
-      var getMinutes = d.getMinutes(); // 29 分
-      var getSeconds = d.getSeconds(); // 17 秒
-      var getMilliseconds = d.getMilliseconds(); // 234 毫秒
-      file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds + ".mp3")
-      file.setDescription(d.getTime());
-      break;
-    } else if (get_extension(file.getName(), 0) == 'content') {
-      var d = new Date();
-      var getFullYear = d.getFullYear(); // 2016 年
-      var getMonth = d.getMonth(); // 12 月
-      var getDate = d.getDate(); // 22 日(號)
-      var getHours = d.getHours(); // 16 時(0~23.0)
-      var getMinutes = d.getMinutes(); // 29 分
-      var getSeconds = d.getSeconds(); // 17 秒
-      var getMilliseconds = d.getMilliseconds(); // 234 毫秒
-      file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds)
-      file.setDescription(d.getTime());
-      break;
-    }
-  }
+  var d = new Date();
+  var getFullYear = d.getFullYear(); // 2016 年
+  var getMonth = d.getMonth(); // 12 月
+  var getDate = d.getDate(); // 22 日(號)
+  var getHours = d.getHours(); // 16 時(0~23.0)
+  var getMinutes = d.getMinutes(); // 29 分
+  var getSeconds = d.getSeconds(); // 17 秒
+  var getMilliseconds = d.getMilliseconds(); // 234 毫秒
+  file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds)
+  file.setDescription(d.getTime());
+
 }
 //=================================================================================
 function sendtext(chat_id, ct, reply_to_message_id) {
