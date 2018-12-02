@@ -1343,10 +1343,10 @@ function doPost(e) {
         // 先開資料夾
         var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
         //處理文件
-        message_json.type = cutM.type
         message_json.DURL = downloadFromLine(
           CHANNEL_ACCESS_TOKEN, cutM.id, cutM.fileName, Folder)
       }
+      message_json.type = cutM.type
       var text = JSON.stringify(message_json)
 
       //下行在 log() 時已取得。
@@ -2198,14 +2198,15 @@ function sendVoice(chat_id, url, notification, caption) {
   return start(payload);
 }
 //=================================================================
-function sendDocument(chat_id, url, notification, caption) {
-  if (notification == undefined)
+function sendDocument(chat_id, url_or_bolb, notification, caption) {
+  if (notification === void 0)
     notification = false
-  caption = caption || ""
+  if (caption === void 0)
+    caption = ''
   var payload = {
     "method": "sendDocument",
     'chat_id': String(chat_id),
-    'document': url,
+    'document': url_or_bolb,
     'disable_notification': notification,
     'caption': caption
   }
