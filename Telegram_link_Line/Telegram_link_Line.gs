@@ -741,7 +741,7 @@ function doPost(e) {
                   }
                   sendtext(chat_id, text);
                   //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
-                  //"address":"260台灣宜蘭縣宜蘭市舊城西路107號",
+                  //"address":"260台灣宜蘭縣宜蘭市舊城西路107號", <-沒是這不是我家:P
                   //"latitude":24.759711,"longitude":121.750114}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "video") {
@@ -756,14 +756,17 @@ function doPost(e) {
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "file") {
-                  var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
-                  text = url
+                  //處理文件
+                  var file_id = message_json.ID
+                  var blob = DriveApp.getFileById(file_id).getBlob();
+
+                  //處理caption
+                  caption = message_json.userName + '\n'
                   if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp, GMT)
-                    text += "\n" + t
+                    caption += get_time_txt(message_json.timestamp, GMT)
                   }
-                  sendtext(chat_id, text);
-                  //sendDocument(url)
+
+                  sendDocument(chat_id, blob, notification, caption)
                   upMessageData(i, col, ed)
                 }
               }
@@ -1343,8 +1346,10 @@ function doPost(e) {
         // 先開資料夾
         var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
         //處理文件
-        message_json.DURL = downloadFromLine(
+        message_json.ID = downloadFromLine(
           CHANNEL_ACCESS_TOKEN, cutM.id, cutM.fileName, Folder)
+        message_json.DURL = (
+          "https://drive.google.com/uc?export=download&id=" + message_json.ID)
       }
       message_json.type = cutM.type
       var text = JSON.stringify(message_json)
@@ -2097,7 +2102,7 @@ function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
   //--------------------------------------------------
   var blob = UrlFetchApp.fetch(url, options);
   var f = Folder.createFile(blob).setName(fileName)
-  return ("https://drive.google.com/uc?export=download&id=" + f.getId())
+  return f.getId()
 }
 //=================================================================================
 function get_extension(filename, reciprocal) {
