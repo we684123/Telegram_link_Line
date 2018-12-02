@@ -717,13 +717,17 @@ function doPost(e) {
                   //"stickerId":"502","packageId":"2"}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "audio") { //這裡看看能不能改
-                  var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
+                  //處理文件
+                  var file_id = message_json.ID
+                  var blob = DriveApp.getFileById(file_id).getBlob();
+
+                  //處理caption
+                  caption = message_json.userName + '\n'
                   if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp, GMT)
-                    url += "\n" + t
+                    caption += get_time_txt(message_json.timestamp, GMT)
                   }
-                  sendtext(chat_id, url)
-                  // ^ "抱歉!請至該連結下載或聆聽!\n" + message_json.DURL + "\n\n來自: " + message_json.userName
+
+                  sendAudio(chat_id, blob, notification, caption)
                   //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
                   //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
                   upMessageData(i, col, ed)
@@ -741,7 +745,7 @@ function doPost(e) {
                   }
                   sendtext(chat_id, text);
                   //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
-                  //"address":"260台灣宜蘭縣宜蘭市舊城西路107號", <-沒是這不是我家:P
+                  //"address":"260台灣宜蘭縣宜蘭市舊城西路107號", <-沒事，這不是我家:P
                   //"latitude":24.759711,"longitude":121.750114}
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "video") {
@@ -2175,14 +2179,15 @@ function sendPhoto(chat_id, url, notification, caption) {
   return start(payload);
 }
 //=================================================================================
-function sendAudio(chat_id, url, notification, caption) {
-  if (notification == undefined)
+function sendAudio(chat_id, url_or_bolb, notification, caption) {
+  if (notification === void 0)
     notification = false
-  caption = caption || ""
+  if (caption === void 0)
+    caption = ''
   var payload = {
     "method": "sendAudio",
     'chat_id': String(chat_id),
-    'audio': url,
+    'audio': url_or_bolb,
     'disable_notification': notification,
     'caption': caption
   }
