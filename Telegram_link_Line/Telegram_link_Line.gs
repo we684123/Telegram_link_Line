@@ -1406,9 +1406,16 @@ function doPost(e) {
               //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
               //"stickerId":"502","packageId":"2"}
             } else if (message_json.type == "audio") {
-              var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
-              sendtext(chat_id, url)
-              // ^ "抱歉!請至該連結下載或聆聽!\n{0}\n\n{1}來自: "
+              //處理文件
+              var file_id = message_json.ID
+              var blob = DriveApp.getFileById(file_id).getBlob();
+              //處理caption
+              caption = message_json.userName + '\n'
+              if (ALL.massage_time) {
+                caption += get_time_txt(message_json.timestamp, GMT)
+              }
+
+              sendAudio(chat_id, blob, notification, caption)
               //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9KakE5Q"}
             } else if (message_json.type == "location") {
@@ -1438,9 +1445,17 @@ function doPost(e) {
               //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1"}
             } else if (message_json.type == "file") {
-              var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
-              sendtext(chat_id, url);
-              //sendDocument(url)
+              //處理文件
+              var file_id = message_json.ID
+              var blob = DriveApp.getFileById(file_id).getBlob();
+
+              //處理caption
+              caption = message_json.userName + '\n'
+              if (ALL.massage_time) {
+                caption += get_time_txt(message_json.timestamp, GMT)
+              }
+
+              sendDocument(chat_id, blob, notification, caption)
             }
           } catch (e) {
             sendtext(chat_id, ct["send_to_TG_error"]['text'].format(e));
