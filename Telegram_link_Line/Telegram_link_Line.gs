@@ -1481,7 +1481,7 @@ function doPost(e) {
           }
           //以下處理關鍵字通知====================================================
           var keyword_notice = ALL.keyword_notice
-          if (keyword_notice && text != "") {
+          if (keyword_notice && message_json.text != undefined) {
             var txt = text
             var keys = ALL.keyword
             var keys_value = key_word_check(message_json.text, keys)
