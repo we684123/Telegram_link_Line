@@ -757,6 +757,7 @@ function doPost(e) {
                   upMessageData(i, col, ed)
                 } else if (message_json.type == "file") {
                   var url = ct["sorry_plz_go_to_url"]["text"].format(message_json.DURL, message_json.userName)
+                  text = url
                   if (ALL.massage_time) {
                     t = get_time_txt(message_json.timestamp, GMT)
                     text += "\n" + t
@@ -1340,7 +1341,7 @@ function doPost(e) {
       } else {
         // 以下需要下載
         // 先開資料夾
-        var Folder = DriveApp.getFolderById(ALL[download_folder_name]);
+        var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
         //處理文件
         message_json.type = cutM.type
         message_json.DURL = downloadFromLine(
@@ -2096,7 +2097,7 @@ function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
   //--------------------------------------------------
   var blob = UrlFetchApp.fetch(url, options);
   var f = Folder.createFile(blob).setName(fileName)
-  return ("https://drive.google.com/uc?export=download&id=" + file.getId())
+  return ("https://drive.google.com/uc?export=download&id=" + f.getId())
 }
 //=================================================================================
 function get_extension(filename, reciprocal) {
