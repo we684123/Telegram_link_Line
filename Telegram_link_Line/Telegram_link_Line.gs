@@ -425,7 +425,7 @@ function doPost(e) {
           var OName = ALL.opposite.Name
           var FM = ALL.FastMatch[OName]
           // 確認符號
-          if (ALL.FastMatch['status'] == '已升級房間2') {
+          if (ALL.data[FM]['status'] == '已升級房間2') {
             var symbol = "⭐️"
           } else if (ALL.FastMatch['Notice']) {
             var symbol = "✅"
@@ -448,7 +448,7 @@ function doPost(e) {
           //=====================================================================
           //var text = "🔖 重新命名完成~\n" + OName + " \n->\n " + Stext + "\n🔮 開啟主選單"
           ct["rename_success"]["text"] = ct["rename_success"]["text"].format(
-            ct["🔖 重新命名"]["text"], OName, Stext, ct["🔮 開啟主選單"]["text"]);
+            ct["🔖 重新命名"]["text"], OName, (Stext + symbol), ct["🔮 開啟主選單"]["text"]);
           text = ct["rename_success"]
           keyboard_main(chat_id, text, ALL)
         }
@@ -1195,6 +1195,8 @@ function doPost(e) {
                     'text': ct["☀ 顯示發送者"]["text"]
                   }],
                   [{
+                    'text': ct['🔖 重新命名']["text"]
+                  }, {
                     'text': ct["🔙 返回大廳"]["text"]
                   }]
                 ]
