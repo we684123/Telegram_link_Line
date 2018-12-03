@@ -1269,6 +1269,8 @@ function doPost(e) {
     }
 
     //=====================================================================================================
+    //=====================================================================================================
+    //=====================================================================================================
   } else if (estringa.events[0].timestamp) {
     //以下來自line
     var from = 'line';
@@ -1313,6 +1315,11 @@ function doPost(e) {
         userName = "";
       var cutM = estringa.events[ev].message; //好長 看的我都花了 縮減個
 
+      if (!cutM) { //專門寫給 line_bot_leave 的
+        cutM = {}
+        cutM.id = 0
+        cutM.type = estringa.events[ev].type
+      }
       var message_json = { //前面先寫 後面替換
         "type": "type",
         "message_id": cutM.id,
@@ -1331,6 +1338,8 @@ function doPost(e) {
       } else if (cutM.type == "sticker") { //貼圖
         message_json.stickerId = cutM.stickerId
         message_json.packageId = cutM.packageId
+      } else if (cutM.type == "leave") {
+        message_json.text = ct['line_bot_leave']['text']
       } else {
         // 以下需要下載
         // 先開資料夾
@@ -1433,6 +1442,8 @@ function doPost(e) {
               }
 
               sendDocument(chat_id, blob, notification, caption)
+            } else if (message_json.type == "leave") {
+              sendtext(chat_id, ct['line_bot_leave']);
             }
           } catch (e) {
             sendtext(chat_id, ct["send_to_TG_error"]['text'].format(e));
@@ -2678,6 +2689,9 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       }
       //發送
       sendDocument(chat_id, blob, notification, caption)
+      upMessageData(i, col, ed)
+    } else if (message_json.type == "leave") {
+      sendtext(chat_id, ct['line_bot_leave']);
       upMessageData(i, col, ed)
     }
   }

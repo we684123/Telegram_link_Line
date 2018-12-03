@@ -735,8 +735,14 @@ function language() {
       "not_read_all_ed":{
         "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": '因原房間中還有留言，故要先傾倒於此，請等等再重發一次您的"內容"\n(如果是隨機碼就不用了)\n\n傾倒開始!', // 自定義文字內容
-        "notification": false,  //不通知? true or false
+        "notification": true,  //不通知? true or false
         "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "line_bot_leave":{
+        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "`QAQ Line_bot 被踢出去了\n你可以考慮刪掉此房間或把 Line_bot 加回來。`", // 自定義文字內容
+        "notification": false,  //不通知? true or false
+        "parse_mode":"Markdown"  //送出文字模式 "HTML" or "Markdown" or ""
       },
     }
   }
