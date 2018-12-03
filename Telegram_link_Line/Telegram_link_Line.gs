@@ -499,6 +499,7 @@ function doPost(e) {
         sendtext(chat_id, ct["plz_forward_verification_code"]);
         // ^ "請確認我在要綁定的群組中後，再轉發上方的驗證碼到那以進行綁定! \
         //   \n或按下 /unsetroom 取消升級"
+        Utilities.sleep(500)
         lock.releaseLock();
         return 0;
       } else if (mode == "/uproom" && Stext != "/main" && Stext != "/debug") {
