@@ -32,7 +32,7 @@ function up_version() {
     clear_folders(Folder); // 清目標資料夾下所有資料夾
     clear_files(Folder); // 清目標資料夾下所有檔案
     var Description = "{'version': 3.2}"
-    // 下面2個註解提醒一下自己之後要完美支援貼圖，希望下次改本能成啦!
+    // 下面2個註解提醒一下自己之後要完美支援貼圖，希望下次改版能成啦!
     //create_Folder(Folder, 'Telegram_貼圖', Description)
     //create_Folder(Folder, 'Line_貼圖', Description)
     create_Folder(Folder, '檔案放置區', Description)
@@ -1403,12 +1403,7 @@ function doPost(e) {
       message_json.type = cutM.type
       var text = JSON.stringify(message_json)
 
-      //下行在 log() 時已取得。
-      //var SpreadSheet = SpreadsheetApp.openById(sheet_key);
       var SheetM = SpreadSheet.getSheetByName("Line訊息區");
-      //var doc = DocumentApp.openById(doc_key)
-      //var f = doc.getText();
-      //var ALL = JSON.parse(f);
       var chat_id = Telegram_id
       //================================================================
       if (ALL.FastMatch2[line_roomID] != undefined) { //以下處理已登記的
@@ -1978,32 +1973,6 @@ function TGdownloadURL(path, Telegram_bot_key) {
   return TGDurl;
 }
 //=================================================================================
-function list2() { //顯示指定資料夾資料
-  var base_json = base()
-  var FolderId = base_json.FolderId
-
-  var Folder = DriveApp.getFolderById(FolderId); //download_from_line
-  var files = Folder.getFiles();
-  var file_array = "[]";
-  var file_array_json = JSON.parse(file_array)
-  while (files.hasNext()) {
-    var file = files.next();
-    var file_data = {
-      "fileName": file.getName(),
-      "fileId": file.getId(),
-      "fileDownloadURL": ("https://drive.google.com/uc?export=download&id=" + file.getId()),
-      "fileSize": file.getSize(),
-      "fileDateCreated": file.getDateCreated(),
-      "fileTimeStamp": file.getDescription()
-    }
-    var i = file_array_json.length;
-    file_array_json.splice(i, 0, file_data)
-
-  }
-  var k = JSON.stringify(file_array_json)
-  return k
-}
-//=================================================================================
 
 /**
  * create_Folder - 創資料夾
@@ -2129,22 +2098,6 @@ function copy_file(file, destination_folder) {
   }
   return [true]
 }
-//==========================================================================
-function getGdriveFileDownloadURL() {
-  var y = list2()
-  var list = JSON.parse(y)
-  var g = list.sort(function(a, b) {
-    if (parseInt(a.fileTimeStamp) > parseInt(b.fileTimeStamp)) {
-      return 1;
-    }
-    if (parseInt(a.fileTimeStamp) < parseInt(b.fileTimeStamp)) {
-      return -1;
-    }
-    return 0;
-  });
-  var g_len = g.length - 1
-  return g[g_len].fileDownloadURL
-}
 //=================================================================================
 
 /**
@@ -2191,29 +2144,9 @@ function downloadFromTG(Telegram_bot_key, Id, fileName, Folder) {
   return f.getId()
 }
 //=================================================================================
-function get_extension(filename, reciprocal) {
-  var extension = filename.split(".")[reciprocal]
-  return extension
-}
-//=================================================================================
 function get_time_txt(timestamp, GMT) {
   var formattedDate = Utilities.formatDate(new Date(timestamp), GMT, "yyyy-MM-dd' 'HH:mm:ss");
   return formattedDate;
-}
-//=================================================================================
-function ch_Name_and_Description(file) {
-
-  var d = new Date();
-  var getFullYear = d.getFullYear(); // 2016 年
-  var getMonth = d.getMonth(); // 12 月
-  var getDate = d.getDate(); // 22 日(號)
-  var getHours = d.getHours(); // 16 時(0~23.0)
-  var getMinutes = d.getMinutes(); // 29 分
-  var getSeconds = d.getSeconds(); // 17 秒
-  var getMilliseconds = d.getMilliseconds(); // 234 毫秒
-  file.setName(getFullYear + "_" + getMonth + "_" + getDate + "_" + getHours + "_" + getMinutes + "_" + getSeconds + "_" + getMilliseconds)
-  file.setDescription(d.getTime());
-
 }
 //=================================================================================
 function sendtext(chat_id, ct, reply_to_message_id) {
@@ -2563,11 +2496,9 @@ function AllRead() {
   var base_json = base()
   var sheet_key = base_json.sheet_key
   var doc_key = base_json.doc_key
-  var FolderId = base_json.FolderId
   var doc = DocumentApp.openById(doc_key)
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
   var Sheet = SpreadSheet.getSheetByName("Line訊息區");
-  var Folder = DriveApp.getFolderById(FolderId); //download_from_line
 
   var doc = DocumentApp.openById(doc_key)
   var f = doc.getText();
@@ -2584,12 +2515,6 @@ function AllRead() {
 
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
-
-  var files = Folder.getFiles();
-  while (files.hasNext()) {
-    var file = files.next();
-    file.setTrashed(true)
-  }
 }
 //=================================================================================
 function write_ALL(ALL, doc) {
@@ -2704,10 +2629,7 @@ function rt_text_reduce(text, rt_max_chats) {
   if (text.length > max_chat) {
     text = text.nslice(max_chat)[0] + '...'
   }
-  text = text.replace('\n','%0A')
-  text = text.replace(/\n/g,' ')
-  text = text.replace('%0A','\n')
-  return text
+  return text.replace('\n','%0A').replace(/\n/g,' ').replace('%0A','\n')
 }
 //=================================================================================
 function start(payload) {
