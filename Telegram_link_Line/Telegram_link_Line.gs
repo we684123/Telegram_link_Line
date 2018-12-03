@@ -146,57 +146,58 @@ function doPost(e) {
     //來源檢查==================================================================
     if (chat_type == "supergroup" || chat_type == "group") { //現在只剩 群組、超級群組 的可能
       var number = ALL.FastMatch3[chat_id]
-      if (number == undefined) { //當莫名被邀入群組時
-        if (ALL['TG_temporary_docking'][chat_id] == 3) { //容忍3句廢話(#
+      if (number == undefined) { //在不認識的群組時
+        //如果出現綁定隨機碼，備份並綁定。
+        if (ALL['wait_to_Bind'][Stext] != undefined) {
+          CP();
+          sendtext(Telegram_id, ct["backed_up_ing"])
+          // ^ "已備份舊資料，更新doc資料庫中..."
+          var n = ALL['wait_to_Bind'][Stext] //這邊的Stext是驗證碼
+          //下面"升級房間2"用的資料新入
+          var chat_title = estringa.message.chat.chat_title
+          var Name = ALL.data[n]["Name"]
+          ALL.data[n]["Name"] = Name.substr(0, Name.length - 1) + "⭐"
+          ALL.data[n]["Bind_groud_chat_id"] = chat_id
+          ALL.data[n]["Bind_groud_chat_title"] = chat_title
+          ALL.data[n]["Bind_groud_chat_type"] = chat_type
+          ALL.data[n].status = "已升級房間2" //NU$ #1(連鎖) 可以做出"已升級房間2(未設定完全)"的狀態來處理是否要 1.更換群組照片(須為貫=管理員) 2.傾倒留言
+          ALL.data[n]["Display_name"] = false
+          ALL.FastMatch3[chat_id] = n //快速存取3寫入
+
+          //下面收拾善後
+          delete ALL.data[n]["Binding_number"]
           delete ALL['TG_temporary_docking'][chat_id]
-          TG_leaveChat(chat_id)
-          var r = JSON.stringify(ALL);
+          ALL['wait_to_Bind'] = {} //NU$ 這裡會有如果同時升級兩個會導致另一個失敗的問題?
+          ALL.mode = 0
+          var REST_result = REST_keyboard(REST_FastMatch1and2and3(ALL)[1])
+          var r = JSON.stringify(REST_result[1]);
           doc.setText(r); //寫入
+          text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
+          keyboard_main(Telegram_id, text, ALL) //NU$ #1(連鎖) 這裡可以加新功能?
+          // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
+          //   請記得去主控bot選擇這個房間並開啟"☀ 顯示發送者"，
+          //   以免Line端眾不知何人發送。
           lock.releaseLock();
           return 0;
-        } else if (ALL['TG_temporary_docking'][chat_id] == undefined) {
-          // 初入群的時候
-          if (estringa.message.left_chat_member) {
+        } else { //如果沒有隨機碼
+          if (ALL['TG_temporary_docking'][chat_id] == 3) { //容忍3句廢話(#
+            delete ALL['TG_temporary_docking'][chat_id]
+            TG_leaveChat(chat_id)
+            var r = JSON.stringify(ALL);
+            doc.setText(r); //寫入
             lock.releaseLock();
             return 0;
-          }
-          ALL['TG_temporary_docking'][chat_id] = 0
-          var r = JSON.stringify(ALL);
-          doc.setText(r); //寫入
-          sendtext(chat_id, ct['not_registered'])
-          // ^ 您好!此群似乎還沒有與資料庫綁定，等主人綁定後我才能在此服務。...
-          lock.releaseLock();
-          return 0;
-        } else {
-          if (ALL['wait_to_Bind'][Stext] != undefined) { //出現綁定隨機碼，備份並綁定。
-            CP();
-            sendtext(Telegram_id, ct["backed_up_ing"])
-            // ^ "已備份舊資料，更新doc資料庫中..."
-            var n = ALL['wait_to_Bind'][Stext] //這邊的Stext是驗證碼
-            //下面"升級房間2"用的資料新入
-            var chat_title = estringa.message.chat.chat_title
-            var Name = ALL.data[n]["Name"]
-            ALL.data[n]["Name"] = Name.substr(0, Name.length - 1) + "⭐"
-            ALL.data[n]["Bind_groud_chat_id"] = chat_id
-            ALL.data[n]["Bind_groud_chat_title"] = chat_title
-            ALL.data[n]["Bind_groud_chat_type"] = chat_type
-            ALL.data[n].status = "已升級房間2" //NU$ #1(連鎖) 可以做出"已升級房間2(未設定完全)"的狀態來處理是否要 1.更換群組照片(須為貫=管理員) 2.傾倒留言
-            ALL.data[n]["Display_name"] = false
-            ALL.FastMatch3[chat_id] = n //快速存取3寫入
-
-            //下面收拾善後
-            delete ALL.data[n]["Binding_number"]
-            delete ALL['TG_temporary_docking'][chat_id]
-            ALL['wait_to_Bind'] = {} //NU$ 這裡會有如果同時升級兩個會導致另一個失敗的問題?
-            ALL.mode = 0
-            var REST_result = REST_keyboard(REST_FastMatch1and2and3(ALL)[1])
-            var r = JSON.stringify(REST_result[1]);
+          } else if (ALL['TG_temporary_docking'][chat_id] == undefined) {
+            // 初入群的時候
+            if (estringa.message.left_chat_member) { //不理離開群組的訊息
+              lock.releaseLock();
+              return 0;
+            }
+            ALL['TG_temporary_docking'][chat_id] = 0
+            var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
-            text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
-            keyboard_main(Telegram_id, text, ALL) //NU$ #1(連鎖) 這裡可以加新功能?
-            // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
-            //   請記得去主控bot選擇這個房間並開啟"☀ 顯示發送者"，
-            //   以免Line端眾不知何人發送。
+            sendtext(chat_id, ct['not_registered'])
+            // ^ 您好!此群似乎還沒有與資料庫綁定，等主人綁定後我才能在此服務。...
             lock.releaseLock();
             return 0;
           } else { //還是等隨機碼驗證中...
@@ -1137,6 +1138,10 @@ function doPost(e) {
             break;
             //-------------------------------------------------------------------
           default:
+            if (Stext == ct['/droproom']['text']) {
+              sendtext(chat_id, ct["incorrect_operation"]);
+              // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+            }
             var st = Stext.substr(0, 2)
             if (ALL.FastMatch[Stext] != undefined || st == "/d") {
 
