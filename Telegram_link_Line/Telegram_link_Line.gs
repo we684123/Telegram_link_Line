@@ -193,7 +193,7 @@ function doPost(e) {
             var r = JSON.stringify(REST_result[1]);
             doc.setText(r); //寫入
             text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
-            keyboard_main(Telegram_id, text, doc_key) //NU$ #1(連鎖) 這裡可以加新功能?
+            keyboard_main(Telegram_id, text, ALL) //NU$ #1(連鎖) 這裡可以加新功能?
             // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
             //   請記得去主控bot選擇這個房間並開啟"☀ 顯示發送者"，
             //   以免Line端眾不知何人發送。
@@ -421,14 +421,24 @@ function doPost(e) {
           sendtext(chat_id, ct["duplicate_command"]);
           // ^ "名子不可跟命令重複，請重新輸入一個!"
         } else {
+          // 找目標
           var OName = ALL.opposite.Name
           var FM = ALL.FastMatch[OName]
-          ALL.data[FM].Name = Stext + "✅"
-          var y = JSON.parse((String(JSON.stringify(ALL.FastMatch)).replace(OName, Stext)).replace(Stext, Stext + "✅"));
-          //var yy = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace(Stext, Stext + "✅"));
-          //上面是取代  看了頭暈  當初怎麼寫出來的
-          ALL.FastMatch = y;
+          // 確認符號
+          if (ALL.FastMatch['status'] == 已升級房間2) {
+            var symbol = "⭐️"
+          } else if (ALL.FastMatch['Notice']) {
+            var symbol = "✅"
+          } else {
+            var symbol = "❎"
+          }
+          // 取代符號
+          ALL.data[FM].Name = Stext + symbol
+          var y = JSON.parse(
+            JSON.stringify(ALL.FastMatch).replace(OName, Stext + symbol)
+          ); //簡化一下當年的技術債... 當紀念吧...
 
+          ALL.FastMatch = y;
           ALL.mode = 0
           //以下處理RoomKeyboard==================================================
           ALL = REST_keyboard(ALL)[1] //重新編排keyborad
@@ -437,9 +447,10 @@ function doPost(e) {
 
           //=====================================================================
           //var text = "🔖 重新命名完成~\n" + OName + " \n->\n " + Stext + "\n🔮 開啟主選單"
-          ct["rename_success"]["text"] = ct["rename_success"]["text"].format(ct["🔖 重新命名"]["text"], OName, Stext, ct["🔮 開啟主選單"]["text"]);
+          ct["rename_success"]["text"] = ct["rename_success"]["text"].format(
+            ct["🔖 重新命名"]["text"], OName, Stext, ct["🔮 開啟主選單"]["text"]);
           text = ct["rename_success"]
-          keyboard_main(chat_id, text, doc_key)
+          keyboard_main(chat_id, text, ALL)
         }
         lock.releaseLock();
         return 0;
@@ -473,7 +484,7 @@ function doPost(e) {
 
         text = ct["delete_room_success"]['text'].format(a1, a2, a3)
         // ^ "Line_leave：{0}\nREST_keyboard：{1}\nREST_FastMatch1and2and3：{2}\n已刪除此聊天室"
-        keyboard_main(chat_id, text, doc_key)
+        keyboard_main(chat_id, text, ALL)
         lock.releaseLock();
         return 0;
       } else if (mode == "⭐ 升級房間" && Stext == "/uproom") {
@@ -529,7 +540,8 @@ function doPost(e) {
         var r = JSON.stringify(REST_result[1]);
         doc.setText(r); //寫入
 
-        keyboard_main(chat_id, ct["droproom_success"]["text"].format(JSON.stringify(ALL.data[number])), doc_key)
+        keyboard_main(chat_id, ct["droproom_success"]["text"].format(
+          JSON.stringify(ALL.data[number])), ALL)
         // ^ "已降級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
         lock.releaseLock();
         return 0;
@@ -598,7 +610,8 @@ function doPost(e) {
         return 0;
       } else if (mode == "⏰訊息時間啟用?") {
         function mixT(chat_id) {
-          keyboard_main(chat_id, ct["change_message_time_func"]["text"].format(String(Stext)), doc_key)
+          keyboard_main(chat_id, ct["change_message_time_func"]["text"].format(
+            String(Stext)), ALL)
           // ^ "已成功 " + Stext + " 訊息時間!"
         }
         if (Stext == ct["開啟"]["text"]) {
@@ -639,7 +652,7 @@ function doPost(e) {
               var r = JSON.stringify(ALL);
               doc.setText(r); //寫入
             }
-            keyboard_main(chat_id, ct["🔮 開啟主選單"], doc_key)
+            keyboard_main(chat_id, ct["🔮 開啟主選單"], ALL)
             break;
           case ct['🔙 返回大廳']["text"]:
             if (ALL.mode != 0) {
@@ -686,7 +699,7 @@ function doPost(e) {
             ALL.mode = 0
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
-            keyboard_main(chat_id, ct["exit_room_ed"], doc_key)
+            keyboard_main(chat_id, ct["exit_room_ed"], ALL)
             // ^ "======已停止對話!======"
             break;
           case ct['📬 讀取留言']["text"]:
@@ -2363,10 +2376,7 @@ function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboa
   return start(payload);
 }
 //=================================================================================
-function keyboard_main(chat_id, ct, doc_key) {
-  var doc = DocumentApp.openById(doc_key)
-  var f = doc.getText();
-  var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
+function keyboard_main(chat_id, ct, ALL) {
   var keyboard_main = ALL.RoomKeyboard
   var resize_keyboard = false
   var one_time_keyboard = false
@@ -2629,7 +2639,7 @@ function rt_text_reduce(text, rt_max_chats) {
   if (text.length > max_chat) {
     text = text.nslice(max_chat)[0] + '...'
   }
-  return text.replace('\n','%0A').replace(/\n/g,' ').replace('%0A','\n')
+  return text.replace('\n', '%0A').replace(/\n/g, ' ').replace('%0A', '\n')
 }
 //=================================================================================
 function start(payload) {
