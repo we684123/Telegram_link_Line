@@ -60,6 +60,12 @@ function language() {
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "sendFile_ed": {
+        "type": "to_Telegram",
+        "text": "(File連結已發送!)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "sendSticker_ed": {
         "type": "to_Telegram",
         "text": "(貼圖已發送!)",
@@ -689,6 +695,12 @@ function language() {
         // {0} = entities_conversion_text , {1} = entities_conversion_link
         // 跟 "entities_conversion_text" 有關連。
         // 跟 "entities_conversion_link" 有關連。
+      },
+      "sendFileToLine": {
+        "type": "to_Line", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "檔名：{1}\n檔案大小：{3}MB\n{0}"
+        // {0} = google drive 檔案下載的連結 , {1} = 檔案名稱
+        // {2} = 檔案大小(單位bit) , {3} = 檔案大小(單位MB)
       },
     }
   }

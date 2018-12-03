@@ -90,6 +90,8 @@ function doPost(e) {
   var gsURL = base_json.gsURL
   var ct = language()["correspond_text"] //語言載入
   var download_folder_name = '檔案放置區'
+  var G_drive_Durl = 'https://drive.google.com/uc?export=download&id='
+  var G_drive_Durl_ex = 'https://drive.google.com/uc?export=download&confirm=YzWC&id='
 
   /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -345,8 +347,25 @@ function doPost(e) {
           sendtext(chat_id, ct["sendGIF_ed"]);
           // ^ "(GIF已發送!)"
         } else if (estringa.message.document) {
-          sendtext(chat_id, ct["not_support_document"]);
-          // "(暫時不支援document傳送喔!)"
+          var fileId = estringa.message.document.file_id
+          var fileName = estringa.message.document.file_name
+          var file_size = parseInt(estringa.message.document.file_size)
+          var file_size_MB = (file_size / 1024 / 1024).toFixed(3)
+
+
+          var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
+          var gfid = downloadFromTG(Telegram_bot_key, fileId, fileName, Folder)
+          var Durl = G_drive_Durl + gfid
+          text = ct['sendFileToLine']['text'].format(Durl, fileName, file_size, file_size_MB)
+          if (estringa.message.caption) { //如有簡介則一同發出
+            text = text + '\n' + estringa.message.caption
+          }
+          if (ALL.data[n]["Display_name"]) {
+            text = by_name + text
+          }
+          TG_Send_text_To_Line(Line_id, text)
+          sendtext(chat_id, ct["sendFile_ed"]);
+          // ^ "(File連結已發送!)"
         }
       }
       lock.releaseLock();
@@ -1218,8 +1237,7 @@ function doPost(e) {
         if (estringa.message.caption)
           TG_Send_text_To_Line(Line_id, estringa.message.caption)
         sendtext(chat_id, ct["sendAudio_ed"]);
-        //sendtext(chat_id, ct["not_support_audio"]);
-        // ^ "(暫時不支援audio傳送喔!)"
+        // ^ "(音檔已發送!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
         // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
@@ -1272,10 +1290,23 @@ function doPost(e) {
       }
     } else if (estringa.message.document) {
       if (mode == "🚀 發送訊息") {
-        //var duration = estringa.message.voice.duration
-        //TG_Send_audio_To_Line(Line_id, audio_id, duration)
-        sendtext(chat_id, ct["not_support_document"]);
-        // "(暫時不支援document傳送喔!)"
+        var fileId = estringa.message.document.file_id
+        var fileName = estringa.message.document.file_name
+        var file_size = parseInt(estringa.message.document.file_size)
+        var file_size_MB = (file_size / 1024 / 1024).toFixed(3)
+
+
+        var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
+        var gfid = downloadFromTG(Telegram_bot_key, fileId, fileName, Folder)
+        var Durl = G_drive_Durl + gfid
+        text = ct['sendFileToLine']['text'].format(Durl, fileName, file_size, file_size_MB)
+        if (estringa.message.caption) { //如有簡介則一同發出
+          text = text + '\n' + estringa.message.caption
+        }
+
+        TG_Send_text_To_Line(Line_id, text)
+        sendtext(chat_id, ct["sendFile_ed"]);
+        // ^ "(File連結已發送!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
         // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
@@ -1913,8 +1944,10 @@ function Line_leave(room_or_groupID) {
 }
 //=================================================================================
 function getpath(id, Telegram_bot_key) {
-  var base_json = base()
-  var Telegram_bot_key = Telegram_bot_key || base_json.Telegram_bot_key
+  if (Telegram_bot_key === void 0) {
+    var base_json = base()
+    var Telegram_bot_key = base_json.Telegram_bot_key
+  }
   url = "https://api.telegram.org/bot" + Telegram_bot_key + "/getFile?file_id=" + id
   var html = UrlFetchApp.fetch(url);
   html = JSON.parse(html);
@@ -1923,8 +1956,10 @@ function getpath(id, Telegram_bot_key) {
 }
 //=================================================================================
 function TGdownloadURL(path, Telegram_bot_key) {
-  var base_json = base()
-  var Telegram_bot_key = Telegram_bot_key || base_json.Telegram_bot_key
+  if (Telegram_bot_key === void 0) {
+    var base_json = base()
+    var Telegram_bot_key = base_json.Telegram_bot_key
+  }
   var TGDurl = "https://api.telegram.org/file/bot" + Telegram_bot_key + "/" + path
   return TGDurl;
 }
@@ -2120,6 +2155,24 @@ function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
   }
   //--------------------------------------------------
   var blob = UrlFetchApp.fetch(url, options);
+  var f = Folder.createFile(blob).setName(fileName)
+  return f.getId()
+}
+//=================================================================================
+
+/**
+ * downloadFromTG - 從TG下載到google_drive
+ *
+ * @param  {type} Telegram_bot_key TG_token
+ * @param  {type} Id               tg_file_id
+ * @param  {type} fileName         檔名
+ * @param  {type} Folder           塞入哪個資料夾
+ * @return {type}                  新檔案的googel_id
+ */
+function downloadFromTG(Telegram_bot_key, Id, fileName, Folder) {
+  var K = Telegram_bot_key
+  var url = TGdownloadURL(getpath(Id, K), K)
+  var blob = UrlFetchApp.fetch(url);
   var f = Folder.createFile(blob).setName(fileName)
   return f.getId()
 }
