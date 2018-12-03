@@ -441,19 +441,43 @@ function language() {
         "type": "command(Telegram)",
         "text": "🔧 更多設定"
       },
-      "🔑設定關鍵字提醒": {
+      "🔑 設定關鍵字提醒": {
         "type": "command(Telegram)",
-        "text": "🔑設定關鍵字提醒"
+        "text": "🔑 設定關鍵字提醒"
       },
-      "⏰訊息時間啟用?": {
+      "⏰ 訊息時間啟用?": {
         "type": "command(Telegram)",
-        "text": "⏰訊息時間啟用?"
+        "text": "⏰ 訊息時間啟用?"
+      },
+      "✈️ 設定GMT": {
+        "type": "command(Telegram)",
+        "text": "✈️ 設定GMT"
+      },
+      "set_GMT_ing_1": {
+        "type": "to_Telegram",
+        "text": '請輸入你的GMT時區，如台灣是"GMT+8"便只輸入"+8"\n如果不知道時區可至 https://time.artjoey.com/ 查詢',
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "set_GMT_ing_2": {
+        "type": "to_Telegram",
+        "text": '如欲取消設定請 /main 回主選單',
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "set_GMT_ed": {
+        "type": "to_Telegram",
+        "text": '已設定GMT為\nGMT{0}',
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+        // {0} = 時區(+8、-1、+9...等)
       },
       "more_setting_status": {
         "type": "to_Telegram",
-        "text": '設定狀態：\n● 關鍵字提醒：{0}\n● 訊息時間啟用： {1}\n',
+        "text": '設定狀態：\n● 關鍵字提醒：{0}\n● 訊息時間啟用： {1}\n● GMT時區：{2}',
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+        // {0} = TorF , {1} = TorF , {2} = GMT時區(ex: +8)
       },
       "plz_select_on_off": {
         "type": "to_Telegram",

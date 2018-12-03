@@ -634,7 +634,7 @@ function doPost(e) {
         }
         lock.releaseLock();
         return 0;
-      } else if (mode == "⏰訊息時間啟用?") {
+      } else if (mode == "⏰ 訊息時間啟用?" && Stext != "/main") {
         function mixT(chat_id) {
           keyboard_main(chat_id, ct["change_message_time_func"]["text"].format(
             String(Stext)), ALL)
@@ -668,6 +668,12 @@ function doPost(e) {
         }
         lock.releaseLock();
         return 0;
+      } else if (mode == "✈️ 設定GMT" && Stext != "/main") {
+        ALL['GMT'] = 'GMT' + Stext
+        ALL.mode = 0
+        write_ALL(ALL, doc)
+        text = ct["set_GMT_ed"]['text'].format(Stext)
+        keyboard_main(chat_id, text, ALL)
       } else {
         //以下指令分流
         switch (Stext) {
@@ -897,11 +903,13 @@ function doPost(e) {
           case ct['🔧 更多設定']["text"]:
             var more_keyboard = [
               [{
-                'text': ct["🔑設定關鍵字提醒"]["text"]
+                'text': ct["🔑 設定關鍵字提醒"]["text"]
               }, {
-                'text': ct['⏰訊息時間啟用?']["text"]
+                'text': ct['⏰ 訊息時間啟用?']["text"]
               }],
               [{
+                'text': ct["✈️ 設定GMT"]["text"]
+              }, {
                 'text': ct["🔙 返回大廳"]["text"]
               }]
             ]
@@ -917,14 +925,15 @@ function doPost(e) {
               var r = JSON.stringify(ALL);
               doc.setText(r); //寫入
             }
-            text = ct["more_setting_status"]['text'].format(ALL.keyword_notice, ALL.massage_time)
+            text = ct["more_setting_status"]['text'].format(
+              ALL['keyword_notice'], ALL['massage_time'], ALL['GMT'])
             // ^ '設定狀態：\n● 關鍵字提醒：{0}\n● 訊息時間啟用： {1}\n'
             var resize_keyboard = true
             var one_time_keyboard = false
             ReplyKeyboardMakeup(chat_id, more_keyboard, resize_keyboard, one_time_keyboard, text)
             break;
-          case ct['⏰訊息時間啟用?']["text"]:
-            ALL.mode = "⏰訊息時間啟用?"
+          case ct['⏰ 訊息時間啟用?']["text"]:
+            ALL.mode = "⏰ 訊息時間啟用?"
             var r = JSON.stringify(ALL);
             doc.setText(r); //寫入
 
@@ -941,7 +950,7 @@ function doPost(e) {
             var one_time_keyboard = false
             ReplyKeyboardMakeup(chat_id, massage_time_q_keyboard, resize_keyboard, one_time_keyboard, text)
             break;
-          case ct["🔑設定關鍵字提醒"]["text"]:
+          case ct["🔑 設定關鍵字提醒"]["text"]:
             if (ALL.keyword_notice == undefined) { //這一次啟動時的重製
               ALL.keyword_notice = false
               var r = JSON.stringify(ALL);
@@ -996,7 +1005,7 @@ function doPost(e) {
             AllRead();
             ReplyKeyboardRemove(chat_id, ct["delete_keyword_ing"])
             // ^ '請輸入欲移除關鍵字的**前方編號!!!**\n刪除多組關鍵字請用 "任意符號" 隔開(推薦用","或"，")\n如遇離開請按 /main'
-            write_ALL(ALL, doc)
+            write_ALL(ALL, doc) //寫入
             break;
           case ct['啟動關鍵字提醒']["text"]:
             ALL.keyword_notice = true
@@ -1041,6 +1050,12 @@ function doPost(e) {
           case '/lookkeyword':
             text = ct["lookkeyword_result"]['text'].format(get_all_keyword(ALL))
             sendtext(chat_id, text);
+            break;
+          case ct["✈️ 設定GMT"]["text"]:
+            ALL.mode = "✈️ 設定GMT"
+            sendtext(chat_id, ct["set_GMT_ing_1"]['text']);
+            ReplyKeyboardRemove(chat_id, ct["set_GMT_ing_2"]['text']);
+            write_ALL(ALL, doc) //寫入
             break;
             //-------------------------------------------------------------------
           default:
