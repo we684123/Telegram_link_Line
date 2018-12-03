@@ -78,6 +78,7 @@ function doPost(e) {
     var ee = JSON.stringify(estringa);
   }
 
+  //各種預設
   var text = "";
   var sheet_key = base_json.sheet_key
   var doc_key = base_json.doc_key
@@ -93,6 +94,7 @@ function doPost(e) {
   var G_drive_Durl = 'https://drive.google.com/uc?export=download&id='
   var G_drive_Durl_ex = 'https://drive.google.com/uc?export=download&confirm=YzWC&id='
   var rt_max_chats = 14
+  var notification = false
 
   /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -170,13 +172,25 @@ function doPost(e) {
           ALL['wait_to_Bind'] = {} //NU$ 這裡會有如果同時升級兩個會導致另一個失敗的問題?
           ALL.mode = 0
           var REST_result = REST_keyboard(REST_FastMatch1and2and3(ALL)[1])
-          var r = JSON.stringify(REST_result[1]);
+          ALL = REST_result[1]
+          var r = JSON.stringify(ALL);
           doc.setText(r); //寫入
           text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
-          keyboard_main(Telegram_id, text, ALL) //NU$ #1(連鎖) 這裡可以加新功能?
+          keyboard_main(Telegram_id, text, ALL)
           // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
           //   請記得去主控bot選擇這個房間並開啟"☀ 顯示發送者"，
           //   以免Line端眾不知何人發送。
+
+          if (ALL.data[n]['Amount']) { //如果還有訊息直接傾倒
+            sendtext(chat_id, ct["not_read_all_ed"])
+            var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification)
+            if (j) {
+              ALL.data[n]['Amount'] = 0
+            }
+            var r = JSON.stringify(ALL);
+            doc.setText(r); //寫入
+          }
+
           lock.releaseLock();
           return 0;
         } else { //如果沒有隨機碼
@@ -209,10 +223,21 @@ function doPost(e) {
           }
         }
       } else { //已綁定群組中發話
-        //NU$ #1(連鎖) 於此處理"已升級房間2(未設定完全)"?
+        if (ALL.data[number]['Amount']) { //如果還有訊息直接傾倒
+          sendtext(chat_id, ct["not_read_all_ed"])
+          var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification)
+          if (j) {
+            ALL.data[number]['Amount'] = 0
+          }
+          var r = JSON.stringify(ALL);
+          doc.setText(r); //寫入
+          lock.releaseLock();
+          return 0
+        }
+
         var n = number
         var Line_id = ALL.data[n]['RoomId'] //目標LINE房間ID
-        if (ALL.data[n]["Display_name"]) { //預先處理名稱問題  //NU$ 暱稱功能加入?
+        if (ALL.data[n]["Display_name"]) { //預先處理名稱問題
           var last_name = ''
           var first_name = estringa.message.from.first_name
           if (estringa.message.from.last_name) {
@@ -708,127 +733,8 @@ function doPost(e) {
               sendtext(chat_id, ct["not_need_read"], notification);
               // ^ "這個房間並沒有未讀的通知喔~ "
             } else {
-
-              var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-              var SheetM = SpreadSheet.getSheetByName("Line訊息區");
-              var col = ALL.FastMatch2[ALL.opposite.RoomId] + 1;
-
-              var Amount = SheetM.getRange(1, col).getDisplayValue();
-              Amount = JSON.parse(Amount)
-              var st = Amount[1] + 2
-              var ed = Amount[0] + 1
-
-              function upMessageData(i, col, ed) {
-                SheetM.getRange(i, col).setValue("")
-                var t = "[" + (ed - 1) + "," + (i - 1) + "]"
-                SheetM.getRange(1, col).setValue(t);
-                //SheetM.getRange(1, col).setValue(Amount);
-              }
-
-              for (var i = st; i <= ed; i++) {
-                text = SheetM.getRange(i, col).getDisplayValue()
-                var message_json = JSON.parse(text);
-
-                if (message_json.type == "text") {
-                  var p = message_json.userName + "：\n" + message_json.text
-                  if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp, GMT)
-                    p += "\n" + t
-                  }
-                  sendtext(chat_id, p);
-                  //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
-                  //"text":"51"}
-                  upMessageData(i, col, ed)
-                } else if (message_json.type == "image") {
-                  var url = message_json.DURL
-                  var caption = ct["is_from"]["text"].format(message_json.userName)
-                  if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp, GMT)
-                    caption += "\n" + t
-                  }
-                  sendPhoto(chat_id, url, notification, caption)
-                  //sendPhoto(url, notification)
-                  //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
-                  //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
-                  upMessageData(i, col, ed)
-                } else if (message_json.type == "sticker") {
-                  var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
-                  var caption = ct["is_from"]["text"].format(message_json.userName)
-                  if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp, GMT)
-                    caption += "\n" + t
-                  }
-                  sendPhoto(chat_id, sticker_png_url, notification, caption)
-                  //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
-                  //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
-                  //"stickerId":"502","packageId":"2"}
-                  upMessageData(i, col, ed)
-                } else if (message_json.type == "audio") { //這裡看看能不能改
-                  //處理文件
-                  var file_id = message_json.ID
-                  var blob = DriveApp.getFileById(file_id).getBlob();
-
-                  //處理caption
-                  caption = message_json.userName + '\n'
-                  if (ALL.massage_time) {
-                    caption += get_time_txt(message_json.timestamp, GMT)
-                  }
-
-                  sendAudio(chat_id, blob, notification, caption)
-                  //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
-                  //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
-                  upMessageData(i, col, ed)
-                } else if (message_json.type == "location") {
-                  var latitude = message_json.latitude
-                  var longitude = message_json.longitude
-                  sendLocation(chat_id, latitude, longitude, notification)
-                  var text = ct["is_from"]["text"].format(message_json.userName)
-                  if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp, GMT)
-                    text += "\n" + t
-                  }
-                  if (message_json.address) {
-                    text = message_json.address + '\n' + text
-                  }
-                  sendtext(chat_id, text);
-                  //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
-                  //"address":"260台灣宜蘭縣宜蘭市舊城西路107號", <-沒事，這不是我家:P
-                  //"latitude":24.759711,"longitude":121.750114}
-                  upMessageData(i, col, ed)
-                } else if (message_json.type == "video") {
-                  var url = message_json.DURL
-                  var caption = ct["is_from"]["text"].format(message_json.userName)
-                  if (ALL.massage_time) {
-                    t = get_time_txt(message_json.timestamp, GMT)
-                    caption += "\n" + t
-                  }
-                  sendVoice(chat_id, url, notification, caption)
-                  //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
-                  //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
-                  upMessageData(i, col, ed)
-                } else if (message_json.type == "file") {
-                  //處理文件
-                  var file_id = message_json.ID
-                  var blob = DriveApp.getFileById(file_id).getBlob();
-
-                  //處理caption
-                  caption = message_json.userName + '\n'
-                  if (ALL.massage_time) {
-                    caption += get_time_txt(message_json.timestamp, GMT)
-                  }
-
-                  sendDocument(chat_id, blob, notification, caption)
-                  upMessageData(i, col, ed)
-                }
-              }
-
-              ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
-              var r = JSON.stringify(ALL);
-              doc.setText(r); //寫入
-              SheetM.getRange(1, col).setValue("[0,0]")
-
-              sendtext(chat_id, ct["read_massage_ed"]);
-              // ^ =======讀取完畢=======
+              //獨立出來比較好
+              read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification)
             }
             break;
           case ct['🔖 重新命名']["text"]:
@@ -1440,7 +1346,6 @@ function doPost(e) {
               //"text":"51"}
             } else if (message_json.type == "image") {
               var url = message_json.DURL
-              var notification = false
               var caption = ct["is_from"]["text"].format(message_json.userName)
               var send_ed = sendtext(chat_id, ct["sendPhoto_ing"]);
               // ^ (正在傳送圖片，請稍後...)
@@ -1453,7 +1358,6 @@ function doPost(e) {
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNskkLZktW"}
             } else if (message_json.type == "sticker") {
               var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
-              var notification = false
               var caption = ct["is_from"]["text"].format(message_json.userName)
               var send_ed = sendtext(chat_id, ct["sendSticker_ing"])
               // ^ (正在傳送貼圖，請稍後...)
@@ -1479,7 +1383,6 @@ function doPost(e) {
               //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9KakE5Q"}
             } else if (message_json.type == "location") {
-              var notification = false
               var latitude = message_json.latitude
               var longitude = message_json.longitude
               sendLocation(chat_id, latitude, longitude, notification)
@@ -1493,7 +1396,6 @@ function doPost(e) {
               //"latitude":24.759711,"longitude":121.750114}
             } else if (message_json.type == "video") {
               var url = message_json.DURL
-              var notification = false
               var caption = ct["is_from"]["text"].format(message_json.userName)
               var send_ed = sendtext(chat_id, ct["sendVideo_ing"])
               // ^ (正在傳送影片，請稍後...)
@@ -2214,17 +2116,20 @@ function sendPhoto(chat_id, url, notification, caption) {
   return start(payload);
 }
 //=================================================================================
-function sendAudio(chat_id, url_or_bolb, notification, caption) {
+function sendAudio(chat_id, url_or_bolb, notification, caption, duration) {
   if (notification === void 0)
     notification = false
   if (caption === void 0)
     caption = ''
+  if (duration === void 0)
+    duration = 0
   var payload = {
     "method": "sendAudio",
     'chat_id': String(chat_id),
     'audio': url_or_bolb,
     'disable_notification': notification,
-    'caption': caption
+    'caption': caption,
+    'duration': duration
   }
   return start(payload);
 }
@@ -2647,6 +2552,129 @@ function rt_text_reduce(text, rt_max_chats) {
     text = text.nslice(max_chat)[0] + '...'
   }
   return text.replace('\n', '%0A').replace(/\n/g, ' ').replace('%0A', '\n')
+}
+//=================================================================================
+function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
+  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+  var SheetM = SpreadSheet.getSheetByName("Line訊息區");
+  var col = ALL.FastMatch2[ALL.opposite.RoomId] + 1;
+
+  var Amount = SheetM.getRange(1, col).getDisplayValue();
+  Amount = JSON.parse(Amount)
+  var st = Amount[1] + 2
+  var ed = Amount[0] + 1
+
+  function upMessageData(i, col, ed) {
+    SheetM.getRange(i, col).setValue("")
+    var t = "[" + (ed - 1) + "," + (i - 1) + "]"
+    SheetM.getRange(1, col).setValue(t);
+    //SheetM.getRange(1, col).setValue(Amount);
+  }
+
+  for (var i = st; i <= ed; i++) {
+    text = SheetM.getRange(i, col).getDisplayValue()
+    var message_json = JSON.parse(text);
+
+    if (message_json.type == "text") {
+      var p = message_json.userName + "：\n" + message_json.text
+      if (ALL.massage_time) {
+        t = get_time_txt(message_json.timestamp, GMT)
+        p += "\n" + t
+      }
+      sendtext(chat_id, p);
+      //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
+      //"text":"51"}
+      upMessageData(i, col, ed)
+    } else if (message_json.type == "image") {
+      var url = message_json.DURL
+      var caption = ct["is_from"]["text"].format(message_json.userName)
+      if (ALL.massage_time) {
+        t = get_time_txt(message_json.timestamp, GMT)
+        caption += "\n" + t
+      }
+      sendPhoto(chat_id, url, notification, caption)
+      //sendPhoto(url, notification)
+      //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
+      //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
+      upMessageData(i, col, ed)
+    } else if (message_json.type == "sticker") {
+      var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
+      var caption = ct["is_from"]["text"].format(message_json.userName)
+      if (ALL.massage_time) {
+        t = get_time_txt(message_json.timestamp, GMT)
+        caption += "\n" + t
+      }
+      sendPhoto(chat_id, sticker_png_url, notification, caption)
+      //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
+      //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
+      //"stickerId":"502","packageId":"2"}
+      upMessageData(i, col, ed)
+    } else if (message_json.type == "audio") { //這裡看看能不能改
+      //處理文件
+      var file_id = message_json.ID
+      var blob = DriveApp.getFileById(file_id).getBlob();
+
+      //處理caption
+      caption = message_json.userName + '\n'
+      if (ALL.massage_time) {
+        caption += get_time_txt(message_json.timestamp, GMT)
+      }
+
+      sendAudio(chat_id, blob, notification, caption)
+      //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
+      //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
+      upMessageData(i, col, ed)
+    } else if (message_json.type == "location") {
+      var latitude = message_json.latitude
+      var longitude = message_json.longitude
+      sendLocation(chat_id, latitude, longitude, notification)
+      var text = ct["is_from"]["text"].format(message_json.userName)
+      if (ALL.massage_time) {
+        t = get_time_txt(message_json.timestamp, GMT)
+        text += "\n" + t
+      }
+      if (message_json.address) {
+        text = message_json.address + '\n' + text
+      }
+      sendtext(chat_id, text);
+      //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
+      //"address":"260台灣宜蘭縣宜蘭市舊城西路107號", <-沒事，這不是我家:P
+      //"latitude":24.759711,"longitude":121.750114}
+      upMessageData(i, col, ed)
+    } else if (message_json.type == "video") {
+      var url = message_json.DURL
+      var caption = ct["is_from"]["text"].format(message_json.userName)
+      if (ALL.massage_time) {
+        t = get_time_txt(message_json.timestamp, GMT)
+        caption += "\n" + t
+      }
+      sendVoice(chat_id, url, notification, caption)
+      //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
+      //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
+      upMessageData(i, col, ed)
+    } else if (message_json.type == "file") {
+      //處理文件
+      var file_id = message_json.ID
+      var blob = DriveApp.getFileById(file_id).getBlob();
+      //處理caption
+      caption = message_json.userName + '\n'
+      if (ALL.massage_time) {
+        caption += get_time_txt(message_json.timestamp, GMT)
+      }
+      //發送
+      sendDocument(chat_id, blob, notification, caption)
+      upMessageData(i, col, ed)
+    }
+  }
+  //讀取房間的 Amount 歸零
+  ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
+  var r = JSON.stringify(ALL);
+  doc.setText(r); //寫入
+  SheetM.getRange(1, col).setValue("[0,0]")
+
+  sendtext(chat_id, ct["read_massage_ed"]);
+  // ^ =======讀取完畢=======
+  return true
 }
 //=================================================================================
 function start(payload) {
