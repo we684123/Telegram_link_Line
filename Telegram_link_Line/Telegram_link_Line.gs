@@ -92,6 +92,7 @@ function doPost(e) {
   var download_folder_name = '檔案放置區'
   var G_drive_Durl = 'https://drive.google.com/uc?export=download&id='
   var G_drive_Durl_ex = 'https://drive.google.com/uc?export=download&confirm=YzWC&id='
+  var rt_max_chats = 14
 
   /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -240,7 +241,12 @@ function doPost(e) {
           try {
             if (estringa.message.reply_to_message) {
               var rt = estringa.message.reply_to_message.text
-              var rt_text = rt_text_reduce(rt)
+              var index = rt.search(ct['reduce_seach_chat']['text'])
+              if (index) {
+                // 處理回覆的字數限制問題(需要跟著名子字數走)
+                var rt_max_chats = rt_max_chats + parseInt(index)
+              }
+              var rt_text = rt_text_reduce(rt, rt_max_chats)
               var rt_date = estringa.message.reply_to_message.date
               var date = get_time_txt(rt_date * 1000, GMT)
               text = ct["For_this_reply"]["text"].format(rt_text, date, Stext);
@@ -2685,10 +2691,10 @@ function entities_conversion(text, entities, ct) { //用來處理格式化的網
   return text + ct["entities_conversion_ALL"]['text'].format(assemble_text, assemble_link)
 }
 //=================================================================================
-function rt_text_reduce(text) {
-  var max_chat = 14
+function rt_text_reduce(text, rt_max_chats) {
+  var max_chat = rt_max_chats
   if (text.length > max_chat) {
-    text = text.nslice(max_chat)[0]
+    text = text.nslice(max_chat)[0] + '...'
   }
   return text
 }

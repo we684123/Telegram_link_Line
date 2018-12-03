@@ -26,9 +26,15 @@ function language() {
       },
       "For_this_reply": {
         "type": "to_Line",
-        "text": "{0}...\n{1}\n████針對回復████\n{2}",
+        "text": "{0}\n{1}\n████針對回復████\n{2}",
         // {0} = 要回覆的文字內容 , {1} = 時間日期
         // {2} = 回覆的文字內容
+      },
+      "reduce_seach_chat": {
+        "type": "to_Telegram(only_text)",
+        "text": "：\n",
+        // 用來搜尋名子的位置(回覆時會用到)
+        // (可能組合有 "：\n" ":\n" "\n")
       },
       "sendPhoto_ed": {
         "type": "to_Telegram",
