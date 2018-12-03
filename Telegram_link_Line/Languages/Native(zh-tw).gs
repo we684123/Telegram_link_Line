@@ -708,6 +708,12 @@ function language() {
         // {0} = google drive 檔案下載的連結 , {1} = 檔案名稱
         // {2} = 檔案大小(單位bit) , {3} = 檔案大小(單位MB)
       },
+      "not_read_all_ed":{
+        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": '因原房間中還有留言，故要先傾倒於此，請等等再重發一次您的"內容"\n(如果是隨機碼就不用了)\n\n傾倒開始!', // 自定義文字內容
+        "notification": false,  //不通知? true or false
+        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+      },
     }
   }
   /*
