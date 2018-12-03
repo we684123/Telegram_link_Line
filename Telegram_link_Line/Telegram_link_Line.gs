@@ -425,7 +425,7 @@ function doPost(e) {
           var OName = ALL.opposite.Name
           var FM = ALL.FastMatch[OName]
           // 確認符號
-          if (ALL.FastMatch['status'] == 已升級房間2) {
+          if (ALL.FastMatch['status'] == '已升級房間2') {
             var symbol = "⭐️"
           } else if (ALL.FastMatch['Notice']) {
             var symbol = "✅"
