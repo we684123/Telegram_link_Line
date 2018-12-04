@@ -1,5 +1,5 @@
 function up_version() {
-  // 每次進行程式版本更新時，若有提到要要執行這個 function 請照做一次
+  // 每次進行程式版本更新時，若有提到要執行這個 function 請照做一次
 
   // 以下為了簡化程式複雜度(不想一直try_error)，故先行檢查、修復ALL物件的完整性
   var base_json = base();
@@ -32,7 +32,7 @@ function up_version() {
     clear_folders(Folder); // 清目標資料夾下所有資料夾
     clear_files(Folder); // 清目標資料夾下所有檔案
     var Description = "{'version': 3.2}"
-    // 下面2個註解提醒一下自己之後要完美支援貼圖，希望下次改版能成啦!
+    // 下面2個註解提醒一下自己之後要完美支援貼圖，希望之後改版能成啦!
     //create_Folder(Folder, 'Telegram_貼圖', Description)
     //create_Folder(Folder, 'Line_貼圖', Description)
     create_Folder(Folder, '檔案放置區', Description)
@@ -93,7 +93,7 @@ function doPost(e) {
   var download_folder_name = '檔案放置區'
   var G_drive_Durl = 'https://drive.google.com/uc?export=download&id='
   var G_drive_Durl_ex = 'https://drive.google.com/uc?export=download&confirm=YzWC&id='
-  var rt_max_chats = 14
+  var rt_max_chats = 14 //對Line回復時應許的字元數
   var notification = false
 
   /*/ debug用
@@ -110,12 +110,13 @@ function doPost(e) {
   try {
     var ALL = JSON.parse(f);
   } catch (d) {
+    console.log(f) //還是要來看到底怎樣會出事，雖然救的回來就是了。
     var Dlen = f.search('}{"');
     var ff = f.substring(0, Dlen + 1)
     var r = ff;
     doc.setText(r); //寫入
     var ALL = JSON.parse(f);
-  } //NU$ WTF???! v3.1反而會崩，需要log來監控狀況
+  }
 
   //以下正式開始================================================================
   if (estringa.update_id) { //利用兩方json不同來判別
@@ -162,19 +163,20 @@ function doPost(e) {
           ALL.data[n]["Bind_groud_chat_id"] = chat_id
           ALL.data[n]["Bind_groud_chat_title"] = chat_title
           ALL.data[n]["Bind_groud_chat_type"] = chat_type
-          ALL.data[n].status = "已升級房間2" //NU$ #1(連鎖) 可以做出"已升級房間2(未設定完全)"的狀態來處理是否要 1.更換群組照片(須為貫=管理員) 2.傾倒留言
+          ALL.data[n].status = "已升級房間2"
           ALL.data[n]["Display_name"] = false
           ALL.FastMatch3[chat_id] = n //快速存取3寫入
 
           //下面收拾善後
           delete ALL.data[n]["Binding_number"]
           delete ALL['TG_temporary_docking'][chat_id]
-          ALL['wait_to_Bind'] = {} //NU$ 這裡會有如果同時升級兩個會導致另一個失敗的問題?
+          //下面這行會有如果同時升級兩個會導致另一個失敗的問題\
+          //但想想應該不會有人一次升兩個...吧?
+          ALL['wait_to_Bind'] = {}
           ALL.mode = 0
           var REST_result = REST_keyboard(REST_FastMatch1and2and3(ALL)[1])
           ALL = REST_result[1]
-          var r = JSON.stringify(ALL);
-          doc.setText(r); //寫入
+          write_ALL(ALL, doc) //寫入
           text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
           keyboard_main(Telegram_id, text, ALL)
           // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
@@ -187,8 +189,7 @@ function doPost(e) {
             if (j) {
               ALL.data[n]['Amount'] = 0
             }
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
           }
 
           lock.releaseLock();
@@ -197,8 +198,7 @@ function doPost(e) {
           if (ALL['TG_temporary_docking'][chat_id] == 3) { //容忍3句廢話(#
             delete ALL['TG_temporary_docking'][chat_id]
             TG_leaveChat(chat_id)
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
             lock.releaseLock();
             return 0;
           } else if (ALL['TG_temporary_docking'][chat_id] == undefined) {
@@ -208,16 +208,14 @@ function doPost(e) {
               return 0;
             }
             ALL['TG_temporary_docking'][chat_id] = 0
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
             sendtext(chat_id, ct['not_registered'])
             // ^ 您好!此群似乎還沒有與資料庫綁定，等主人綁定後我才能在此服務。...
             lock.releaseLock();
             return 0;
           } else { //還是等隨機碼驗證中...
             ALL['TG_temporary_docking'][chat_id] += 1
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
             lock.releaseLock();
             return 0;
           }
@@ -229,8 +227,7 @@ function doPost(e) {
           if (j) {
             ALL.data[number]['Amount'] = 0
           }
-          var r = JSON.stringify(ALL);
-          doc.setText(r); //寫入
+          write_ALL(ALL, doc) //寫入
           lock.releaseLock();
           return 0
         }
@@ -468,8 +465,7 @@ function doPost(e) {
           ALL.mode = 0
           //以下處理RoomKeyboard==================================================
           ALL = REST_keyboard(ALL)[1] //重新編排keyborad
-          var r = JSON.stringify(ALL);
-          doc.setText(r); //寫入
+          write_ALL(ALL, doc) //寫入
 
           //=====================================================================
           //var text = "🔖 重新命名完成~\n" + OName + " \n->\n " + Stext + "\n🔮 開啟主選單"
@@ -504,9 +500,7 @@ function doPost(e) {
         var a3 = y2[0]
         ALL = y2[1]
 
-        //寫入ALL
-        var r = JSON.stringify(ALL);
-        doc.setText(r); //重新寫入
+        write_ALL(ALL, doc) //寫入
 
         text = ct["delete_room_success"]['text'].format(a1, a2, a3)
         // ^ "Line_leave：{0}\nREST_keyboard：{1}\nREST_FastMatch1and2and3：{2}\n已刪除此聊天室"
@@ -519,8 +513,7 @@ function doPost(e) {
         var Binding_number = String(Random_text(12))
         ALL.data[FastMatch2_number]['Binding_number'] = Binding_number //有點多餘但可確保
         ALL['wait_to_Bind'][Binding_number] = FastMatch2_number
-        var r = JSON.stringify(ALL);
-        doc.setText(r); //寫入
+        write_ALL(ALL, doc) //寫入
         sendtext(chat_id, Binding_number)
         sendtext(chat_id, ct["plz_forward_verification_code"]);
         // ^ "請確認我在要綁定的群組中後，再轉發上方的驗證碼到那以進行綁定! \
@@ -531,8 +524,7 @@ function doPost(e) {
         if (Stext == "/unsetroom") {
           delete ALL.FastMatch2[ALL.opposite.RoomId].Binding_number
           ALL.mode = 0
-          var r = JSON.stringify(ALL);
-          doc.setText(r); //寫入
+          write_ALL(ALL, doc) //寫入
 
           sendtext(chat_id, ct["unsetroom_ed"]);
           // ^ "已取消設定bot"
@@ -562,9 +554,7 @@ function doPost(e) {
         ALL.data[number].status = "normal"
         ALL.mode = 0 //讓mode回復正常
         var REST_result = REST_keyboard(REST_FastMatch1and2and3(ALL)[1])
-
-        var r = JSON.stringify(REST_result[1]);
-        doc.setText(r); //寫入
+        write_ALL(REST_result[1], doc) //寫入
 
         keyboard_main(chat_id, ct["droproom_success"]["text"].format(
           JSON.stringify(ALL.data[number])), ALL)
@@ -681,16 +671,14 @@ function doPost(e) {
           case ct['🔃 重新整理']["text"]:
             if (ALL.mode != 0) {
               ALL.mode = 0
-              var r = JSON.stringify(ALL);
-              doc.setText(r); //寫入
+              write_ALL(ALL, doc) //寫入
             }
             keyboard_main(chat_id, ct["🔮 開啟主選單"], ALL)
             break;
           case ct['🔙 返回大廳']["text"]:
             if (ALL.mode != 0) {
               ALL.mode = 0
-              var r = JSON.stringify(ALL);
-              doc.setText(r); //寫入
+              write_ALL(ALL, doc) //寫入
             }
             var keyboard = ALL.RoomKeyboard;
             var resize_keyboard = true
@@ -722,15 +710,13 @@ function doPost(e) {
             break;
           case ct['🚀 發送訊息']["text"]:
             ALL.mode = "🚀 發送訊息"
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
             ReplyKeyboardRemove(chat_id, ct["sendtext_to_XXX"]["text"].format(ALL.opposite.Name))
             // ^  "將對 {0} 發送訊息\n如欲離開請輸入 /exit \n請輸入訊息："
             break;
           case '/exit':
             ALL.mode = 0
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
             keyboard_main(chat_id, ct["exit_room_ed"], ALL)
             // ^ "======已停止對話!======"
             break;
@@ -746,15 +732,13 @@ function doPost(e) {
           case ct['🔖 重新命名']["text"]:
             var OName = ALL.opposite.Name
             ALL.mode = "🔖 重新命名"
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
             ReplyKeyboardRemove(chat_id, ct["rename_room_text"]['text'].format(OName))
             // ^ "將對 {0} 重新命名!!!\n如要取消命名請按 /main 取消\n請輸入新名子："
             break;
           case ct['🔥 刪除房間']["text"]:
             ALL.mode = "🔥 刪除房間"
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
             sendtext(chat_id, ct["sure_delete_room?"]["text"].format(ALL.opposite.Name));
             // ^ 你確定要刪除 {0} 嗎?\n若是請按一下 /delete\n若沒按下則不會刪除!!!"
             break;
@@ -768,8 +752,7 @@ function doPost(e) {
             ALL.FastMatch = y;
             ALL.opposite.Name = u;
             ALL = REST_keyboard(ALL)[1] //重新編排keyborad
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
             sendtext(chat_id, ct["enabled_notification_ed"]["text"].format(OName));
             // ^ "已開啟 {0} 的通知"
             //以下處理RoomKeyboard==================================================
@@ -785,8 +768,7 @@ function doPost(e) {
             ALL.FastMatch = y;
             ALL.opposite.Name = u;
             ALL = REST_keyboard(ALL)[1] //重新編排keyborad
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
             sendtext(chat_id, ct["disabled_notification_ed"]["text"].format(OName));
             // ^ "已暫停 {0} 的通知"
             //以下處理RoomKeyboard==================================================
@@ -813,13 +795,11 @@ function doPost(e) {
                 return 0
               }
               ALL.ctrl_bot_id = ctrl_bot_id
-              var r = JSON.stringify(ALL);
-              doc.setText(r); //寫入
+              write_ALL(ALL, doc) //寫入
             }
 
             ALL.mode = "⭐ 升級房間"
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
 
             sendtext(chat_id, ct["uproom_Introduction"]);
             // ^ "⭐ 升級房間功能介紹：\n升級房間後，以後來自該對象(Line)的訊息
@@ -830,8 +810,7 @@ function doPost(e) {
             break;
           case ct['💫 降級房間']["text"]:
             ALL.mode = "💫 降級房間"
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
 
             sendtext(chat_id, ct["droproom_sure?"]["text"].format(ALL.opposite.Name));
             // ^ "您確定要降級 {0} 嗎?\n若是請按一下 /droproom \n若沒按下則不會降級!!!"
@@ -841,8 +820,7 @@ function doPost(e) {
             var FM = ALL.FastMatch[OName]
             ALL.data[FM].Display_name = true;
             ALL.mode = 0
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
             var keyboard = [
               [{
                 'text': ct['💫 降級房間']["text"]
@@ -863,8 +841,7 @@ function doPost(e) {
             var FM = ALL.FastMatch[OName]
             ALL.data[FM].Display_name = false;
             ALL.mode = 0
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
             var keyboard = [
               [{
                 'text': ct['💫 降級房間']["text"]
@@ -922,8 +899,7 @@ function doPost(e) {
               var istrue = true
             }
             if (istrue) {
-              var r = JSON.stringify(ALL);
-              doc.setText(r); //寫入
+              write_ALL(ALL, doc) //寫入
             }
             text = ct["more_setting_status"]['text'].format(
               ALL['keyword_notice'], ALL['massage_time'], ALL['GMT'])
@@ -934,8 +910,7 @@ function doPost(e) {
             break;
           case ct['⏰ 訊息時間啟用?']["text"]:
             ALL.mode = "⏰ 訊息時間啟用?"
-            var r = JSON.stringify(ALL);
-            doc.setText(r); //寫入
+            write_ALL(ALL, doc) //寫入
 
             var massage_time_q_keyboard = [
               [{
@@ -953,8 +928,7 @@ function doPost(e) {
           case ct["🔑 設定關鍵字提醒"]["text"]:
             if (ALL.keyword_notice == undefined) { //這一次啟動時的重製
               ALL.keyword_notice = false
-              var r = JSON.stringify(ALL);
-              doc.setText(r); //寫入
+              write_ALL(ALL, doc) //寫入
               sendtext(chat_id, ct["first_use_keyword_text"]);
               // ^ 提醒您，如要啟用關鍵字提醒，請記得按下方按鈕開啟！\n預設為'關閉提醒'"
             }
@@ -1085,8 +1059,7 @@ function doPost(e) {
               }
               ALL.opposite.RoomId = ORoomId;
               ALL.opposite.Name = OName;
-              var r = JSON.stringify(ALL);
-              doc.setText(r); //寫入
+              write_ALL(ALL, doc) //寫入
               var Notice = ALL.data[FM].Notice
 
               text = ct["select_room_text"]["text"].format(OName, OAmount, Notice, ODisplay_name, Ostatus)
@@ -1459,8 +1432,7 @@ function doPost(e) {
           SheetM.getRange(1, col).setValue(JSON.stringify(LastRowM)) //更新數量
           //以下處理doc==========================================================
           ALL.data[col - 1].Amount = ALL.data[col - 1].Amount + 1 //!!!!!!!!!!!!!!!!!!!!!!
-          var r = JSON.stringify(ALL);
-          doc.setText(r); //寫入
+          write_ALL(ALL, doc) //寫入
           //以下處理通知=========================================================
           var Notice = ALL.data[col - 1].Notice //通知 true or false
           if (Notice) {
@@ -1540,8 +1512,7 @@ function doPost(e) {
         //以下處理RoomKeyboard====================================================
         ALL = REST_keyboard(ALL)[1]
         //以下處理doc(寫入訊息)====================================================
-        var r = JSON.stringify(ALL);
-        doc.setText(r); //寫入
+        write_ALL(ALL, doc) //寫入
         //以下通知有新的ID進來=====================================================
         text = "已有新ID登入!!! id =\n" + U + "\n請盡快重新命名。"
         sendtext(chat_id, text);
@@ -1623,8 +1594,7 @@ function mv_all_uproom() {
     delete ALL.TG_bot_updateID_array
   } catch (e) {}
 
-  var r = JSON.stringify(ALL);
-  doc.setText(r); //寫入
+  write_ALL(ALL, doc) //寫入
 
 }
 //=================================================================================
@@ -2461,13 +2431,12 @@ function AllRead() {
   Sheet.clear();
   Sheet.appendRow(row1)
 
-  var r = JSON.stringify(ALL);
-  doc.setText(r); //寫入
+  write_ALL(ALL, doc) //寫入
 }
 //=================================================================================
 function write_ALL(ALL, doc) {
   try {
-    var r = JSON.stringify(ALL);
+    var r = JSON.stringify(ALL); //別刪，這是源頭啦!!!
     doc.setText(r); //寫入
   } catch (e) {
     return e
@@ -2697,8 +2666,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
   }
   //讀取房間的 Amount 歸零
   ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
-  var r = JSON.stringify(ALL);
-  doc.setText(r); //寫入
+  write_ALL(ALL, doc) //寫入
   SheetM.getRange(1, col).setValue("[0,0]")
 
   sendtext(chat_id, ct["read_massage_ed"]);
