@@ -115,7 +115,7 @@ function doPost(e) {
     var ff = f.substring(0, Dlen + 1)
     var r = ff;
     doc.setText(r); //寫入
-    var ALL = JSON.parse(f);
+    var ALL = JSON.parse(r);
   }
 
   //以下正式開始================================================================
@@ -1247,7 +1247,7 @@ function doPost(e) {
   } else if (estringa.events[0].timestamp) {
     //以下來自line
     var from = 'line';
-    // 下行防止再開啟第二次SpreadSheet
+    // 下行預先開啟SpreadSheet
     var SpreadSheet = Log(ee, from, sheet_key, email); //log
 
     for (var ev = 0; ev < estringa.events.length; ev++) {
@@ -1276,11 +1276,11 @@ function doPost(e) {
           var g = cutSource.roomId
         }
         if (cutSource.type == "user") {
-          var userName = getUserName(u); //如果有則用
+          var userName = Get_profile(u)['displayName']; //如果有則用
         } else if (cutSource.type == "room") {
-          var userName = newGetUserName(u, 'room', g);
+          var userName = new_Get_profile(u, 'room', g)['displayName'];
         } else {
-          var userName = newGetUserName(u, 'group', g);
+          var userName = new_Get_profile(u, 'group', g)['displayName'];
         }
       }
 
@@ -1288,7 +1288,7 @@ function doPost(e) {
         userName = "";
       var cutM = estringa.events[ev].message; //好長 看的我都花了 縮減個
 
-      if (!cutM) { //專門寫給 line_bot_leave 的
+      if (!cutM) { //專門寫給非 message 事件的
         cutM = {}
         cutM.id = 0
         cutM.type = estringa.events[ev].type
@@ -1311,8 +1311,14 @@ function doPost(e) {
       } else if (cutM.type == "sticker") { //貼圖
         message_json.stickerId = cutM.stickerId
         message_json.packageId = cutM.packageId
-      } else if (cutM.type == "leave") {
+      } else if (cutM.type == "leave") { //有想過Join要不要用，後來想想算了，沒差。
         message_json.text = ct['line_bot_leave']['text']
+      } else if (cutM.type == "memberLeft") {
+        message_json.left = estringa.events[ev]['left']
+        message_json['room_type'] = cutSource['type']
+      } else if (cutM.type == "memberJoined") {
+        message_json.joined = estringa.events[ev]['joined']
+        message_json['room_type'] = cutSource['type']
       } else {
         // 以下需要下載
         // 先開資料夾
@@ -1417,6 +1423,40 @@ function doPost(e) {
               sendDocument(chat_id, blob, notification, caption)
             } else if (message_json.type == "leave") {
               sendtext(chat_id, ct['line_bot_leave']);
+            } else if (cutM.type == "memberJoined") {
+              //新人加入啦
+              var cutL = message_json['left']['members']
+              var members_data_text = ''
+              for (var i = 0; i < cutL.length; i++) {
+                try {
+                  var j = Get_profile(u)
+                  members_data_text +=
+                    String('[{0}]({1})、').format(j['displayName'], j['pictureUrl'])
+                } catch (e) {
+                  var j = new_Get_profile(cutL[i]['userId'], 'room', g)
+                  members_data_text +=
+                    String('[{0}]({1})').format(j['displayName'], j['pictureUrl'])
+                }
+              }
+              sendtext(ct['memberJoined']['text'].format(members_data_text))
+
+            } else if (cutM.type == "memberLeft") {
+              //有人離開啦
+              var cutL = message_json['left']['members']
+              var members_data_text = ''
+              for (var i = 0; i < cutL.length; i++) {
+                try {
+                  var j = Get_profile(u)
+                  members_data_text +=
+                    String('[{0}]({1})、').format(j['displayName'], j['pictureUrl'])
+                } catch (e) {
+                  var j = new_Get_profile(cutL[i]['userId'], 'room', g)
+                  members_data_text +=
+                    String('[{0}]({1})').format(j['displayName'], j['pictureUrl'])
+                }
+              }
+              sendtext(ct['memberLeft']['text'].format(members_data_text))
+
             }
           } catch (e) {
             sendtext(Telegram_id, ct["send_to_TG_error"]['text'].format(e));
@@ -1599,7 +1639,7 @@ function mv_all_uproom() {
 
 }
 //=================================================================================
-function getUserName(userId) {
+function Get_profile(userId) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
   var header = {
@@ -1611,15 +1651,15 @@ function getUserName(userId) {
     'method': 'get'
   }
   try {
-    var profile = JSON.parse(UrlFetchApp.fetch("https://api.line.me/v2/bot/profile/" + userId, options))
-    var userName = profile.displayName
+    var profile = JSON.parse(
+      UrlFetchApp.fetch("https://api.line.me/v2/bot/profile/" + userId, options))
   } catch (r) {
-    var userName = "未知姓名"
+    var profile = "未知姓名"
   }
-  return userName
+  return profile
 }
 //=================================================================================
-function newGetUserName(userId, rq_mode, groupId) {
+function new_Get_profile(userId, rq_mode, groupId) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
   var header = {
@@ -1631,14 +1671,13 @@ function newGetUserName(userId, rq_mode, groupId) {
     'method': 'get'
   }
   try {
-    var profile = UrlFetchApp.fetch("https://api.line.me/v2/bot/" + rq_mode + "/" + groupId + "/member/" + userId, options)
+    var url = 'https://api.line.me/v2/bot/{0}/{1}/member/{2}'.format(rq_mode, groupId, userId)
+    var profile = UrlFetchApp.fetch(url, options)
     profile = JSON.parse(profile)
-    var userName = profile.displayName
   } catch (r) {
-    var userName = "未知姓名"
+    var profile = "未知姓名"
   }
-
-  return userName
+  return profile
 }
 //=================================================================================
 function TG_Send_text_To_Line(Line_id, text) {
@@ -1698,7 +1737,6 @@ function TG_Send_Photo_To_Line(Line_id, photo_id) {
 }
 //=================================================================================
 function TG_Send_video_To_Line(Line_id, video_id) {
-  //為什麼就跟錄音跟影片要原本的TG_token?? 是說不用原本的就是TG出bug了吧?
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
   var Telegram_bot_key = base_json.Telegram_bot_key

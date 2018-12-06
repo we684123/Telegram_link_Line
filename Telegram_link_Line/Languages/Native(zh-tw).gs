@@ -744,6 +744,20 @@ function language() {
         "notification": false,  //不通知? true or false
         "parse_mode":"Markdown"  //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "memberJoined":{
+        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "有新人加入\n{0}", // 自定義文字內容
+        "notification": false,  //不通知? true or false
+        "parse_mode":"Markdown"  //送出文字模式 "HTML" or "Markdown" or ""
+        // {0} = "[新人姓名](大頭貼)" 的陣列
+      },
+      "memberLeft":{
+        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "有人離開啦\n{0}", // 自定義文字內容
+        "notification": false,  //不通知? true or false
+        "parse_mode":"Markdown"  //送出文字模式 "HTML" or "Markdown" or ""
+        // {0} = "[新人姓名](大頭貼)" 的陣列
+      },
     }
   }
   /*
