@@ -5,8 +5,10 @@ function up_version() {
   var base_json = base();
   var FolderId = base_json.FolderId
   var doc_key = base_json.doc_key
+  var Telegram_id = base_json.Telegram_id
   var doc = DocumentApp.openById(doc_key)
   var ALL = JSON.parse(doc.getText());
+  var ct = language()["correspond_text"]
 
 
   // 下面是 V3.1 所需
@@ -42,6 +44,16 @@ function up_version() {
     }
     ALL = up_room_start(ALL) // 將房間已升級的符號改變成星星
     ALL['code_version'] = 3.2
+    // /debug
+    ALL.mode = 0
+    ALL.wait_to_Bind = {}
+    var xfjhxgfh = REST_FastMatch1and2and3(ALL); //強制等待，不知道為什麼有時候不會執行
+    var ydjdyf = REST_keyboard(xfjhxgfh[1]); //強制等待，不知道為什麼有時候不會執行
+    var r = JSON.stringify(ydjdyf[1]);
+    doc.setText(r); //寫入
+    sendtext(Telegram_id, ct["debug_ed"]["text"].format(xfjhxgfh[0], ydjdyf[0]));
+    // 🔮 開啟主選單
+    keyboard_main(Telegram_id, ct["🔮 開啟主選單"], ydjdyf[1])
   }
 
   // 寫入ALL
