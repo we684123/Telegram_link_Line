@@ -1425,39 +1425,43 @@ function doPost(e) {
               sendtext(chat_id, ct['line_bot_leave']);
             } else if (cutM.type == "memberJoined") {
               //新人加入啦
-              var cutL = message_json['left']['members']
+              var cutL = message_json['joined']['members']
               var members_data_text = ''
               for (var i = 0; i < cutL.length; i++) {
                 try {
-                  var j = Get_profile(u)
+                  var j = Get_profile(cutL[i]['userId'])
                   members_data_text +=
-                    String('[{0}]({1})、').format(j['displayName'], j['pictureUrl'])
+                    String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
                 } catch (e) {
                   var j = new_Get_profile(cutL[i]['userId'], 'room', g)
                   members_data_text +=
-                    String('[{0}]({1})').format(j['displayName'], j['pictureUrl'])
+                    String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
                 }
               }
-              sendtext(ct['memberJoined']['text'].format(members_data_text))
-
+              ct['memberJoined']['text'] = ct['memberJoined']['text'].format(members_data_text)
+              sendtext(chat_id, ct['memberJoined'])
+              // ^ "有新人加入\n{0}"
             } else if (cutM.type == "memberLeft") {
               //有人離開啦
               var cutL = message_json['left']['members']
               var members_data_text = ''
               for (var i = 0; i < cutL.length; i++) {
                 try {
-                  var j = Get_profile(u)
+                  var j = Get_profile(cutL[i]['userId'])
                   members_data_text +=
-                    String('[{0}]({1})、').format(j['displayName'], j['pictureUrl'])
+                    String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
                 } catch (e) {
                   var j = new_Get_profile(cutL[i]['userId'], 'room', g)
                   members_data_text +=
-                    String('[{0}]({1})').format(j['displayName'], j['pictureUrl'])
+                    String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
                 }
               }
-              sendtext(ct['memberLeft']['text'].format(members_data_text))
-
+              ct['memberLeft']['text'] = ct['memberLeft']['text'].format(members_data_text)
+              sendtext(chat_id, ct['memberLeft'])
+              // ^ "有人離開啦\n{0}"
             }
+            lock.releaseLock(); //釋放鎖
+            return 0;
           } catch (e) {
             sendtext(Telegram_id, ct["send_to_TG_error"]['text'].format(e));
             // ^ '傳送失敗...，原因如下\n\n{0}'
@@ -2722,6 +2726,7 @@ function start(payload) {
   }
 
   //*/  <- 只要刪除或增加最前面的"/"就能切換模式了喔(*´∀`)~♥
+  // throw new Error("強制停止!")
   return UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
   /*/  為了速度和穩定 不必要就算了
   var sheet_key = base_json.sheet_key
