@@ -51,8 +51,8 @@ function up_version() {
     // /debug
     ALL.mode = 0
     ALL.wait_to_Bind = {}
-    var xfjhxgfh = REST_FastMatch1and2and3(ALL); //強制等待，不知道為什麼有時候不會執行
-    var ydjdyf = REST_keyboard(xfjhxgfh[1]); //強制等待，不知道為什麼有時候不會執行
+    var xfjhxgfh = REST_FastMatch1and2and3(ALL);
+    var ydjdyf = REST_keyboard(xfjhxgfh[1]);
     var r = JSON.stringify(ydjdyf[1]);
     doc.setText(r); //寫入
     sendtext(Telegram_id, ct["debug_ed"]["text"].format(xfjhxgfh[0], ydjdyf[0]));
@@ -334,7 +334,7 @@ function doPost(e) {
           // ^ "(影片已發送!)"
         } else if (estringa.message.sticker) {
           var file_id = estringa.message.sticker.file_id
-          TG_Send_Photo_To_Line(Line_id, file_id)
+          TG_Send_Sticker_To_Line(Line_id, file_id)
           if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
             TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
             // ^ "來自: {0}"
@@ -1175,7 +1175,7 @@ function doPost(e) {
       if (mode == "🚀 發送訊息") {
         var file_id = estringa.message.sticker.file_id
         var Line_id = ALL.opposite.RoomId;
-        TG_Send_Photo_To_Line(Line_id, file_id)
+        TG_Send_Sticker_To_Line(Line_id, file_id)
         sendtext(chat_id, ct["sendSticker_ed"]);
         // ^ "(貼圖已發送!)"
       } else {
@@ -1878,7 +1878,7 @@ function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_addres
 function TG_Send_Sticker_To_Line(Line_id, sticker_id) { //舊款function 先留著
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-  var G = TGdownloadURL(getpath(photo_id))
+  var G = TGdownloadURL(getpath(sticker_id))
 
   var url = 'https://api.line.me/v2/bot/message/push';
   //--------------------------------------------------
