@@ -30,6 +30,10 @@ function up_version() {
     ALL['code_version'] = 3.1
   }
   if (ALL['code_version'] < 3.2) {
+  var ctv = language()["match_version"]
+    if (ctv != 3.2) {
+      throw new Error("請更新 language 文件再重來!")
+    }
     var Folder = DriveApp.getFolderById(FolderId);
     clear_folders(Folder); // 清目標資料夾下所有資料夾
     clear_files(Folder); // 清目標資料夾下所有檔案
