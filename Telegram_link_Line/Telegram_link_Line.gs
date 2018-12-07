@@ -301,7 +301,10 @@ function doPost(e) {
           var p = estringa.message.photo
           var max = p.length - 1; //挑品質最好的 //NU$ 須注意照片大小以免傳送失敗
           var photo_id = p[max].file_id
-          TG_Send_Photo_To_Line(Line_id, photo_id)
+          var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
+          var gfid = downloadFromTG(Telegram_bot_key, photo_id, fileName, Folder)
+          var Durl = G_drive_Durl + gfid
+          TG_Send_Photo_To_Line(Line_id, photo_id, Durl)
           if (ALL.data[n]["Display_name"]) {
             TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
           }
@@ -313,8 +316,9 @@ function doPost(e) {
           // ^ "(圖片已發送!)"
         } else if (estringa.message.video) {
           //以下選擇telegram video並發到line
-          var video_id = estringa.message.video.file_id
-          TG_Send_video_To_Line(Line_id, video_id)
+          var file_id = estringa.message.video.file_id
+          var thumb_id = estringa.message.video.thumb.file_id
+          TG_Send_video_To_Line(Line_id, file_id, thumb_id)
           if (ALL.data[n]["Display_name"]) {
             TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
           }
@@ -376,8 +380,8 @@ function doPost(e) {
           }
         } else if (estringa.message.animation) {
           var file_id = estringa.message.animation.file_id
-          var duration = estringa.message.animation.duration
-          TG_Send_video_To_Line(Line_id, file_id)
+          var thumb_id = estringa.message.animation.thumb.file_id
+          TG_Send_video_To_Line(Line_id, file_id, thumb_id)
           if (ALL.data[n]["Display_name"]) {
             TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
           }
@@ -1134,7 +1138,11 @@ function doPost(e) {
 
         var photo_id = p[max].file_id
         var Line_id = ALL.opposite.RoomId;
-        TG_Send_Photo_To_Line(Line_id, photo_id)
+        var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
+        var gfid = downloadFromTG(Telegram_bot_key, photo_id, fileName, Folder)
+        var Durl = G_drive_Durl + gfid
+        TG_Send_Photo_To_Line(Line_id, photo_id, Durl)
+
         if (estringa.message.caption)
           TG_Send_text_To_Line(Line_id, estringa.message.caption)
         //如有簡介則一同發出
@@ -1147,9 +1155,10 @@ function doPost(e) {
     } else if (estringa.message.video) { //如果是影片
       if (mode == "🚀 發送訊息") {
         //以下選擇telegram video並發到line
-        var video_id = estringa.message.video.file_id
         var Line_id = ALL.opposite.RoomId;
-        TG_Send_video_To_Line(Line_id, video_id)
+        var video_id = estringa.message.video.file_id
+        var thumb_id = estringa.message.video.thumb.file_id
+        TG_Send_video_To_Line(Line_id, video_id, thumb_id)
         if (estringa.message.caption)
           TG_Send_text_To_Line(Line_id, estringa.message.caption)
         sendtext(chat_id, ct["sendVideo_ed"]);
@@ -1219,9 +1228,11 @@ function doPost(e) {
       }
     } else if (estringa.message.animation) {
       if (mode == "🚀 發送訊息") {
+        //var duration = estringa.message.animation.duration
+        var Line_id = ALL.opposite.RoomId;
         var file_id = estringa.message.animation.file_id
-        var duration = estringa.message.animation.duration
-        TG_Send_video_To_Line(Line_id, file_id)
+        var thumb_id = estringa.message.animation.thumb.file_id
+        TG_Send_video_To_Line(Line_id, file_id, thumb_id)
         sendtext(chat_id, ct["sendGIF_ed"]);
         // ^ "(GIF已發送!)"
       } else {
@@ -1723,17 +1734,18 @@ function TG_Send_text_To_Line(Line_id, text) {
   UrlFetchApp.fetch(url, options);
 }
 //=================================================================================
-function TG_Send_Photo_To_Line(Line_id, photo_id) {
+function TG_Send_Photo_To_Line(Line_id, photo_id, G_drive_Durl) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-  var G = TGdownloadURL(getpath(photo_id))
 
+  var G1 = G_drive_Durl
+  var G2 = TGdownloadURL(getpath(photo_id))
   var url = 'https://api.line.me/v2/bot/message/push';
   //--------------------------------------------------
   var retMsg = [{
     "type": "image",
-    "originalContentUrl": G,
-    "previewImageUrl": G
+    "originalContentUrl": G1,
+    "previewImageUrl": G2
   }];
   var header = {
     'Content-Type': 'application/json; charset=UTF-8',
@@ -1752,18 +1764,19 @@ function TG_Send_Photo_To_Line(Line_id, photo_id) {
   UrlFetchApp.fetch(url, options);
 }
 //=================================================================================
-function TG_Send_video_To_Line(Line_id, video_id) {
+function TG_Send_video_To_Line(Line_id, video_id, thumb_id) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
   var Telegram_bot_key = base_json.Telegram_bot_key
-  var G = TGdownloadURL(getpath(video_id, Telegram_bot_key), Telegram_bot_key)
 
+  var G1 = TGdownloadURL(getpath(video_id, Telegram_bot_key), Telegram_bot_key)
+  var G2 = TGdownloadURL(getpath(thumb_id, Telegram_bot_key), Telegram_bot_key)
   var url = 'https://api.line.me/v2/bot/message/push';
   //--------------------------------------------------
   var retMsg = [{
     "type": "video",
-    "originalContentUrl": G,
-    "previewImageUrl": G
+    "originalContentUrl": G1,
+    "previewImageUrl": G2
   }];
   var header = {
     'Content-Type': 'application/json; charset=UTF-8',
@@ -2109,9 +2122,9 @@ function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
  * @param  {type} Folder           塞入哪個資料夾
  * @return {type}                  新檔案的googel_id
  */
-function downloadFromTG(Telegram_bot_key, Id, fileName, Folder) {
+function downloadFromTG(Telegram_bot_key, tg_file_id, fileName, Folder) {
   var K = Telegram_bot_key
-  var url = TGdownloadURL(getpath(Id, K), K)
+  var url = TGdownloadURL(getpath(tg_file_id, K), K)
   var blob = UrlFetchApp.fetch(url);
   var f = Folder.createFile(blob).setName(fileName)
   return f.getId()
