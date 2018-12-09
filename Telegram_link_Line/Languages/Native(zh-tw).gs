@@ -8,7 +8,7 @@ function language() {
     "correspond_text": {
       "backed_up_ing": {
         "type": "to_Telegram",
-        "text": "已備份舊資料，更新doc資料庫中...",
+        "text": "已備份舊資料，更新doc資料庫中...\n#doc",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
