@@ -1534,8 +1534,6 @@ function doPost(e) {
               sendtext(chat_id, ct['memberLeft'])
               // ^ "有人離開啦\n{0}"
             }
-            lock.releaseLock(); //釋放鎖
-            return 0;
           } catch (e) {
             sendtext(Telegram_id, ct["send_to_TG_error"]['text'].format(e));
             // ^ '傳送失敗...，原因如下\n\n{0}'
