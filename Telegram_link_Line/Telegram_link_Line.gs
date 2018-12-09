@@ -384,13 +384,27 @@ function doPost(e) {
         } else if (estringa.message.location) {
           var latitude = estringa.message.location.latitude
           var longitude = estringa.message.location.longitude
-          var key = ""
-          var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=" + key + "&language=zh-tw"
-          var t = UrlFetchApp.fetch(url)
-          var t2 = JSON.parse(t)
-          var t3 = JSON.stringify(t2.results)
-          var t4 = JSON.parse(t3) //這麼多t我也很無奈...
-          var formatted_address = t4[0]["formatted_address"]
+
+          /* api掛了qwq
+          try {
+            var key = ""
+            var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=" + key + "&language=zh-tw"
+            var t = UrlFetchApp.fetch(url)
+            var t2 = JSON.parse(t)
+            var t3 = JSON.stringify(t2.results)
+            var t4 = JSON.parse(t3) //這麼多t我也很無奈...
+            var formatted_address = t4[0]["formatted_address"]
+          } catch (e) {
+            var formatted_address = '未知地點'
+          }
+          */
+          try {
+            var response = Maps.newGeocoder().setLanguage('zh-TW').reverseGeocode(latitude, longitude);
+            var formatted_address = response.results[0]['formatted_address']
+          } catch (e) {
+            var formatted_address = '未知地點'
+          }
+
           //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
           TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
           if (ALL.data[n]["Display_name"]) {
