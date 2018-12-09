@@ -30,7 +30,7 @@ function up_version() {
     ALL['code_version'] = 3.1
   }
   if (ALL['code_version'] < 3.2) {
-  var ctv = language()["match_version"]
+    var ctv = language()["match_version"]
     if (ctv != 3.2) {
       throw new Error("請更新 language 文件再重來!")
     }
@@ -332,6 +332,20 @@ function doPost(e) {
           }
           sendtext(chat_id, ct["sendVideo_ed"]);
           // ^ "(影片已發送!)"
+        } else if (estringa.message.video_note) {
+          //以下選擇telegram video並發到line
+          var file_id = estringa.message.video_note.file_id
+          var thumb_id = estringa.message.video_note.thumb.file_id
+          TG_Send_video_To_Line(Line_id, file_id, thumb_id)
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+          }
+          if (estringa.message.caption) { //如有簡介則一同發出
+            var text = by_name + estringa.message.caption
+            TG_Send_text_To_Line(Line_id, text)
+          }
+          sendtext(chat_id, ct["sendVideo_ed"]);
+          // ^ "(影片已發送!)"
         } else if (estringa.message.sticker) {
           var file_id = estringa.message.sticker.file_id
           TG_Send_Sticker_To_Line(Line_id, file_id)
@@ -344,7 +358,7 @@ function doPost(e) {
         } else if (estringa.message.audio) {
           var duration = estringa.message.audio.duration
           var audio_id = estringa.message.audio.file_id
-          TG_Send_audio_To_Line(Line_id, audio_id, duration)
+          TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
           if (ALL.data[n]["Display_name"]) {
             TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
           }
@@ -357,7 +371,7 @@ function doPost(e) {
         } else if (estringa.message.voice) {
           var duration = estringa.message.voice.duration
           var audio_id = estringa.message.voice.file_id
-          TG_Send_audio_To_Line(Line_id, audio_id, duration)
+          TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
           if (ALL.data[n]["Display_name"]) {
             TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
           }
@@ -1171,6 +1185,21 @@ function doPost(e) {
         sendtext(chat_id, ct["incorrect_operation"]);
         // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
       }
+    } else if (estringa.message.video_note) { //如果是影片
+      if (mode == "🚀 發送訊息") {
+        //以下選擇telegram video並發到line
+        var Line_id = ALL.opposite.RoomId;
+        var video_id = estringa.message.video_note.file_id
+        var thumb_id = estringa.message.video_note.thumb.file_id
+        TG_Send_video_To_Line(Line_id, video_id, thumb_id)
+        if (estringa.message.caption)
+          TG_Send_text_To_Line(Line_id, estringa.message.caption)
+        sendtext(chat_id, ct["sendVideo_ed"]);
+        // ^ "(影片已發送!)"
+      } else {
+        sendtext(chat_id, ct["incorrect_operation"]);
+        // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+      }
     } else if (estringa.message.sticker) { //如果是貼圖
       if (mode == "🚀 發送訊息") {
         var file_id = estringa.message.sticker.file_id
@@ -1186,7 +1215,7 @@ function doPost(e) {
       if (mode == "🚀 發送訊息") {
         var duration = estringa.message.audio.duration
         var audio_id = estringa.message.audio.file_id
-        TG_Send_audio_To_Line(Line_id, audio_id, duration)
+        TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
         if (estringa.message.caption)
           TG_Send_text_To_Line(Line_id, estringa.message.caption)
         sendtext(chat_id, ct["sendAudio_ed"]);
@@ -1199,7 +1228,7 @@ function doPost(e) {
       if (mode == "🚀 發送訊息") {
         var duration = estringa.message.voice.duration
         var audio_id = estringa.message.voice.file_id
-        TG_Send_audio_To_Line(Line_id, audio_id, duration)
+        TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
         if (estringa.message.caption)
           TG_Send_text_To_Line(Line_id, estringa.message.caption)
         sendtext(chat_id, ct["sendVoice_ed"]);
@@ -1804,6 +1833,9 @@ function TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key) {
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
   var G = TGdownloadURL(getpath(audio_id, Telegram_bot_key), Telegram_bot_key)
 
+  if (duration <= 0) {
+    duration = 0.1
+  }
   var url = 'https://api.line.me/v2/bot/message/push';
   //--------------------------------------------------
   var retMsg = [{
