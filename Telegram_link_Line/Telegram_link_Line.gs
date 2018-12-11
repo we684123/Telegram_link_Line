@@ -1476,7 +1476,14 @@ function doPost(e) {
               var caption = ct["is_from"]["text"].format(message_json.userName)
               var send_ed = sendtext(chat_id, ct["sendVideo_ing"])
               // ^ (正在傳送影片，請稍後...)
-              sendVoice(chat_id, url, notification, caption)
+              try {
+                sendVideo(chat_id, url, notification, caption)
+              } catch (e) {
+                var file_id = message_json.ID
+                var blob = DriveApp.getFileById(file_id).getBlob();
+                sendVideo(chat_id, blob, notification, caption)
+              }
+
 
               //刪除"正在傳送XXX" 整潔舒爽!
               deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
@@ -2250,6 +2257,20 @@ function sendAudio(chat_id, url_or_bolb, notification, caption, duration) {
   return start(payload);
 }
 //=================================================================
+function sendVideo(chat_id, url_or_bolb, notification, caption) {
+  if (notification == undefined)
+    notification = false
+  caption = caption || ""
+  var payload = {
+    "method": "sendVideo",
+    'chat_id': String(chat_id),
+    'video': url_or_bolb,
+    'disable_notification': notification,
+    'caption': caption
+  }
+  return start(payload);
+}
+//=================================================================
 function sendVoice(chat_id, url, notification, caption) {
   if (notification == undefined)
     notification = false
@@ -2763,7 +2784,13 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
         t = get_time_txt(message_json.timestamp, GMT)
         caption += "\n" + t
       }
-      sendVoice(chat_id, url, notification, caption)
+      try {
+        sendVideo(chat_id, url, notification, caption)
+      } catch (e) {
+        var file_id = message_json.ID
+        var blob = DriveApp.getFileById(file_id).getBlob();
+        sendVideo(chat_id, blob, notification, caption)
+      }
       //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
       //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
       upMessageData(i, col, ed)
