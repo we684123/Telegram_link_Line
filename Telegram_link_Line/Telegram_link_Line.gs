@@ -474,12 +474,36 @@ function doPost(e) {
     if (estringa.message.text) { //如果是文字訊息
       if (mode == "🚀 發送訊息" && Stext != "/exit") {
         //以下準備接收telegram資訊並發到line
+
+        // 檢查是否誤傳
         if (in_command(Stext) || Stext.substr(0, 2) == "/d") {
           sendtext(chat_id, ct["plz_exit_and_resend"]);
           // ^ "請先按下 /exit 離開後再下指令喔!"
           lock.releaseLock();
           return 0;
         }
+
+        // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
+        var rg = Stext.split("_")
+        if (rg[0] == '/tryget') {
+          // "/resend_video_fliename_123456789"
+          sendtext(chat_id, ct['get_command_ed'])
+          var line_flie_id = rg[1]
+          var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
+          var file_id = downloadFromLine(
+            CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line' , Folder)
+          if (file_id == false) {
+            sendtext(chat_id, ct['tryget_error'])
+            // ^ 目前依舊無法取得，請再等等qwq
+          } else {
+            var blob = DriveApp.getFileById(file_id).getBlob();
+            sendDocument(chat_id, blob)
+          }
+          lock.releaseLock();
+          return 0
+        }
+
+        
         try {
           if (estringa.message.reply_to_message.text) {
             var rt = estringa.message.reply_to_message.text
