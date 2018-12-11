@@ -425,7 +425,7 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "allRead_ing": {
+      "get_command_ed": {
         "type": "to_Telegram",
         "text": "已接收指令!\n處理中請稍後...",
         "notification": true, //不通知? true or false
@@ -757,6 +757,19 @@ function language() {
         "notification": false,  //不通知? true or false
         "parse_mode":"Markdown"  //送出文字模式 "HTML" or "Markdown" or ""
         // {0} = "[新人姓名](大頭貼)" 的陣列
+      },
+      "tryget_command":{
+        "type": "command(Telegram)",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "{3} 傳送了一個檔名為'{1}'的{0}\n但因為Line伺服器出狀況，暫無法傳送，請稍後用下列指令取得內容\n/tryget_{2}", // 自定義文字內容
+        // {0} = "檔案類型" , {1} = "檔名", {2} = "檔案line_id"
+        // {3} = "發送者姓名"
+        // "/tryget_{0}_{1}"請不要改，謝謝!
+      },
+      "tryget_error":{
+        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "目前依舊無法取得，請再等等qwq", // 自定義文字內容
+        "notification": false,  //不通知? true or false
+        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
       },
     }
   }
