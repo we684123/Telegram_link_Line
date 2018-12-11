@@ -760,10 +760,10 @@ function language() {
       },
       "tryget_command":{
         "type": "command(Telegram)",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-        "text": "{3} 傳送了一個檔名為'{1}'的{0}\n但因為Line伺服器出狀況，暫無法傳送，請稍後用下列指令取得內容\n/tryget_{2}", // 自定義文字內容
+        "text": "{3} 傳送了一個 {0}\n但因為Line伺服器出狀況，暫無法傳送，請稍後用下列指令取得內容\n/tryget_{2}", // 自定義文字內容
         // {0} = "檔案類型" , {1} = "檔名", {2} = "檔案line_id"
         // {3} = "發送者姓名"
-        // "/tryget_{0}_{1}"請不要改，謝謝!
+        // "/tryget_{2}" <- 請不要改，謝謝!
       },
       "tryget_error":{
         "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"

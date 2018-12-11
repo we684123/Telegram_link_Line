@@ -253,11 +253,10 @@ function doPost(e) {
         if (rg[0] == '/tryget') {
           // "/resend_video_fliename_123456789"
           sendtext(chat_id, ct['get_command_ed'])
-          var line_type = rg[1]
-          var line_flie_id = rg[2]
+          var line_flie_id = rg[1]
           var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
           var file_id = downloadFromLine(
-            CHANNEL_ACCESS_TOKEN, line_flie_id, '等Line處理的檔案' + line_type, Folder)
+            CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line' , Folder)
           if (file_id == false) {
             sendtext(chat_id, ct['tryget_error'])
             // ^ 目前依舊無法取得，請再等等qwq
@@ -1112,11 +1111,10 @@ function doPost(e) {
             if (rg[0] == '/tryget') {
               // "/resend_video_fliename_123456789"
               sendtext(chat_id, ct['get_command_ed'])
-              var line_type = rg[1]
-              var line_flie_id = rg[2]
+              var line_flie_id = rg[1]
               var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
               var file_id = downloadFromLine(
-                CHANNEL_ACCESS_TOKEN, line_flie_id, '等Line處理的檔案' + line_type, Folder)
+                CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line' , Folder)
               if (file_id == false) {
                 sendtext(chat_id, ct['tryget_error'])
                 // ^ 目前依舊無法取得，請再等等qwq
@@ -2767,9 +2765,11 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
 
     if (message_json.ID == false) { //擺這代表，讀取的部分要想
       var tryget_command = ct['tryget_command']['text'].format(
-        cutM.type, cutM.fileName, cutM.id, userName)
+        message_json.type, message_json.fileName, message_json.message_id,
+         message_json.userName)
       sendtext(chat_id, tryget_command)
-      continue; //跑下一輪以免其他的也失敗
+      upMessageData(i, col, ed)
+      continue; //直接跑下一輪
     }
 
     if (message_json.type == "text") {
