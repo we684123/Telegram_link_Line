@@ -2242,7 +2242,11 @@ function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
     console.log('Line server 出問題了!，或有意外的類型的post。');
     return false
   }
+
   var f = Folder.createFile(blob).setName(fileName)
+  if (fileName == 'wait_Line' || fileName == undefined) {
+    f.setName(f.getMimeType())
+  }
   return f.getId()
 }
 //=================================================================================
