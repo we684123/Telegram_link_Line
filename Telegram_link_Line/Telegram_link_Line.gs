@@ -2811,7 +2811,6 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       sendtext(chat_id, p);
       //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
       //"text":"51"}
-      upMessageData(i, col, ed)
     } else if (message_json.type == "image") {
       var url = message_json.DURL
       var caption = ct["is_from"]["text"].format(message_json.userName)
@@ -2827,7 +2826,6 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       //sendPhoto(url, notification)
       //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
       //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
-      upMessageData(i, col, ed)
     } else if (message_json.type == "sticker") {
       var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
       var caption = ct["is_from"]["text"].format(message_json.userName)
@@ -2839,7 +2837,6 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
       //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
       //"stickerId":"502","packageId":"2"}
-      upMessageData(i, col, ed)
     } else if (message_json.type == "audio") { //這裡看看能不能改
       //處理文件
       var file_id = message_json.ID
@@ -2857,7 +2854,6 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
       //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
       //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
-      upMessageData(i, col, ed)
     } else if (message_json.type == "location") {
       var latitude = message_json.latitude
       var longitude = message_json.longitude
@@ -2874,7 +2870,6 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
       //"address":"260台灣宜蘭縣宜蘭市舊城西路107號", <-沒事，這不是我家:P
       //"latitude":24.759711,"longitude":121.750114}
-      upMessageData(i, col, ed)
     } else if (message_json.type == "video") {
       var url = message_json.DURL
       var caption = ct["is_from"]["text"].format(message_json.userName)
@@ -2895,7 +2890,6 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
 
       //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
       //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
-      upMessageData(i, col, ed)
     } else if (message_json.type == "file") {
       //處理文件
       var file_id = message_json.ID
@@ -2911,13 +2905,10 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       sendDocument(chat_id, blob, notification, caption)
       //刪除"正在傳送XXX" 整潔舒爽!
       deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
-      upMessageData(i, col, ed)
     } else if (message_json.type == "leave") {
       sendtext(chat_id, ct['line_bot_leave']);
-      upMessageData(i, col, ed)
     } else if (message_json.type == "join") {
       sendtext(chat_id, ct['line_bot_join']);
-      upMessageData(i, col, ed)
     } else if (message_json.type == "memberJoined") {
       //新人加入啦
       var cutL = message_json['joined']['members']
@@ -2937,7 +2928,6 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       ct['memberJoined']['text'] = ct['memberJoined']['text'].format(members_data_text)
       sendtext(chat_id, ct['memberJoined'])
       // ^ "有新人加入\n{0}"
-      upMessageData(i, col, ed)
     } else if (message_json.type == "memberLeft") {
       //有人離開啦
       var cutL = message_json['lefted']['members']
@@ -2958,8 +2948,9 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       ct['memberLeft']['text'] = ct['memberLeft']['text'].format(members_data_text)
       sendtext(chat_id, ct['memberLeft'])
       // ^ "有人離開啦\n{0}"
-      upMessageData(i, col, ed)
     }
+    //最後再"推前"
+    upMessageData(i, col, ed)
   }
   //讀取房間的 Amount 歸零
   ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
