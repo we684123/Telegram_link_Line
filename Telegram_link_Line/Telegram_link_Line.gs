@@ -1458,7 +1458,8 @@ function doPost(e) {
       } else if (cutM.type == "Join") {
         message_json.text = ct['line_bot_join']['text'].format(cutSource.type)
       } else if (cutM.type == "memberLeft") {
-        message_json.lefted = estringa.events[ev]['lefted']
+        message_json.lefted = estringa.events[ev]['left']
+        // 對，是 left。不能改。Line為什麼不用lefted ......
       } else if (cutM.type == "memberJoined") {
         message_json.joined = estringa.events[ev]['joined']
       } else {
@@ -2915,6 +2916,46 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       upMessageData(i, col, ed)
     } else if (message_json.type == "join") {
       sendtext(chat_id, ct['line_bot_join']);
+      upMessageData(i, col, ed)
+    } else if (message_json.type == "memberJoined") {
+      //新人加入啦
+      var cutL = message_json['joined']['members']
+      var members_data_text = ''
+
+      for (var k = 0; k < cutL.length; k++) {
+        try {
+          var j = Get_profile(cutL[k]['userId'])
+          members_data_text +=
+            String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
+        } catch (e) {
+          var j = new_Get_profile(cutL[i]['userId'], 'room', g)
+          members_data_text +=
+            String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
+        }
+      }
+      ct['memberJoined']['text'] = ct['memberJoined']['text'].format(members_data_text)
+      sendtext(chat_id, ct['memberJoined'])
+      // ^ "有新人加入\n{0}"
+      upMessageData(i, col, ed)
+    } else if (message_json.type == "memberLeft") {
+      //有人離開啦
+      var cutL = message_json['lefted']['members']
+      var members_data_text = ''
+
+      for (var k = 0; k < cutL.length; k++) {
+        try {k
+          var j = Get_profile(cutL[k]['userId'])
+          members_data_text +=
+            String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
+        } catch (e) {
+          var j = new_Get_profile(cutL[i]['userId'], 'room', g)
+          members_data_text +=
+            String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
+        }
+      }
+      ct['memberLeft']['text'] = ct['memberLeft']['text'].format(members_data_text)
+      sendtext(chat_id, ct['memberLeft'])
+      // ^ "有人離開啦\n{0}"
       upMessageData(i, col, ed)
     }
   }
