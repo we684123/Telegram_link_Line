@@ -132,7 +132,7 @@
   * 具有應用程式存取的使用者 改成"任何人甚至匿名使用者" ->     
   * 確定(or更新)(註二) ->     
   * 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)     
-  * 將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)(用來備份整個doc)    
+  * 將 [CP()](https://t.me/TG_link_Line/23)，[設定計時器](https://t.me/TG_link_Line/24) 每6小時一次 (<-非必要，以防萬一用。)(用來備份整個doc)    
     [說明圖1](http://i.imgur.com/KGXuqhT.png)、[說明圖2](http://i.imgur.com/GWpqmYH.png)、[說明圖3](http://i.imgur.com/tP8HUgR.png)、[說明圖4](http://i.imgur.com/HHs9qOH.png)
   * **執行 up_version()，如[說明圖](https://imgur.com/ghcR90c)，很重要!(考試不會考:p**    
 
@@ -274,7 +274,7 @@ data = 存放房間資訊
 
 mode = 暫存指令(通常為0)
 
-Notice = 管理整體通知(但可能廢除)(未作用)
+Notice = 管理整體通知(確定廢除)(未作用)
 
 opposite = 暫存指令對象房間
 
@@ -284,7 +284,7 @@ Order = 預計用來做自動依時間排序房間(未作用)
 
 keyword = 關鍵字設定，出現關鍵字自動通知
 
-RoomKeyboard = 房間的keyboard，為節省重生時間而生
+RoomKeyboard = 房間的 keyboard，為節省重生時間而生
 
 FastMatch = 快速索引用
 
@@ -324,7 +324,7 @@ code_version =
    * 現在在 TG 中已能知道 Line 群人員加入、離開的狀況。
    * 現在在 TG 中已能知道 Line_bot 被踢除、加入的狀況。
    * 現在如果 "Line伺服器" 掛掉無法取得檔案，可用 /tryget_XXX 的方式重新取得。
-   * "(正在傳送XX，請稍後...)" 或其他 "告知類" 訊息再完成後會自動刪除。
+   * "(正在傳送XX，請稍後...)" 或其他 "告知類" 訊息在完成後會自動刪除。
    * 修復 一直傳同張照片的問題、附檔名錯亂的問題。
    * 修復 安卓、ios版Line app 無法查看照片的問題(分別測試於8.18.1、8.17.0)。
    * 修復 Line room type 為"room"時，Line群人名無法獲取的問題。
@@ -337,8 +337,8 @@ code_version =
 更新內容：
 1. Telegram_link_Line.gs 修改    
 2. Languages.gs 修改    
-3. 在gs中執行 up_version() 函式。
-4. **重部署**版本 (版本是 "新增" 謝謝)
+3. 在gs中**執行 up_version() 函式**。
+4. **重部署版本** (版本是 "新增" 謝謝)
 
   ##### 2018/10/06 -     
    * GIF、錄音 可從 Telegram 傳 Line。    
