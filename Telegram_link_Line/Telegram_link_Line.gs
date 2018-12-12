@@ -257,7 +257,7 @@ function doPost(e) {
             var line_flie_id = rg[1]
             var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
             var file_id = downloadFromLine(
-              CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line' , Folder)
+              CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line', Folder)
             if (file_id == false) {
               sendtext(chat_id, ct['tryget_error'])
               // ^ 目前依舊無法取得，請再等等qwq
@@ -268,7 +268,7 @@ function doPost(e) {
             lock.releaseLock();
             return 0
           }
-        } catch (e) { } 
+        } catch (e) {}
 
 
         // 下面才是正常的流程
@@ -474,6 +474,10 @@ function doPost(e) {
     }
     //============================================================================
     //以下是私人1對1的時候
+    //先定義好往Line的發送對象
+    var Line_id = ALL.opposite.RoomId;
+
+    //再針對不同的情況處理訊息
     if (estringa.message.text) { //如果是文字訊息
       if (mode == "🚀 發送訊息" && Stext != "/exit") {
         //以下準備接收telegram資訊並發到line
@@ -494,7 +498,7 @@ function doPost(e) {
           var line_flie_id = rg[1]
           var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
           var file_id = downloadFromLine(
-            CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line' , Folder)
+            CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line', Folder)
           if (file_id == false) {
             sendtext(chat_id, ct['tryget_error'])
             // ^ 目前依舊無法取得，請再等等qwq
@@ -526,7 +530,6 @@ function doPost(e) {
         } catch (e) {
           text = Stext;
         }
-        var Line_id = ALL.opposite.RoomId;
         TG_Send_text_To_Line(Line_id, text)
         lock.releaseLock();
         return 0;
@@ -1141,7 +1144,7 @@ function doPost(e) {
               var line_flie_id = rg[1]
               var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
               var file_id = downloadFromLine(
-                CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line' , Folder)
+                CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line', Folder)
               if (file_id == false) {
                 sendtext(chat_id, ct['tryget_error'])
                 // ^ 目前依舊無法取得，請再等等qwq
@@ -1240,7 +1243,6 @@ function doPost(e) {
         var max = p.length - 1;
 
         var photo_id = p[max].file_id
-        var Line_id = ALL.opposite.RoomId;
         var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
         var gfid = downloadFromTG(Telegram_bot_key, photo_id, fileName, Folder)
         var Durl = G_drive_Durl + gfid
@@ -1258,7 +1260,6 @@ function doPost(e) {
     } else if (estringa.message.video) { //如果是影片
       if (mode == "🚀 發送訊息") {
         //以下選擇telegram video並發到line
-        var Line_id = ALL.opposite.RoomId;
         var video_id = estringa.message.video.file_id
         var thumb_id = estringa.message.video.thumb.file_id
         TG_Send_video_To_Line(Line_id, video_id, thumb_id)
@@ -1273,7 +1274,6 @@ function doPost(e) {
     } else if (estringa.message.video_note) { //如果是影片
       if (mode == "🚀 發送訊息") {
         //以下選擇telegram video並發到line
-        var Line_id = ALL.opposite.RoomId;
         var video_id = estringa.message.video_note.file_id
         var thumb_id = estringa.message.video_note.thumb.file_id
         TG_Send_video_To_Line(Line_id, video_id, thumb_id)
@@ -1288,7 +1288,6 @@ function doPost(e) {
     } else if (estringa.message.sticker) { //如果是貼圖
       if (mode == "🚀 發送訊息") {
         var file_id = estringa.message.sticker.file_id
-        var Line_id = ALL.opposite.RoomId;
         TG_Send_Sticker_To_Line(Line_id, file_id)
         sendtext(chat_id, ct["sendSticker_ed"]);
         // ^ "(貼圖已發送!)"
@@ -1347,7 +1346,6 @@ function doPost(e) {
     } else if (estringa.message.animation) {
       if (mode == "🚀 發送訊息") {
         //var duration = estringa.message.animation.duration
-        var Line_id = ALL.opposite.RoomId;
         var file_id = estringa.message.animation.file_id
         var thumb_id = estringa.message.animation.thumb.file_id
         TG_Send_video_To_Line(Line_id, file_id, thumb_id)
@@ -1985,23 +1983,7 @@ function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_addres
     'muteHttpExceptions': true
   }
   //--------------------------------------------------
-  try {
-    var f = UrlFetchApp.fetch(url, options);
-    var e = f
-    var base_json = base()
-    var sheet_key = base_json.sheet_key
-    var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-    var SheetD = SpreadSheet.getSheetByName("Debug");
-    var LastRowD = SheetD.getLastRow();
-    SheetD.getRange(LastRowD + 1, 2).setValue(e);
-  } catch (e) {
-    var base_json = base()
-    var sheet_key = base_json.sheet_key
-    var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-    var SheetD = SpreadSheet.getSheetByName("Debug");
-    var LastRowD = SheetD.getLastRow();
-    SheetD.getRange(LastRowD + 1, 2).setValue(e);
-  }
+  UrlFetchApp.fetch(url, options);
 }
 //=================================================================================
 function TG_Send_Sticker_To_Line(Line_id, sticker_id) { //舊款function 先留著
@@ -2793,7 +2775,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
     if (message_json.ID == false) { //擺這代表，讀取的部分要想
       var tryget_command = ct['tryget_command']['text'].format(
         message_json.type, message_json.fileName, message_json.message_id,
-         message_json.userName)
+        message_json.userName)
       sendtext(chat_id, tryget_command)
       upMessageData(i, col, ed)
       continue; //直接跑下一輪
