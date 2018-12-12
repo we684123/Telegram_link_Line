@@ -134,7 +134,7 @@
   * 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)     
   * 將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)(用來備份整個doc)    
     [說明圖1](http://i.imgur.com/KGXuqhT.png)、[說明圖2](http://i.imgur.com/GWpqmYH.png)、[說明圖3](http://i.imgur.com/tP8HUgR.png)、[說明圖4](http://i.imgur.com/HHs9qOH.png)
-  * 執行 up_version()，如[說明圖](https://imgur.com/ghcR90c)。    
+  * **執行 up_version()，如[說明圖](https://imgur.com/ghcR90c)，很重要!(考試不會考:p**    
 
 ##### Telegram bot 需要新增四個指令：
 
@@ -266,7 +266,8 @@
       "massage_time": false,
       "TG_temporary_docking": {},
       "wait_to_Bind": {},
-      "GMT": "GMT+8"
+      "GMT": "GMT+8",
+      "code_version": 3.1
     }
 
 data = 存放房間資訊
@@ -306,6 +307,8 @@ wait_to_Bind =
 GMT =
 此預設 GMT+8 若不再該時區可自行調整(預計下一版會可以在TG端調整)
 
+code_version =     
+該程式的版本，用來驗證正確性。
 
 ---
 # 版本資訊
