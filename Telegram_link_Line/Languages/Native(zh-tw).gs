@@ -563,9 +563,21 @@ function language() {
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "sendAudio_ing": {
+        "type": "to_Telegram",
+        "text": "(正在傳送音檔，請稍後...)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "sendVideo_ing": {
         "type": "to_Telegram",
         "text": "(正在傳送影片，請稍後...)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "sendFile_ing": {
+        "type": "to_Telegram",
+        "text": "(正在傳送檔案，請稍後...)",
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -732,44 +744,50 @@ function language() {
         // {0} = google drive 檔案下載的連結 , {1} = 檔案名稱
         // {2} = 檔案大小(單位bit) , {3} = 檔案大小(單位MB)
       },
-      "not_read_all_ed":{
-        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+      "not_read_all_ed": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": '因原房間中還有留言，故要先傾倒於此，請等等再重發一次您的"內容"\n(如果是隨機碼就不用了)\n\n傾倒開始!', // 自定義文字內容
-        "notification": true,  //不通知? true or false
-        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "line_bot_leave":{
-        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+      "line_bot_join": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "`Line_bot 已加入此 {0}`", // 自定義文字內容
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "line_bot_leave": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "`QAQ Line_bot 被踢出去了\n你可以考慮刪掉此房間或把 Line_bot 加回來。`", // 自定義文字內容
-        "notification": false,  //不通知? true or false
-        "parse_mode":"Markdown"  //送出文字模式 "HTML" or "Markdown" or ""
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "memberJoined":{
-        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+      "memberJoined": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "有新人加入\n{0}", // 自定義文字內容
-        "notification": false,  //不通知? true or false
-        "parse_mode":"Markdown"  //送出文字模式 "HTML" or "Markdown" or ""
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
         // {0} = "[新人姓名](大頭貼)" 的陣列
       },
-      "memberLeft":{
-        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+      "memberLeft": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "有人離開啦\n{0}", // 自定義文字內容
-        "notification": false,  //不通知? true or false
-        "parse_mode":"Markdown"  //送出文字模式 "HTML" or "Markdown" or ""
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
         // {0} = "[新人姓名](大頭貼)" 的陣列
       },
-      "tryget_command":{
-        "type": "command(Telegram)",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+      "tryget_command": {
+        "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "{3} 傳送了一個 {0}\n但因為Line伺服器出狀況，暫無法傳送，請稍後用下列指令取得內容\n/tryget_{2}", // 自定義文字內容
         // {0} = "檔案類型" , {1} = "檔名", {2} = "檔案line_id"
         // {3} = "發送者姓名"
         // "/tryget_{2}" <- 請不要改，謝謝!
       },
-      "tryget_error":{
-        "type": "to_Telegram",   // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+      "tryget_error": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "目前依舊無法取得，請再等等qwq", // 自定義文字內容
-        "notification": false,  //不通知? true or false
-        "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
     }
   }

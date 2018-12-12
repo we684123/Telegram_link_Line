@@ -549,7 +549,7 @@ function doPost(e) {
           // 確認符號
           if (ALL.data[FM]['status'] == '已升級房間2') {
             var symbol = "⭐️"
-          } else if (ALL.FastMatch['Notice']) {
+          } else if (ALL.data[FM]['Notice']) {
             var symbol = "✅"
           } else {
             var symbol = "❎"
@@ -1438,7 +1438,8 @@ function doPost(e) {
         "type": "type",
         "message_id": cutM.id,
         "userName": userName,
-        "timestamp": parseInt(estringa.events[ev].timestamp)
+        "timestamp": parseInt(estringa.events[ev].timestamp),
+        "room_type": cutSource.type
       }
 
       // 以下處理資料，分不需要下載跟需要下載處理
@@ -1454,12 +1455,12 @@ function doPost(e) {
         message_json.packageId = cutM.packageId
       } else if (cutM.type == "leave") { //有想過Join要不要用，後來想想算了，沒差。
         message_json.text = ct['line_bot_leave']['text']
+      } else if (cutM.type == "Join") {
+        message_json.text = ct['line_bot_join']['text'].format(cutSource.type)
       } else if (cutM.type == "memberLeft") {
-        message_json.left = estringa.events[ev]['left']
-        message_json['room_type'] = cutSource['type']
+        message_json.lefted = estringa.events[ev]['lefted']
       } else if (cutM.type == "memberJoined") {
         message_json.joined = estringa.events[ev]['joined']
-        message_json['room_type'] = cutSource['type']
       } else {
         // 以下需要下載
         // 先開資料夾
@@ -1482,7 +1483,8 @@ function doPost(e) {
             //切換成綁訂房間的chat_id
             chat_id = ALL.data[ALL.FastMatch2[line_roomID]].Bind_groud_chat_id
           }
-          if (message_json.ID == false) { //擺這代表，讀取的部分要想
+          if (message_json.ID == false && message_json.type != "join") {
+            //預先處理掉不要的部分
             var tryget_command = ct['tryget_command']['text'].format(
               cutM.type, cutM.fileName, cutM.id, userName)
             sendtext(chat_id, tryget_command)
@@ -1523,6 +1525,8 @@ function doPost(e) {
               //處理文件
               var file_id = message_json.ID
               var blob = DriveApp.getFileById(file_id).getBlob();
+              var send_ed = sendtext(chat_id, ct["sendAudio_ing"])
+              // ^ (正在傳送音檔，請稍後...)
               //處理caption
               caption = message_json.userName + '\n'
               if (ALL.massage_time) {
@@ -1530,6 +1534,8 @@ function doPost(e) {
               }
 
               sendAudio(chat_id, blob, notification, caption)
+              //刪除"正在傳送XXX" 整潔舒爽!
+              deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
               //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9KakE5Q"}
             } else if (message_json.type == "location") {
@@ -1566,6 +1572,8 @@ function doPost(e) {
               //處理文件
               var file_id = message_json.ID
               var blob = DriveApp.getFileById(file_id).getBlob();
+              var send_ed = sendtext(chat_id, ct["sendFile_ing"])
+              // ^ (正在傳送檔案，請稍後...)
 
               //處理caption
               caption = message_json.userName + '\n'
@@ -1574,6 +1582,8 @@ function doPost(e) {
               }
 
               sendDocument(chat_id, blob, notification, caption)
+              //刪除"正在傳送XXX" 整潔舒爽!
+              deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
             } else if (message_json.type == "leave") {
               sendtext(chat_id, ct['line_bot_leave']);
             } else if (cutM.type == "memberJoined") {
@@ -1596,7 +1606,7 @@ function doPost(e) {
               // ^ "有新人加入\n{0}"
             } else if (cutM.type == "memberLeft") {
               //有人離開啦
-              var cutL = message_json['left']['members']
+              var cutL = message_json['lefted']['members']
               var members_data_text = ''
               for (var i = 0; i < cutL.length; i++) {
                 try {
@@ -1612,6 +1622,9 @@ function doPost(e) {
               ct['memberLeft']['text'] = ct['memberLeft']['text'].format(members_data_text)
               sendtext(chat_id, ct['memberLeft'])
               // ^ "有人離開啦\n{0}"
+            } else if (message_json.type == "join") {
+              ct['line_bot_join']['text'] = ct['line_bot_join']['text'].format(cutSource.type)
+              sendtext(chat_id, ct['line_bot_join']);
             }
           } catch (e) {
             sendtext(Telegram_id, ct["send_to_TG_error"]['text'].format(e));
@@ -1691,7 +1704,8 @@ function doPost(e) {
           "Name": (U + "✅"),
           "status": "normal",
           "Amount": 1,
-          "Notice": true
+          "Notice": true,
+          "line_room_type": cutSource.type
         }
         ALL.data.splice(data_len, 0, N)
         //以下處理FastMatch===================================
@@ -2225,7 +2239,7 @@ function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
   //--------------------------------------------------
   var blob = UrlFetchApp.fetch(url, options);
   if (blob.getResponseCode() != 200) {
-    console.log('Line server 出問題了!');
+    console.log('Line server 出問題了!，或有意外的類型的post。');
     return false
   }
   var f = Folder.createFile(blob).setName(fileName)
@@ -2772,7 +2786,8 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
     text = SheetM.getRange(i, col).getDisplayValue()
     var message_json = JSON.parse(text);
 
-    if (message_json.ID == false) { //擺這代表，讀取的部分要想
+    if (message_json.ID == false && message_json.type != "join") {
+      //預先處理掉不要的部分
       var tryget_command = ct['tryget_command']['text'].format(
         message_json.type, message_json.fileName, message_json.message_id,
         message_json.userName)
@@ -2798,7 +2813,11 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
         t = get_time_txt(message_json.timestamp, GMT)
         caption += "\n" + t
       }
+      var send_ed = sendtext(chat_id, ct["sendPhoto_ing"]);
+      // ^ (正在傳送圖片，請稍後...)
       sendPhoto(chat_id, url, notification, caption)
+      //刪除"正在傳送XXX" 整潔舒爽!
+      deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
       //sendPhoto(url, notification)
       //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
       //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
@@ -2819,7 +2838,8 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       //處理文件
       var file_id = message_json.ID
       var blob = DriveApp.getFileById(file_id).getBlob();
-
+      var send_ed = sendtext(chat_id, ct["sendAudio_ing"])
+      // ^ (正在傳送音檔，請稍後...)
       //處理caption
       caption = message_json.userName + '\n'
       if (ALL.massage_time) {
@@ -2827,6 +2847,8 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       }
 
       sendAudio(chat_id, blob, notification, caption)
+      //刪除"正在傳送XXX" 整潔舒爽!
+      deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
       //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
       //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
       upMessageData(i, col, ed)
@@ -2872,6 +2894,8 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       //處理文件
       var file_id = message_json.ID
       var blob = DriveApp.getFileById(file_id).getBlob();
+      var send_ed = sendtext(chat_id, ct["sendFile_ing"])
+      // ^ (正在傳送檔案，請稍後...)
       //處理caption
       caption = message_json.userName + '\n'
       if (ALL.massage_time) {
@@ -2879,9 +2903,14 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       }
       //發送
       sendDocument(chat_id, blob, notification, caption)
+      //刪除"正在傳送XXX" 整潔舒爽!
+      deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
       upMessageData(i, col, ed)
     } else if (message_json.type == "leave") {
       sendtext(chat_id, ct['line_bot_leave']);
+      upMessageData(i, col, ed)
+    } else if (message_json.type == "join") {
+      sendtext(chat_id, ct['line_bot_join']);
       upMessageData(i, col, ed)
     }
   }
