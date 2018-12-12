@@ -970,11 +970,12 @@ function doPost(e) {
           case '/Allread':
           case '/allRead':
           case '/allread':
-            sendtext(chat_id, ct["get_command_ed"]["text"]);
+            var send_ed = sendtext(chat_id, ct["get_command_ed"]["text"]);
             // ^ "已接收指令!"
             AllRead();
             sendtext(chat_id, ct["allRead_ed"]["text"]);
             // ^ "已全已讀"
+            deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
             break;
           case ct['🔧 更多設定']["text"]:
             var more_keyboard = [
@@ -1505,7 +1506,7 @@ function doPost(e) {
               sendPhoto(chat_id, url, notification, caption)
 
               //刪除"正在傳送XXX" 整潔舒爽!
-              deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
+              deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
 
               //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNskkLZktW"}
@@ -1517,7 +1518,7 @@ function doPost(e) {
               sendPhoto(chat_id, sticker_png_url, notification, caption)
 
               //刪除"正在傳送XXX" 整潔舒爽!
-              deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
+              deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
 
               //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
               //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
@@ -1536,7 +1537,7 @@ function doPost(e) {
 
               sendAudio(chat_id, blob, notification, caption)
               //刪除"正在傳送XXX" 整潔舒爽!
-              deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
+              deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
               //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9KakE5Q"}
             } else if (message_json.type == "location") {
@@ -1565,7 +1566,7 @@ function doPost(e) {
               }
 
               //刪除"正在傳送XXX" 整潔舒爽!
-              deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
+              deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
 
               //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1"}
@@ -1584,7 +1585,7 @@ function doPost(e) {
 
               sendDocument(chat_id, blob, notification, caption)
               //刪除"正在傳送XXX" 整潔舒爽!
-              deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
+              deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
             } else if (message_json.type == "leave") {
               sendtext(chat_id, ct['line_bot_leave']);
             } else if (cutM.type == "memberJoined") {
@@ -2822,7 +2823,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       // ^ (正在傳送圖片，請稍後...)
       sendPhoto(chat_id, url, notification, caption)
       //刪除"正在傳送XXX" 整潔舒爽!
-      deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
+      deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
       //sendPhoto(url, notification)
       //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
       //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
@@ -2853,7 +2854,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
 
       sendAudio(chat_id, blob, notification, caption)
       //刪除"正在傳送XXX" 整潔舒爽!
-      deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
+      deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
       //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
       //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
       upMessageData(i, col, ed)
@@ -2890,7 +2891,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
         sendVideo(chat_id, blob, notification, caption)
       }
       //刪除"正在傳送XXX" 整潔舒爽!
-      deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
+      deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
 
       //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
       //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
@@ -2909,7 +2910,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       //發送
       sendDocument(chat_id, blob, notification, caption)
       //刪除"正在傳送XXX" 整潔舒爽!
-      deleteMessage(chat_id, String(JSON.parse(send_ed)["result"]['message_id']))
+      deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
       upMessageData(i, col, ed)
     } else if (message_json.type == "leave") {
       sendtext(chat_id, ct['line_bot_leave']);
@@ -2943,7 +2944,8 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       var members_data_text = ''
 
       for (var k = 0; k < cutL.length; k++) {
-        try {k
+        try {
+          k
           var j = Get_profile(cutL[k]['userId'])
           members_data_text +=
             String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
