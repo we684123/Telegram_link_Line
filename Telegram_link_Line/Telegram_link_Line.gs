@@ -248,25 +248,28 @@ function doPost(e) {
           return 0
         }
 
-        // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
-        var rg = Stext.split("_")
-        if (rg[0] == '/tryget') {
-          // "/resend_video_fliename_123456789"
-          sendtext(chat_id, ct['get_command_ed'])
-          var line_flie_id = rg[1]
-          var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
-          var file_id = downloadFromLine(
-            CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line' , Folder)
-          if (file_id == false) {
-            sendtext(chat_id, ct['tryget_error'])
-            // ^ 目前依舊無法取得，請再等等qwq
-          } else {
-            var blob = DriveApp.getFileById(file_id).getBlob();
-            sendDocument(chat_id, blob)
+        try {
+          // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
+          var rg = Stext.split("_")
+          if (rg[0] == '/tryget') {
+            // "/resend_video_fliename_123456789"
+            sendtext(chat_id, ct['get_command_ed'])
+            var line_flie_id = rg[1]
+            var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
+            var file_id = downloadFromLine(
+              CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line' , Folder)
+            if (file_id == false) {
+              sendtext(chat_id, ct['tryget_error'])
+              // ^ 目前依舊無法取得，請再等等qwq
+            } else {
+              var blob = DriveApp.getFileById(file_id).getBlob();
+              sendDocument(chat_id, blob)
+            }
+            lock.releaseLock();
+            return 0
           }
-          lock.releaseLock();
-          return 0
-        }
+        } catch (e) { } 
+
 
         // 下面才是正常的流程
         var n = number
@@ -503,7 +506,7 @@ function doPost(e) {
           return 0
         }
 
-        
+
         try {
           if (estringa.message.reply_to_message.text) {
             var rt = estringa.message.reply_to_message.text
