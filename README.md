@@ -81,6 +81,8 @@
 鍵盤內容也可自訂    
 ![Imgur](https://imgur.com/bZnoT6P.png)    
 
+支援 粗體、斜體、連結
+![Imgur](https://imgur.com/w9PS2iL.png)
 ----
 
 
