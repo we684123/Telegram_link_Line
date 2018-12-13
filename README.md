@@ -342,7 +342,7 @@ code_version =
 更新內容：
 1. Telegram_link_Line.gs 修改    
 2. Languages.gs 修改    
-3. 在gs中**執行 up_version() 函式**。
+3. 在gs中[執行 up_version() 函式](https://imgur.com/ghcR90c)。
 4. **重部署版本** (版本是 "新增" 謝謝)
 
   ##### 2018/10/06 -     
