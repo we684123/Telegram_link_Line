@@ -512,7 +512,18 @@ function doPost(e) {
           return 0
         }
 
-
+        if (estringa.message['entities']) {
+          //處理 text 格式化字串連結
+          var entities = estringa.message['entities']
+          Stext = entities_conversion(Stext, entities, ct)
+        }
+        if (estringa.message['caption_entities']) {
+          //處理 caption 格式化字串連結
+          var entities = estringa.message['caption_entities']
+          var caption = estringa.message.caption
+          estringa.message.caption = entities_conversion(caption, entities, ct)
+        }
+        
         try {
           if (estringa.message.reply_to_message.text) {
             var rt = estringa.message.reply_to_message.text
