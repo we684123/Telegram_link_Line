@@ -2408,7 +2408,7 @@ function sendtext(chat_id, ct, reply_to_message_id) {
     if (notification == undefined || notification != true)
       var notification = false
     if (parse_mode == undefined)
-      var parse_mode = ""
+      var parse_mode = "Markdown"
   } catch (e) {
     var notification = false
     var parse_mode = ""
