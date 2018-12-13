@@ -254,6 +254,7 @@ function doPost(e) {
           if (rg[0] == '/tryget') {
             // "/resend_video_fliename_123456789"
             sendtext(chat_id, ct['get_command_ed'])
+            // ^ "已接收指令!\n處理中請稍後..."
             var line_flie_id = rg[1]
             var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
             var file_id = downloadFromLine(
@@ -495,6 +496,7 @@ function doPost(e) {
         if (rg[0] == '/tryget') {
           // "/resend_video_fliename_123456789"
           sendtext(chat_id, ct['get_command_ed'])
+          // ^ "已接收指令!\n處理中請稍後..."
           var line_flie_id = rg[1]
           var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
           var file_id = downloadFromLine(
@@ -763,6 +765,39 @@ function doPost(e) {
         write_ALL(ALL, doc)
         text = ct["set_GMT_ed"]['text'].format(Stext)
         keyboard_main(chat_id, text, ALL)
+        lock.releaseLock();
+        return 0;
+      } else if (mode == "🌋 丟棄舊檔" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+        sendtext(chat_id, ct['get_command_ed'])
+        // ^ "已接收指令!\n處理中請稍後..."
+        var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
+        switch (Stext) {
+          case ct['Trashed_10day']["text"]:
+            var result = clear_files_by_mode(Folder, 'time', 10)
+            break;
+          case ct['Trashed_30day']["text"]:
+            var result = clear_files_by_mode(Folder, 'time', 30)
+            break;
+          case ct['Trashed_ALL']["text"]:
+            var result = clear_files_by_mode(Folder, 'All')
+            break;
+          default:
+            sendtext(chat_id, ct['not_eat_this'])
+            // ^ "030...\n請不要給我吃怪怪的東西..."
+            lock.releaseLock();
+            return 0;
+        }
+        if (!result[0]) { //意外發生
+          var ey = '失敗\n' + result[1]
+        } else {
+          var ey = '成功'
+        }
+        ct['Trashed_result'] = ct['Trashed_result']['text'].format(ey)
+        ALL.mode = 0
+        write_ALL(ALL, doc)
+        keyboard_main(chat_id, ct['Trashed_result'], ALL)
+        lock.releaseLock();
+        return 0;
       } else {
         //以下指令分流
         switch (Stext) {
@@ -987,6 +1022,9 @@ function doPost(e) {
               [{
                 'text': ct["✈️ 設定GMT"]["text"]
               }, {
+                'text': ct["🌋 丟棄舊檔"]["text"]
+              }],
+              [{
                 'text': ct["🔙 返回大廳"]["text"]
               }]
             ]
@@ -1119,7 +1157,8 @@ function doPost(e) {
             ]
             var resize_keyboard = true
             var one_time_keyboard = false
-            ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
+            ReplyKeyboardMakeup(
+              chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
             break;
           case '/lookkeyword':
             text = ct["lookkeyword_result"]['text'].format(get_all_keyword(ALL))
@@ -1127,8 +1166,29 @@ function doPost(e) {
             break;
           case ct["✈️ 設定GMT"]["text"]:
             ALL.mode = "✈️ 設定GMT"
-            sendtext(chat_id, ct["set_GMT_ing_1"]['text']);
-            ReplyKeyboardRemove(chat_id, ct["set_GMT_ing_2"]['text']);
+            sendtext(chat_id, ct["set_GMT_ing_1"]);
+            ReplyKeyboardRemove(chat_id, ct["set_GMT_ing_2"]);
+            write_ALL(ALL, doc) //寫入
+            break;
+          case ct["🌋 丟棄舊檔"]["text"]:
+            ALL.mode = "🌋 丟棄舊檔"
+            text = ct["file_to_Trashed"]
+            var Trashed_keyboard = [
+              [{
+                'text': ct["Trashed_10day"]["text"]
+              }, {
+                'text': ct["Trashed_30day"]["text"]
+              }],
+              [{
+                'text': ct['Trashed_ALL']["text"]
+              }, {
+                'text': ct["🔙 返回大廳"]["text"]
+              }]
+            ]
+            var resize_keyboard = true
+            var one_time_keyboard = false
+            ReplyKeyboardMakeup(
+              chat_id, Trashed_keyboard, resize_keyboard, one_time_keyboard, text)
             write_ALL(ALL, doc) //寫入
             break;
             //-------------------------------------------------------------------
@@ -2196,6 +2256,59 @@ function clear_files(Description_Folder) {
 //=================================================================================
 
 /**
+ * clear_files_by_mode - 依模式、時間、來源清理檔案
+ *
+ * @param  {Folder} Description_Folder 目標資料夾
+ * @param  {String} mode               time、All、Line、Telegram
+ * @param  {Number} time               間隔時間(單位：天)
+ * @return {Array}                     結果
+ */
+function clear_files_by_mode(Description_Folder, mode, time) {
+
+  if (Description_Folder === void 0)
+    throw new Error("Description_Folder未給")
+  if (mode === void 0)
+    throw new Error("mode未給")
+
+  var files = Description_Folder.getFiles();
+  while (files.hasNext()) {
+    try {
+      var f = files.next()
+      var ft = f.getLastUpdated().getTime()
+      var fd = f.getDescription()
+      var d = new Date();
+      var difference = (d - ft) / 1000 / 60 / 60 / 24 //換算成"天"了
+
+      if (mode == 'time') {
+        if (time === void 0)
+          throw new Error("time未給")
+        if (difference > time) {
+          f.setTrashed(true);
+        } else if (time < 0) {
+          throw new Error("time給錯了")
+        }
+      } else if (mode == 'All') {
+        f.setTrashed(true);
+      } else if (mode == 'Line') {
+        if (fd == 'line') {
+          f.setTrashed(true);
+        }
+      } else if (mode == 'Telegram') {
+        if (fd == 'Telegram') {
+          f.setTrashed(true);
+        }
+      } else {
+        throw new Error("mode設定有誤!")
+      }
+    } catch (e) {
+      return [false, e]
+    }
+  }
+  return [true]
+}
+//=================================================================================
+
+/**
  * copy_file - 複製檔案到目標資料夾
  *
  * @param  {file} file               目標檔案
@@ -2281,6 +2394,10 @@ function get_time_txt(timestamp, GMT) {
 function sendtext(chat_id, ct, reply_to_message_id) {
   reply_to_message_id === void 0 ? reply_to_message_id : ''
 
+  if (chat_id === void 0)
+    throw new Error("chat_id未給")
+  if (ct === void 0)
+    throw new Error("ct未給")
   try {
     var notification = ct["notification"]
     var parse_mode = ct["parse_mode"]
@@ -2294,6 +2411,11 @@ function sendtext(chat_id, ct, reply_to_message_id) {
   }
   if (ct["text"] == undefined) {
     var text = String(ct)
+  } else if (typeof ct["text"] === 'object') {
+    var text = ''
+    ct["text"].forEach(function(element) {
+      text += element
+    });
   } else {
     var text = ct["text"]
   }
@@ -2437,6 +2559,10 @@ function TG_leaveChat(chat_id) {
 }
 //=================================================================
 function ReplyKeyboardRemove(chat_id, ct) {
+  if (chat_id === void 0)
+    throw new Error("chat_id未給")
+  if (ct === void 0)
+    throw new Error("ct未給")
   try {
     var notification = ct["notification"]
     var parse_mode = ct["parse_mode"]
@@ -2450,6 +2576,11 @@ function ReplyKeyboardRemove(chat_id, ct) {
   }
   if (ct["text"] == undefined) {
     var text = String(ct)
+  } else if (typeof ct["text"] === 'object') {
+    var text = ''
+    ct["text"].forEach(function(element) {
+      text += element
+    });
   } else {
     var text = ct["text"]
   }
@@ -2470,6 +2601,10 @@ function ReplyKeyboardRemove(chat_id, ct) {
 }
 //=================================================================================
 function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, ct) {
+  if (chat_id === void 0)
+    throw new Error("chat_id未給")
+  if (ct === void 0)
+    throw new Error("ct未給")
   try {
     var notification = ct["notification"]
     var parse_mode = ct["parse_mode"]
@@ -2483,6 +2618,11 @@ function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboa
   }
   if (ct["text"] == undefined) {
     var text = String(ct)
+  } else if (typeof ct["text"] === 'object') {
+    var text = ''
+    ct["text"].forEach(function(element) {
+      text += element
+    });
   } else {
     var text = ct["text"]
   }

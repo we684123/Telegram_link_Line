@@ -472,6 +472,40 @@ function language() {
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
         // {0} = 時區(+8、-1、+9...等)
       },
+      "🌋 丟棄舊檔": {
+        "type": "command(Telegram)",
+        "text": "🌋 丟棄舊檔"
+      },
+      "file_to_Trashed": {
+        "type": "to_Telegram",
+        "text": ['如果不是出問題或google drive滿了要清空間，請盡量不要用此指令\n\n',
+          '因為從TG中發送的任何檔案，在Line後台接收時都只是一個"連結到drive的link"',
+          '，因此一但刪了，Line的人便無法讀取你發的任何檔案。',
+          '\n\n此外，這裡的丟棄僅把檔案丟到"垃圾桶"，因此並不會騰出空間',
+          '，還需要你去google drive手動按下"清除垃圾桶"才會真正清空',
+          '\n如欲取消請按下 /main 回主選單。'
+        ],
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "Trashed_10day": {
+        "type": "command(Telegram)",
+        "text": '丟棄10天前全部'
+      },
+      "Trashed_30day": {
+        "type": "command(Telegram)",
+        "text": '丟棄30天前全部'
+      },
+      "Trashed_ALL": {
+        "type": "command(Telegram)",
+        "text": '丟棄全部'
+      },
+      "Trashed_result": {
+        "type": "to_Telegram",
+        "text": '丟棄結果：{0}', // {0} = "'失敗\n' + 原因" 或 "成功"
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "more_setting_status": {
         "type": "to_Telegram",
         "text": '設定狀態：\n● 關鍵字提醒：{0}\n● 訊息時間啟用： {1}\n● GMT時區：{2}',
