@@ -12,13 +12,13 @@
 | 功能 | V1 | V2 | V3 | V3.1 | V3.2 |     
 |-------|:----:|:-----:|:-----:|:-----:|:-----:|     
 | 文字      |  ✓  |    ✓        |   ✓  |   ✓  |  ✓  |    
-| 貼圖      |     |        | 僅Line發給TG |  ✓(註1) | ✓(註1)|    
+| 貼圖      |     |    | 僅Line發給TG |  ✓(註1) | ✓(註1)|    
 | 照片      |     | 僅TG發給Line |    ✓  |   ✓   |  ✓  |    
 | 影片      |     |              |   ✓  |   ✓  |  ✓  |    
-| 錄音      |     |              | 僅Line發給TG |   ✓  |  ✓  |    
+| 錄音      |     |      | 僅Line發給TG |   ✓  |  ✓  |    
 | 位置      |     |              |   ✓  |   ✓  |  ✓  |    
 | 檔案      |    |  | 僅Line發給TG | 僅Line發給TG |  ✓ |    
-| GIF       |     |             |    |  僅TG發給Line(註2)  | 僅TG發給Line(註2)  |    
+| GIF  |  | |  | 僅TG發給Line(註2) | 僅TG發給Line(註2)  |    
 |TG_video_note|   |            |      |      |  ✓  |
 | 知道誰發言 |     |    ✓       |   ✓  |  ✓  |  ✓  |    
 | 針對回復   |     |            |   ✓  |  ✓  |   ✓  |   
@@ -64,8 +64,11 @@
 其屬性及內容：
 
     "":{ //物件名稱
-      "type": "to_Telegram",     // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-      "text": "",   // 自定義文字內容 如有像 {0} 這種東西代表會有引入的文字 你也可以完全不引入
+      "type": "to_Telegram",     
+      //^ "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+      "text": "" or ['',''],   
+      //^ 自定義文字內容 如有像 {0} 這種東西代表會有引入的文字 你也可以完全不引入
+      //^ 如果形式是['','']則陣列內的內容會自動串接成一字串。
       "notification": false,  //不通知? true or false
       "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
     },
@@ -339,6 +342,9 @@ code_version =
    * 修復 特殊情況下要轉傳2次驗證碼才能綁訂房間的問題。
    * 提升bot檔案檢索速度。
    * 指令效果變更! /allread 現在不會把檔案丟到垃圾桶。
+   如要丟棄檔案起至 "🔧 更多設定 / 🌋 丟棄舊檔" 。
+   * ct['xxx']['text']的內容現在可以為 ['String','String']，系統會串接起來。
+
 
 **這次更新前一樣先 CP() 過後再用 /allread 在更新較不會有意外發生。**    
 
