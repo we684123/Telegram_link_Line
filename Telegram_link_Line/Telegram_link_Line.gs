@@ -410,21 +410,9 @@ function doPost(e) {
           var latitude = estringa.message.location.latitude
           var longitude = estringa.message.location.longitude
 
-          /* api掛了qwq
           try {
-            var key = ""
-            var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=" + key + "&language=zh-tw"
-            var t = UrlFetchApp.fetch(url)
-            var t2 = JSON.parse(t)
-            var t3 = JSON.stringify(t2.results)
-            var t4 = JSON.parse(t3) //這麼多t我也很無奈...
-            var formatted_address = t4[0]["formatted_address"]
-          } catch (e) {
-            var formatted_address = '未知地點'
-          }
-          */
-          try {
-            var response = Maps.newGeocoder().setLanguage('zh-TW').reverseGeocode(latitude, longitude);
+            var response = Maps.newGeocoder().setLanguage(
+              'zh-TW').reverseGeocode(latitude, longitude);
             var formatted_address = response.results[0]['formatted_address']
           } catch (e) {
             var formatted_address = '未知地點'
@@ -893,7 +881,8 @@ function doPost(e) {
             ALL.data[FM].Notice = true;
             var u = ALL.data[FM].Name.replace("❎", "✅");
             ALL.data[FM].Name = u;
-            var y = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace(OName, OName.slice(0, OName.length - 1) + "✅"));
+            var y = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace(
+              OName, OName.slice(0, OName.length - 1) + "✅"));
             ALL.FastMatch = y;
             ALL.opposite.Name = u;
             ALL = REST_keyboard(ALL)[1] //重新編排keyborad
@@ -909,7 +898,8 @@ function doPost(e) {
             ALL.data[FM].Notice = false
             var u = ALL.data[FM].Name.replace("✅", "❎");
             ALL.data[FM].Name = u;
-            var y = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace(OName, OName.slice(0, OName.length - 1) + "❎"));
+            var y = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace(
+              OName, OName.slice(0, OName.length - 1) + "❎"));
             ALL.FastMatch = y;
             ALL.opposite.Name = u;
             ALL = REST_keyboard(ALL)[1] //重新編排keyborad
@@ -932,7 +922,8 @@ function doPost(e) {
                 "method": "post",
                 "payload": payload
               }
-              var ans = UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
+              var ans = UrlFetchApp.fetch(
+                "https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
               var ans_json = JSON.parse(ans)
               var ctrl_bot_id = ans_json['result'].from.id
               if (ctrl_bot_id == undefined) {
@@ -1072,7 +1063,8 @@ function doPost(e) {
             // ^  "請選擇開啟或關閉"
             var resize_keyboard = true
             var one_time_keyboard = false
-            ReplyKeyboardMakeup(chat_id, massage_time_q_keyboard, resize_keyboard, one_time_keyboard, text)
+            ReplyKeyboardMakeup(
+              chat_id, massage_time_q_keyboard, resize_keyboard, one_time_keyboard, text)
             break;
           case ct["🔑 設定關鍵字提醒"]["text"]:
             if (ALL.keyword_notice == undefined) { //這一次啟動時的重製
@@ -1115,12 +1107,14 @@ function doPost(e) {
             var all_word = get_all_keyword(ALL)
             var resize_keyboard = true
             var one_time_keyboard = false
-            ReplyKeyboardMakeup(chat_id, keyword_keyboard, resize_keyboard, one_time_keyboard, all_word)
+            ReplyKeyboardMakeup(
+              chat_id, keyword_keyboard, resize_keyboard, one_time_keyboard, all_word)
             break;
           case ct['📎 新增關鍵字']["text"]:
             ALL.mode = "📎 新增關鍵字"
             ReplyKeyboardRemove(chat_id, ct["add_keyword_ing"])
-            // ^ "請輸入欲新增關鍵字\n新增多組關鍵字請用 ',' 或 '，' 號隔開\n如欲離開請按 /main"
+            // ^ "請輸入欲新增關鍵字\n新增多組關鍵字請用 ',' 或 '，' 號隔開
+            // \n如欲離開請按 /main"
             write_ALL(ALL, doc)
             break;
           case ct['♻ 移除關鍵字']["text"]:
@@ -1254,7 +1248,8 @@ function doPost(e) {
               write_ALL(ALL, doc) //寫入
               var Notice = ALL.data[FM].Notice
 
-              text = ct["select_room_text"]["text"].format(OName, OAmount, Notice, ODisplay_name, Ostatus)
+              text = ct["select_room_text"]["text"].format(
+                OName, OAmount, Notice, ODisplay_name, Ostatus)
               // ^ "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?"
               var keyboard = [
                 [{
@@ -1398,16 +1393,12 @@ function doPost(e) {
       if (mode == "🚀 發送訊息") {
         var latitude = estringa.message.location.latitude
         var longitude = estringa.message.location.longitude
-        var key = ""
-        var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=" + key + "&language=zh-tw"
-        var t = UrlFetchApp.fetch(url)
-        var t2 = JSON.parse(t)
-        var t3 = JSON.stringify(t2.results)
-        var t4 = JSON.parse(t3) //這麼多t我也很無奈...
         try {
-          var formatted_address = t4[0]["formatted_address"]
+          var response = Maps.newGeocoder().setLanguage(
+            'zh-TW').reverseGeocode(latitude, longitude);
+          var formatted_address = response.results[0]['formatted_address']
         } catch (e) {
-          var formatted_address = ct["not_find_location_name"]["text"]
+          var formatted_address = '未知地點'
         }
         //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
         TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
@@ -1433,7 +1424,6 @@ function doPost(e) {
         var fileName = estringa.message.document.file_name
         var file_size = parseInt(estringa.message.document.file_size)
         var file_size_MB = (file_size / 1024 / 1024).toFixed(3)
-
 
         var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
         var gfid = downloadFromTG(Telegram_bot_key, fileId, fileName, Folder)
@@ -1551,7 +1541,8 @@ function doPost(e) {
       var chat_id = Telegram_id
       //================================================================
       if (ALL.FastMatch2[line_roomID] != undefined) { //以下處理已登記的
-        if (ALL.data[ALL.FastMatch2[line_roomID]].status == "已升級房間2" || (ALL.mode == "🚀 發送訊息" && line_roomID == ALL.opposite.RoomId)) {
+        if (ALL.data[ALL.FastMatch2[line_roomID]].status == "已升級房間2" || (
+            ALL.mode == "🚀 發送訊息" && line_roomID == ALL.opposite.RoomId)) {
           if (ALL.data[ALL.FastMatch2[line_roomID]].status == "已升級房間2") {
             //切換成綁訂房間的chat_id
             chat_id = ALL.data[ALL.FastMatch2[line_roomID]].Bind_groud_chat_id
@@ -1582,7 +1573,8 @@ function doPost(e) {
               //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNskkLZktW"}
             } else if (message_json.type == "sticker") {
-              var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
+              var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" +
+                message_json.stickerId + "/android/sticker.png;compress=true"
               var caption = ct["is_from"]["text"].format(message_json.userName)
               var send_ed = sendtext(chat_id, ct["sendSticker_ing"])
               // ^ (正在傳送貼圖，請稍後...)
@@ -1591,7 +1583,8 @@ function doPost(e) {
               //刪除"正在傳送XXX" 整潔舒爽!
               deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
 
-              //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
+              //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753
+              // /android/sticker.png;compress=true
               //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
               //"stickerId":"502","packageId":"2"}
             } else if (message_json.type == "audio") {
@@ -2753,7 +2746,9 @@ function REST_FastMatch1and2and3(ALL) { //重製快速索引
 
 //=================================================================================
 //喔乾，感謝 Kevin Tseng 開源這個用法
-//來源: https://kevintsengtw.blogspot.com/2011/09/javascript-stringformat.html?showComment=1536387871696#c7569907085658128584
+//來源:
+// https://kevintsengtw.blogspot.com/2011/09/javascript-stringformat.html?
+// showComment=1536387871696#c7569907085658128584
 //可在Javascript中使用如同C#中的string.format (對jQuery String的擴充方法)
 //使用方式 : var fullName = 'Hello. My name is {0} {1}.'.format('FirstName', 'LastName');
 String.prototype.format = function() {
@@ -2837,7 +2832,9 @@ function key_word_check(txt, keys) {
 //=================================================================================
 function Random_text(codeLength) {
   var id = ""
-  var selectChar = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
+  var selectChar = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D',
+    'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+    'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
   for (var i = 0; i < codeLength; i++) {
     var charIndex = Math.floor(Math.random() * 36);
     id += selectChar[charIndex];
@@ -2993,14 +2990,16 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
       //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
     } else if (message_json.type == "sticker") {
-      var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + message_json.stickerId + "/android/sticker.png;compress=true"
+      var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" +
+        message_json.stickerId + "/android/sticker.png;compress=true"
       var caption = ct["is_from"]["text"].format(message_json.userName)
       if (ALL.massage_time) {
         t = get_time_txt(message_json.timestamp, GMT)
         caption += "\n" + t
       }
       sendPhoto(chat_id, sticker_png_url, notification, caption)
-      //https://stickershop.line-scdn.net/stickershop/v1/sticker/3214753/android/sticker.png;compress=true
+      //https://stickershop.line-scdn.net/stickershop/v1/sticker/
+      // 3214753/android/sticker.png;compress=true
       //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
       //"stickerId":"502","packageId":"2"}
     } else if (message_json.type == "audio") { //這裡看看能不能改
