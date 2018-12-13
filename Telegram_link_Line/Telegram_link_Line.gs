@@ -1629,7 +1629,7 @@ function doPost(e) {
               sendtext(chat_id, ct['line_bot_join']);
             }
           } catch (e) {
-            sendtext(Telegram_id, ct["send_to_TG_error"]['text'].format(e));
+            sendtext(Telegram_id, ct["send_to_TG_error"]['text'].format(message_json, e));
             // ^ '傳送失敗...，原因如下\n\n{0}'
             // NU$ 例外狀況未加
           }
@@ -2242,6 +2242,9 @@ function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
   var blob = UrlFetchApp.fetch(url, options);
   if (blob.getResponseCode() != 200) {
     console.log('Line server 出問題了!，或有意外的類型的post。');
+    console.log(blob.getResponseCode())
+    console.log(blob.getContentText())
+    console.log('-------------')
     return false
   }
 

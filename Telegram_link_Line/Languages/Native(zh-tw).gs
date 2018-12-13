@@ -642,7 +642,8 @@ function language() {
       },
       "send_to_TG_error": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-        "text": '傳送失敗...，原因如下\n\n{0}', // {0} = 失敗原因
+        "text": '傳送失敗...\n\n處理失敗的資料：\n{0}\n\n結果：\n{1}',
+        // {0} = 出錯的訊息 , {1} = 失敗原因
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
