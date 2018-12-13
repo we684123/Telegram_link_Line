@@ -523,7 +523,7 @@ function doPost(e) {
           var caption = estringa.message.caption
           estringa.message.caption = entities_conversion(caption, entities, ct)
         }
-        
+
         try {
           if (estringa.message.reply_to_message.text) {
             var rt = estringa.message.reply_to_message.text
@@ -2887,31 +2887,43 @@ function up_room_start(ALL) {
 function entities_conversion(text, entities, ct) { //用來處理格式化的網址
   var EC_text = []
   var text_link = []
-  var index = 0
+  var st_index = 0
+  var ed_index = text.length
+  var URL_Quantity = 0
   // 下先分解
   for (var i = entities.length - 1; i >= 0; i--) {
     //Logger.log('i = ', i)
     //Logger.log(entities[i]["type"])
+    var st_capture = parseInt(entities[i]["offset"]) //+ index
+    var ed_capture = parseInt(entities[i]["length"]) + st_capture
+    var y = text.nslice(ed_capture)
+    text = y[0]
+    EC_text.unshift(y[1])
     if (entities[i]["type"] == 'text_link') {
-      var k1 = parseInt(entities[i]["offset"]) //+ index
-      var k2 = parseInt(entities[i]["length"])
-      //Logger.log('k1 = ', k1)
-      //Logger.log('k2 = ', k2)
-      index = k1 + k2
-      var y = text.nslice(index)
+      var y = text.nslice(st_capture)
       text = y[0]
-      //Logger.log('y = ', y)
-      EC_text.unshift(y[1])
+      var u = ct['entities_conversion_text']['text'].format(y[1], URL_Quantity)
+      URL_Quantity += 1
+      EC_text.unshift(u)
       text_link.unshift(entities[i]["url"])
+    } else if (entities[i]["type"] == 'bold') { //粗體
+      var y = text.nslice(st_capture)
+      text = y[0]
+      EC_text.unshift(' *{0}* '.format(y[1]))
+    } else if (entities[i]["type"] == 'italic') { //斜體
+      var y = text.nslice(st_capture)
+      text = y[0]
+      EC_text.unshift(' _{0}_ '.format(y[1]))
     }
   }
-
+  //Logger.log('EC_text = ', EC_text)
   //組合
   var assemble_text = ''
   var assemble_link = ''
-  //Logger.log('EC_text = ', EC_text)
   for (var j = 0; j < EC_text.length; j++) { // #NU 未來考慮連結短網址服務
-    assemble_text += ct["entities_conversion_text"]['text'].format(EC_text[j], String(j))
+    assemble_text += EC_text[j]
+  }
+  for (var j = 0; j < text_link.length; j++) { // #NU 未來考慮連結短網址服務
     assemble_link += ct["entities_conversion_link"]['text'].format(String(j), text_link[j])
   }
   return text + ct["entities_conversion_ALL"]['text'].format(assemble_text, assemble_link)

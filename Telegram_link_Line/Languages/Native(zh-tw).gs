@@ -753,8 +753,8 @@ function language() {
       },
       "entities_conversion_text": {
         "type": "to_Line", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-        "text": "[{1}]{0}"
-        // {0} = 文字本體 , {1} = 網址的編號
+        "text": "{0}[{1}]"
+        // {0} = 格式化文字本體 , {1} = 網址的編號
         // 例如 "Youtube [1] " 然後最下面依序放連結
         // 跟 "entities_conversion_link" 有關連。
         // 跟 "entities_conversion_ALL" 有關連。
