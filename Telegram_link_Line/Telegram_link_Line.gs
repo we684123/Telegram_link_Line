@@ -2408,7 +2408,7 @@ function sendtext(chat_id, ct, reply_to_message_id) {
     if (notification == undefined || notification != true)
       var notification = false
     if (parse_mode == undefined)
-      var parse_mode = "Markdown"
+      var parse_mode = ""
   } catch (e) {
     var notification = false
     var parse_mode = ""
@@ -2923,7 +2923,12 @@ function entities_conversion(text, entities, ct) { //用來處理格式化的網
   for (var j = 0; j < text_link.length; j++) { // #NU 未來考慮連結短網址服務
     assemble_link += ct["entities_conversion_link"]['text'].format(String(j), text_link[j])
   }
-  return text + ct["entities_conversion_ALL"]['text'].format(assemble_text, assemble_link)
+  if (assemble_link) {
+    return text + ct["entities_conversion_ALL"]['text'].format(assemble_text, assemble_link)
+  } else {
+    return text + assemble_text
+  }
+
 }
 //=================================================================================
 function rt_text_reduce(text, rt_max_chats) {

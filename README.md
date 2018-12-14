@@ -328,7 +328,6 @@ code_version =
   ##### 2018/12/14 -     
    * 支援 File 傳送至 Line。    
    * 支援 Telegram 傳送格式化連結給 Line。**(粗體、斜體、連結，不包含code)**
-   * 支援 Line 傳 Markdown 格式內容給 Telegram 。
    * 支援 Telegram Vote_Note(前鏡頭圓形影片) 傳至 Line。
    * 支援 在 bot 內更改時區(GMT)。
    * Telegram "回覆訊息"格式更改，以美化 Line 那邊的排版。
