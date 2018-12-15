@@ -253,7 +253,7 @@ function doPost(e) {
           var rg = Stext.split("_")
           if (rg[0] == '/tryget') {
             // "/resend_video_fliename_123456789"
-            sendtext(chat_id, ct['get_command_ed'])
+            var send_ed = sendtext(chat_id, ct['get_command_ed'])
             // ^ "已接收指令!\n處理中請稍後..."
             var line_flie_id = rg[1]
             var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
@@ -266,6 +266,7 @@ function doPost(e) {
               var blob = DriveApp.getFileById(file_id).getBlob();
               sendDocument(chat_id, blob)
             }
+            deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
             lock.releaseLock();
             return 0
           }
@@ -483,7 +484,7 @@ function doPost(e) {
         var rg = Stext.split("_")
         if (rg[0] == '/tryget') {
           // "/resend_video_fliename_123456789"
-          sendtext(chat_id, ct['get_command_ed'])
+          var send_ed = sendtext(chat_id, ct['get_command_ed'])
           // ^ "已接收指令!\n處理中請稍後..."
           var line_flie_id = rg[1]
           var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
@@ -496,6 +497,7 @@ function doPost(e) {
             var blob = DriveApp.getFileById(file_id).getBlob();
             sendDocument(chat_id, blob)
           }
+          deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
           lock.releaseLock();
           return 0
         }
@@ -767,7 +769,7 @@ function doPost(e) {
         lock.releaseLock();
         return 0;
       } else if (mode == "🌋 丟棄舊檔" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
-        sendtext(chat_id, ct['get_command_ed'])
+        var send_ed = sendtext(chat_id, ct['get_command_ed'])
         // ^ "已接收指令!\n處理中請稍後..."
         var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
         switch (Stext) {
@@ -783,6 +785,7 @@ function doPost(e) {
           default:
             sendtext(chat_id, ct['not_eat_this'])
             // ^ "030...\n請不要給我吃怪怪的東西..."
+            deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
             lock.releaseLock();
             return 0;
         }
@@ -1206,7 +1209,7 @@ function doPost(e) {
             var rg = Stext.split("_")
             if (rg[0] == '/tryget') {
               // "/resend_video_fliename_123456789"
-              sendtext(chat_id, ct['get_command_ed'])
+              var send_ed = sendtext(chat_id, ct['get_command_ed'])
               var line_flie_id = rg[1]
               var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
               var file_id = downloadFromLine(
@@ -1218,6 +1221,7 @@ function doPost(e) {
                 var blob = DriveApp.getFileById(file_id).getBlob();
                 sendDocument(chat_id, blob)
               }
+              deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
               lock.releaseLock();
               return 0
             }
