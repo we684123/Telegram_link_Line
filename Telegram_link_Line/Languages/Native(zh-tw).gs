@@ -1,14 +1,14 @@
 function language() {
   var language = { //多包一層看以後有沒有打算擴充...............
     "language_name": "Native(zh-tw)",
-    "language_version": 0.2,
-    "match_version": 3.1,
-    "update_time": 1538635728802,
+    "language_version": 1.0,
+    "match_version": 3.2,
+    "update_time": 1544636639164,
     "author": "永格天",
     "correspond_text": {
       "backed_up_ing": {
         "type": "to_Telegram",
-        "text": "已備份舊資料，更新doc資料庫中...",
+        "text": "已備份舊資料，更新doc資料庫中...\n#doc",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -26,7 +26,15 @@ function language() {
       },
       "For_this_reply": {
         "type": "to_Line",
-        "text": "------\n{0}\n---^^^針對此回復^^^---\n{1}", // {0} = 要回覆的文字內容 , {1} = 回覆的文字內容
+        "text": "{0}\n{1}\n████針對回復████\n{2}",
+        // {0} = 要回覆的文字內容 , {1} = 時間日期
+        // {2} = 回覆的文字內容
+      },
+      "reduce_seach_chat": {
+        "type": "to_Telegram(only_text)",
+        "text": "：\n",
+        // 用來搜尋名子的位置(回覆時會用到)
+        // (可能組合有 "：\n" ":\n" "\n")
       },
       "sendPhoto_ed": {
         "type": "to_Telegram",
@@ -55,6 +63,12 @@ function language() {
       "sendGIF_ed": {
         "type": "to_Telegram",
         "text": "(GIF已發送!)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "sendFile_ed": {
+        "type": "to_Telegram",
+        "text": "(File連結已發送!)",
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -411,6 +425,12 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "get_command_ed": {
+        "type": "to_Telegram",
+        "text": "已接收指令!\n處理中請稍後...",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "allRead_ed": {
         "type": "to_Telegram",
         "text": "已全已讀",
@@ -421,19 +441,77 @@ function language() {
         "type": "command(Telegram)",
         "text": "🔧 更多設定"
       },
-      "🔑設定關鍵字提醒": {
+      "🔑 設定關鍵字提醒": {
         "type": "command(Telegram)",
-        "text": "🔑設定關鍵字提醒"
+        "text": "🔑 設定關鍵字提醒"
       },
-      "⏰訊息時間啟用?": {
+      "⏰ 訊息時間啟用?": {
         "type": "command(Telegram)",
-        "text": "⏰訊息時間啟用?"
+        "text": "⏰ 訊息時間啟用?"
+      },
+      "✈️ 設定GMT": {
+        "type": "command(Telegram)",
+        "text": "✈️ 設定GMT"
+      },
+      "set_GMT_ing_1": {
+        "type": "to_Telegram",
+        "text": '請輸入你的GMT時區，如台灣是"GMT+8"便只輸入"+8"\n如果不知道時區可至 https://time.artjoey.com/ 查詢',
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "set_GMT_ing_2": {
+        "type": "to_Telegram",
+        "text": '如欲取消設定請 /main 回主選單',
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "set_GMT_ed": {
+        "type": "to_Telegram",
+        "text": '已設定GMT為\nGMT{0}',
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+        // {0} = 時區(+8、-1、+9...等)
+      },
+      "🌋 丟棄舊檔": {
+        "type": "command(Telegram)",
+        "text": "🌋 丟棄舊檔"
+      },
+      "file_to_Trashed": {
+        "type": "to_Telegram",
+        "text": ['如果不是出問題或google drive滿了要清空間，請盡量不要用此指令\n\n',
+          '因為從TG中發送的任何檔案，在Line後台接收時都只是一個"連結到drive的link"',
+          '，因此一但刪了，Line的人便無法讀取你發的任何檔案。',
+          '\n\n此外，這裡的丟棄僅把檔案丟到"垃圾桶"，因此並不會騰出空間',
+          '，還需要你去google drive手動按下"清除垃圾桶"才會真正清空',
+          '\n如欲取消請按下 /main 回主選單。'
+        ],
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "Trashed_10day": {
+        "type": "command(Telegram)",
+        "text": '丟棄10天前全部'
+      },
+      "Trashed_30day": {
+        "type": "command(Telegram)",
+        "text": '丟棄30天前全部'
+      },
+      "Trashed_ALL": {
+        "type": "command(Telegram)",
+        "text": '丟棄全部'
+      },
+      "Trashed_result": {
+        "type": "to_Telegram",
+        "text": '丟棄結果：{0}', // {0} = "'失敗\n' + 原因" 或 "成功"
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "more_setting_status": {
         "type": "to_Telegram",
-        "text": '設定狀態：\n● 關鍵字提醒：{0}\n● 訊息時間啟用： {1}\n',
+        "text": '設定狀態：\n● 關鍵字提醒：{0}\n● 訊息時間啟用： {1}\n● GMT時區：{2}',
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+        // {0} = TorF , {1} = TorF , {2} = GMT時區(ex: +8)
       },
       "plz_select_on_off": {
         "type": "to_Telegram",
@@ -519,6 +597,24 @@ function language() {
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "sendAudio_ing": {
+        "type": "to_Telegram",
+        "text": "(正在傳送音檔，請稍後...)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "sendVideo_ing": {
+        "type": "to_Telegram",
+        "text": "(正在傳送影片，請稍後...)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "sendFile_ing": {
+        "type": "to_Telegram",
+        "text": "(正在傳送檔案，請稍後...)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "you_have_new_massage": {
         "type": "to_Telegram",
         "text": "你有新訊息!\n來自：{0}\n點擊以快速切換至該房間 /d{1}",
@@ -580,7 +676,8 @@ function language() {
       },
       "send_to_TG_error": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-        "text": '傳送失敗...，原因如下\n\n{0}', // {0} = 失敗原因
+        "text": '傳送失敗...\n\n處理失敗的資料：\n{0}\n\n結果：\n{1}',
+        // {0} = 出錯的訊息 , {1} = 失敗原因
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -651,6 +748,79 @@ function language() {
       "can_not_leave_from_line": {
         "type": "to_Telegram",
         "text": "bot無法離開，因為不是在group或room內",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "entities_conversion_text": {
+        "type": "to_Line", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "{0}[{1}]"
+        // {0} = 格式化文字本體 , {1} = 網址的編號
+        // 例如 "Youtube [1] " 然後最下面依序放連結
+        // 跟 "entities_conversion_link" 有關連。
+        // 跟 "entities_conversion_ALL" 有關連。
+      },
+      "entities_conversion_link": {
+        "type": "to_Line", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "網址[{0}]：\n{1}\n"
+        // {0} = 網址的編號 , {1} = 網址
+        // 跟 "entities_conversion_text" 有關連。
+        // 跟 "entities_conversion_ALL" 有關連。
+      },
+      "entities_conversion_ALL": {
+        "type": "to_Line", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "{0}\n\n{1}"
+        // {0} = entities_conversion_text , {1} = entities_conversion_link
+        // 跟 "entities_conversion_text" 有關連。
+        // 跟 "entities_conversion_link" 有關連。
+      },
+      "sendFileToLine": {
+        "type": "to_Line", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "檔名：{1}\n檔案大小：{3}MB\n{0}"
+        // {0} = google drive 檔案下載的連結 , {1} = 檔案名稱
+        // {2} = 檔案大小(單位bit) , {3} = 檔案大小(單位MB)
+      },
+      "not_read_all_ed": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": '因原房間中還有留言，故要先傾倒於此，請等等再重發一次您的"內容"\n(如果是隨機碼就不用了)\n\n傾倒開始!', // 自定義文字內容
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "line_bot_join": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "`Line_bot 已加入此 {0}`", // 自定義文字內容
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "line_bot_leave": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "`QAQ Line_bot 被踢出去了\n你可以考慮刪掉此房間或把 Line_bot 加回來。`", // 自定義文字內容
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "memberJoined": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "有新人加入\n{0}", // 自定義文字內容
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+        // {0} = "[新人姓名](大頭貼)" 的陣列
+      },
+      "memberLeft": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "有人離開啦\n{0}", // 自定義文字內容
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+        // {0} = "[新人姓名](大頭貼)" 的陣列
+      },
+      "tryget_command": {
+        "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "{3} 傳送了一個 {0}\n但因為Line伺服器出狀況，暫無法傳送，請稍後用下列指令取得內容\n/tryget_{2}", // 自定義文字內容
+        // {0} = "檔案類型" , {1} = "檔名", {2} = "檔案line_id"
+        // {3} = "發送者姓名"
+        // "/tryget_{2}" <- 請不要改，謝謝!
+      },
+      "tryget_error": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "目前依舊無法取得，請再等等qwq", // 自定義文字內容
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },

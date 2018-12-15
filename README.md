@@ -9,28 +9,32 @@
 
 
 
-| 功能 | V1 | V2 | V3 | V3.1 |     
-|-------|:----:|:-----:|:-----:|:-----:|     
-| 文字      |  ✓  |    ✓        |   ✓  |   ✓  |    
-| 貼圖      |     |              | 僅Line發給TG |  ✓(註1)   |    
-| 照片      |     | 僅TG發給Line |    ✓  |   ✓   |    
-| 影片      |     |              |   ✓  |   ✓  |    
-| 錄音      |     |              | 僅Line發給TG |   ✓  |    
-| 位置      |     |              |   ✓  |   ✓  |    
-| 檔案      |     |              | 僅Line發給TG | 僅Line發給TG   |    
-| GIF       |     |             |    |  僅TG發給Line(註2)  |    
-| 知道誰發言 |     |    ✓       |   ✓  |  ✓  |    
-| 針對回復   |     |            |   ✓  |  ✓  |    
-| 房間分類   |     |    ✓       |   ✓  |  ✓  |    
-| 獨立房間   |     |            |    ✓  |  ✓(註3)  |    
-| 關鍵字提醒 |     |            |    ✓  |  ✓  |    
-| 訊息時間   |     |            |    ✓  |  ✓  |    
-| 自訂語言包 |     |            |       |  ✓  |    
-| 自訂時區  |     |            |       |  ✓  |    
+| 功能 | V1 | V2 | V3 | V3.1 | V3.2 |     
+|-------|:----:|:-----:|:-----:|:-----:|:-----:|     
+| 文字      |  ✓  |    ✓        |   ✓  |   ✓  |  ✓  |    
+| 貼圖      |     |    | 僅Line發給TG |  ✓(註1) | ✓(註1)|    
+| 照片      |     | 僅TG發給Line |    ✓  |   ✓   |  ✓  |    
+| 影片      |     |              |   ✓  |   ✓  |  ✓  |    
+| 錄音      |     |      | 僅Line發給TG |   ✓  |  ✓  |    
+| 位置      |     |              |   ✓  |   ✓  |  ✓  |    
+| 檔案      |    |  | 僅Line發給TG | 僅Line發給TG |  ✓ |    
+| GIF  |  | |  | 僅TG發給Line(註2) | 僅TG發給Line(註2)  |    
+|TG_video_note|   |            |      |      |  ✓  |
+| 知道誰發言 |     |    ✓       |   ✓  |  ✓  |  ✓  |    
+| 針對回復   |     |            |   ✓  |  ✓  |   ✓  |   
+| 房間分類   |     |    ✓       |   ✓  |  ✓  |  ✓  |    
+| 獨立房間   |     |            |    ✓  |  ✓  |  ✓  |    
+| 關鍵字提醒 |     |            |    ✓  |  ✓  |  ✓  |    
+| 訊息時間   |     |            |    ✓  |  ✓  |  ✓  |    
+| 自訂語言包 |     |            |       |  ✓  |  ✓  |    
+| 自訂時區  |     |            |       |  ✓  |  ✓  |    
+| 知道Line_bot異動 |     |      |       |     |  ✓  |         
+|知道Line群人員異動 |     |      |       |     |  ✓  |    
+| /tryget_XXX 功能 |     |      |       |     |  ✓  |    
 * V2、V3有時會不知道是誰發言是因為對方[版本](https://goo.gl/noYa7L)不夠新。
-* 註1：目前確定 "安卓8.5.3" 可以正常看貼圖，"Windows 5.10.0.1789" 則無法，其他未知
-* 註2：LINE發送到TG僅會收到GIF的第一格的畫面
-* 註3：與前一版不同，這次改寫成以"新群組"的方式來"升級房間"，整體流程順暢簡單了不少，不過不確定為何有些人開的TG普通群組bot會**收不到**除了"加入群組"以外的訊息，此時請升級成 **超級群組** 並給bot管理員的權限即可。
+* 註1：目前確定 "安卓8.5.3" 可以正常看貼圖，"Windows 5.10.0.1789" 則無法，其他未知。
+* 註2：LINE發送到TG僅會收到GIF的第一格的畫面。
+
 
 
 ----
@@ -60,8 +64,11 @@
 其屬性及內容：
 
     "":{ //物件名稱
-      "type": "to_Telegram",     // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-      "text": "",   // 自定義文字內容 如有像 {0} 這種東西代表會有引入的文字 你也可以完全不引入
+      "type": "to_Telegram",     
+      //^ "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+      "text": "" or ['',''],   
+      //^ 自定義文字內容 如有像 {0} 這種東西代表會有引入的文字 你也可以完全不引入
+      //^ 如果形式是['','']則陣列內的內容會自動串接成一字串。
       "notification": false,  //不通知? true or false
       "parse_mode":""  //送出文字模式 "HTML" or "Markdown" or ""
     },
@@ -74,6 +81,8 @@
 鍵盤內容也可自訂    
 ![Imgur](https://imgur.com/bZnoT6P.png)    
 
+支援 粗體、斜體、連結
+![Imgur](https://imgur.com/w9PS2iL.png)
 ----
 
 
@@ -82,6 +91,7 @@
  #### [企鵝](https://t.me/penguinF)做了一個非常詳細的[圖文教學](https://hackmd.io/s/Bkc6LwAP7#)(萬分感謝 m(_ \_)m )，可以去看看。
  #### (但是此教學目前過期，不過創建LINEbot的部分是能用的，另外就是這個版本升級房間時不再使用新的bot，轉成用"新群組"替代)
 
+----
 
 # 準備
  ##### 需要使用者申請 Telegram_bot跟Line_bot(Developer Trial)
@@ -127,8 +137,10 @@
   * 具有應用程式存取的使用者 改成"任何人甚至匿名使用者" ->     
   * 確定(or更新)(註二) ->     
   * 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)     
-  * 將 CP() 設定計時器 每6小時一次 (<-非必要，以防萬一用。)(用來備份整個doc)    
+  * 將 [CP()](https://t.me/TG_link_Line/23)，[設定計時器](https://t.me/TG_link_Line/24) 每6小時一次 (<-非必要，以防萬一用。)(用來備份整個doc)    
     [說明圖1](http://i.imgur.com/KGXuqhT.png)、[說明圖2](http://i.imgur.com/GWpqmYH.png)、[說明圖3](http://i.imgur.com/tP8HUgR.png)、[說明圖4](http://i.imgur.com/HHs9qOH.png)
+  * **執行 up_version()，如[說明圖](https://imgur.com/ghcR90c)，很重要!(考試不會考:p**    
+
 ##### Telegram bot 需要新增四個指令：
 
       main - 開啟主選單
@@ -145,6 +157,21 @@
   * 完成！    
   ps' /allread、/debug這兩個指令也可以移到bot的About裡面     
   ![bot的About](https://imgur.com/ypwUAtg.png)    
+
+##### Telegram bot 需要關閉隱私模式：
+  **不然升級房間後會有沒接收到訊息的問題。**
+
+  找[@BotFather](https://t.me/BotFather)關閉掉隱私模式。    
+
+  步驟：
+  - /mybos
+  - (選擇你的bot)
+  - Bot Settings
+  - Group Privacy
+  - turn off
+
+  此時上面的文字應該是會改成向類似這樣
+  "Privacy mode  is disabled for (bot 名稱) (bot的username)."    
 
 ----
 - 註一
@@ -199,6 +226,14 @@
 
 ----
 
+# 注意
+
+**如果你的GCP專案列表出現不明的專案請先不要砍，這個專案可能就是這個bot用的，如果砍了...     
+[這裡有補救的方式......](https://blog.tdccc.com.tw/307)    
+ by我的血淚教訓。**
+
+----
+
 # doc的json說明
 
     {
@@ -244,14 +279,15 @@
       "massage_time": false,
       "TG_temporary_docking": {},
       "wait_to_Bind": {},
-      "GMT": "GMT+8"
+      "GMT": "GMT+8",
+      "code_version": 3.1
     }
 
 data = 存放房間資訊
 
 mode = 暫存指令(通常為0)
 
-Notice = 管理整體通知(但可能廢除)(未作用)
+Notice = 管理整體通知(確定廢除)(未作用)
 
 opposite = 暫存指令對象房間
 
@@ -261,7 +297,7 @@ Order = 預計用來做自動依時間排序房間(未作用)
 
 keyword = 關鍵字設定，出現關鍵字自動通知
 
-RoomKeyboard = 房間的keyboard，為節省重生時間而生
+RoomKeyboard = 房間的 keyboard，為節省重生時間而生
 
 FastMatch = 快速索引用
 
@@ -284,9 +320,46 @@ wait_to_Bind =
 GMT =
 此預設 GMT+8 若不再該時區可自行調整(預計下一版會可以在TG端調整)
 
+code_version =     
+該程式的版本，用來驗證配對語言包正確性。
 
 ---
 # 版本資訊
+  ##### 2018/12/14 -     
+   * 支援 File 傳送至 Line。    
+   * 支援 Telegram 傳送格式化連結給 Line。**(粗體、斜體、連結，不包含code)**
+   * 支援 Telegram Vote_Note(前鏡頭圓形影片) 傳至 Line。
+   * 支援 在 bot 內更改時區(GMT)。
+   * Telegram "回覆訊息"格式更改，以美化 Line 那邊的排版。
+   * Line 傳送給 Telegram 的檔案和錄音不再是連結而是"實物"。
+   * "已升級的房間" 在 "主選單" 中的狀態符號改為"⭐️"。
+   * "已升級的房間" 已可直接改名，不需先降回去普通房間。
+   * 現在在 Telegram 中已能知道 Line 群人員加入、離開的狀況。
+   * 現在在 Telegram 中已能知道 Line_bot 被踢除、加入的狀況。
+   * 現在如果 "Line伺服器" 掛掉無法取得檔案，可用 /tryget_XXX 的方式重新取得。
+   * "(正在傳送XX，請稍後...)" 或其他 "告知類" 訊息在完成後會自動刪除。
+   * 修復 一直傳同張照片的問題、附檔名錯亂的問題。
+   * 修復 安卓、ios版Line app 無法查看照片的問題(分別測試於8.18.1、8.17.0)。
+   * 修復 Line room type 為"room"時，Line群人名無法獲取的問題。
+   * 修復 特殊情況下要轉傳2次驗證碼才能綁訂房間的問題。
+   * 提升bot檔案檢索速度。
+   * 指令效果變更! /allread 現在不會把檔案丟到垃圾桶。    
+   如要丟棄檔案請至 "🔧 更多設定 / 🌋 丟棄舊檔" 。
+   * ct['xxx']['text']的內容現在可以為 ['String','String']，系統會串接起來。
+
+
+**這次更新前一樣先 CP() 過後再用 /allread 在更新較不會有意外發生。**    
+
+**此外如果你的GCP專案列表出現不明的專案請先不要砍，這個專案可能就是這個bot用的，如果砍了...     
+[這裡有補救的方式......](https://blog.tdccc.com.tw/307)    
+ by我的血淚教訓。**
+
+
+更新方式：
+1. Telegram_link_Line.gs 修改    
+2. Languages.gs 修改    
+3. 在gs中[執行 up_version() 函式](https://imgur.com/ghcR90c)。
+4. **重部署版本** (版本是 "新增" 謝謝)
 
   ##### 2018/10/06 -     
    * GIF、錄音 可從 Telegram 傳 Line。    
@@ -312,7 +385,7 @@ GMT =
 - Bot Settings
 - Group Privacy
 - turn off
-    
+
 此時上面的文字應該是會改成向類似這樣
 "Privacy mode  is disabled for (bot 名稱) (bot的username)."
 
