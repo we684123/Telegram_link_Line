@@ -355,7 +355,7 @@ code_version =
  by我的血淚教訓。**
 
 
-更新內容：
+更新方式：
 1. Telegram_link_Line.gs 修改    
 2. Languages.gs 修改    
 3. 在gs中[執行 up_version() 函式](https://imgur.com/ghcR90c)。
