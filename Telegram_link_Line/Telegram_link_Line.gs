@@ -1475,6 +1475,11 @@ function doPost(e) {
         }
       } //強制轉ID
 
+      if (cutSource.groupId) { //看是group or room 再取出對應數值
+        var g = cutSource.groupId
+      } else {
+        var g = cutSource.roomId
+      }
       if (cutSource.userId) { //嘗試取得發話人名稱
         var u = cutSource.userId
         if (cutSource.type == "user") {
@@ -1485,11 +1490,7 @@ function doPost(e) {
           var userName = new_Get_profile(u, 'group', g)['displayName'];
         }
       }
-      if (cutSource.groupId) { //看是group or room 再取出對應數值
-        var g = cutSource.groupId
-      } else {
-        var g = cutSource.roomId
-      }
+
 
       if (!userName)
         userName = "";
