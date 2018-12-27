@@ -201,7 +201,7 @@ function doPost(e) {
 
           if (ALL.data[n]['Amount']) { //如果還有訊息直接傾倒
             sendtext(chat_id, ct["not_read_all_ed"])
-            var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification)
+            var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id)
             if (j) {
               ALL.data[n]['Amount'] = 0
             }
@@ -239,7 +239,7 @@ function doPost(e) {
       } else { //已綁定群組中發話
         if (ALL.data[number]['Amount']) { //如果還有訊息直接傾倒
           sendtext(chat_id, ct["not_read_all_ed"])
-          var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification)
+          var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id)
           if (j) {
             ALL.data[number]['Amount'] = 0
           }
@@ -845,7 +845,7 @@ function doPost(e) {
               // ^ "這個房間並沒有未讀的通知喔~ "
             } else {
               //獨立出來比較好
-              read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification)
+              read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id)
             }
             break;
           case ct['🔖 重新命名']["text"]:
@@ -2932,177 +2932,188 @@ function rt_text_reduce(text, rt_max_chats) {
   return text.replace('\n', '%0A').replace(/\n/g, ' ').replace('%0A', '\n')
 }
 //=================================================================================
-function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
-  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-  var SheetM = SpreadSheet.getSheetByName("Line訊息區");
-  var col = ALL.FastMatch2[ALL.opposite.RoomId] + 1;
+function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id) {
 
-  var Amount = SheetM.getRange(1, col).getDisplayValue();
-  Amount = JSON.parse(Amount)
-  var st = Amount[1] + 2
-  var ed = Amount[0] + 1
+  try {
+    var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+    var SheetM = SpreadSheet.getSheetByName("Line訊息區");
+    var col = ALL.FastMatch2[ALL.opposite.RoomId] + 1;
 
-  function upMessageData(i, col, ed) {
-    SheetM.getRange(i, col).setValue("")
-    var t = "[" + (ed - 1) + "," + (i - 1) + "]"
-    SheetM.getRange(1, col).setValue(t);
-    //SheetM.getRange(1, col).setValue(Amount);
-  }
+    var Amount = SheetM.getRange(1, col).getDisplayValue();
+    Amount = JSON.parse(Amount)
+    var st = Amount[1] + 2
+    var ed = Amount[0] + 1
 
-  for (var i = st; i <= ed; i++) {
-    text = SheetM.getRange(i, col).getDisplayValue()
-    var message_json = JSON.parse(text);
-
-    if (message_json.ID == false && message_json.type != "join") {
-      //預先處理掉不要的部分
-      var tryget_command = ct['tryget_command']['text'].format(
-        message_json.type, message_json.fileName, message_json.message_id,
-        message_json.userName)
-      sendtext(chat_id, tryget_command)
-      upMessageData(i, col, ed)
-      continue; //直接跑下一輪
+    function upMessageData(i, col, ed) {
+      SheetM.getRange(i, col).setValue("")
+      var t = "[" + (ed - 1) + "," + (i - 1) + "]"
+      SheetM.getRange(1, col).setValue(t);
+      //SheetM.getRange(1, col).setValue(Amount);
     }
 
-    if (message_json.type == "text") {
-      var p = message_json.userName + "：\n" + message_json.text
-      if (ALL.massage_time) {
-        t = get_time_txt(message_json.timestamp, GMT)
-        p += "\n" + t
-      }
-      sendtext(chat_id, p);
-      //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
-      //"text":"51"}
-    } else if (message_json.type == "image") {
-      var url = message_json.DURL
-      var caption = ct["is_from"]["text"].format(message_json.userName)
-      if (ALL.massage_time) {
-        t = get_time_txt(message_json.timestamp, GMT)
-        caption += "\n" + t
-      }
-      var send_ed = sendtext(chat_id, ct["sendPhoto_ing"]);
-      // ^ (正在傳送圖片，請稍後...)
-      sendPhoto(chat_id, url, notification, caption)
-      //刪除"正在傳送XXX" 整潔舒爽!
-      deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
-      //sendPhoto(url, notification)
-      //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
-      //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
-    } else if (message_json.type == "sticker") {
-      var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" +
-        message_json.stickerId + "/android/sticker.png;compress=true"
-      var caption = ct["is_from"]["text"].format(message_json.userName)
-      if (ALL.massage_time) {
-        t = get_time_txt(message_json.timestamp, GMT)
-        caption += "\n" + t
-      }
-      sendPhoto(chat_id, sticker_png_url, notification, caption)
-      //https://stickershop.line-scdn.net/stickershop/v1/sticker/
-      // 3214753/android/sticker.png;compress=true
-      //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
-      //"stickerId":"502","packageId":"2"}
-    } else if (message_json.type == "audio") { //這裡看看能不能改
-      //處理文件
-      var file_id = message_json.ID
-      var blob = DriveApp.getFileById(file_id).getBlob();
-      var send_ed = sendtext(chat_id, ct["sendAudio_ing"])
-      // ^ (正在傳送音檔，請稍後...)
-      //處理caption
-      caption = message_json.userName + '\n'
-      if (ALL.massage_time) {
-        caption += get_time_txt(message_json.timestamp, GMT)
+    for (var i = st; i <= ed; i++) {
+      text = SheetM.getRange(i, col).getDisplayValue()
+      var message_json = JSON.parse(text);
+
+      if (message_json.ID == false && message_json.type != "join") {
+        //預先處理掉不要的部分
+        var tryget_command = ct['tryget_command']['text'].format(
+          message_json.type, message_json.fileName, message_json.message_id,
+          message_json.userName)
+        sendtext(chat_id, tryget_command)
+        upMessageData(i, col, ed)
+        continue; //直接跑下一輪
       }
 
-      sendAudio(chat_id, blob, notification, caption)
-      //刪除"正在傳送XXX" 整潔舒爽!
-      deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
-      //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
-      //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
-    } else if (message_json.type == "location") {
-      var latitude = message_json.latitude
-      var longitude = message_json.longitude
-      sendLocation(chat_id, latitude, longitude, notification)
-      var text = ct["is_from"]["text"].format(message_json.userName)
-      if (ALL.massage_time) {
-        t = get_time_txt(message_json.timestamp, GMT)
-        text += "\n" + t
-      }
-      if (message_json.address) {
-        text = message_json.address + '\n' + text
-      }
-      sendtext(chat_id, text);
-      //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
-      //"address":"260台灣宜蘭縣宜蘭市舊城西路107號", <-沒事，這不是我家:P
-      //"latitude":24.759711,"longitude":121.750114}
-    } else if (message_json.type == "video") {
-      var url = message_json.DURL
-      var caption = ct["is_from"]["text"].format(message_json.userName)
-      if (ALL.massage_time) {
-        t = get_time_txt(message_json.timestamp, GMT)
-        caption += "\n" + t
-      }
-      var send_ed = sendtext(chat_id, ct["sendVideo_ing"])
-      try {
-        sendVideo(chat_id, url, notification, caption)
-      } catch (e) {
+      if (message_json.type == "text") {
+        var p = message_json.userName + "：\n" + message_json.text
+        if (ALL.massage_time) {
+          t = get_time_txt(message_json.timestamp, GMT)
+          p += "\n" + t
+        }
+        sendtext(chat_id, p);
+        //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
+        //"text":"51"}
+      } else if (message_json.type == "image") {
+        var url = message_json.DURL
+        var caption = ct["is_from"]["text"].format(message_json.userName)
+        if (ALL.massage_time) {
+          t = get_time_txt(message_json.timestamp, GMT)
+          caption += "\n" + t
+        }
+        var send_ed = sendtext(chat_id, ct["sendPhoto_ing"]);
+        // ^ (正在傳送圖片，請稍後...)
+        sendPhoto(chat_id, url, notification, caption)
+        //刪除"正在傳送XXX" 整潔舒爽!
+        deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
+        //sendPhoto(url, notification)
+        //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
+        //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
+      } else if (message_json.type == "sticker") {
+        var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" +
+          message_json.stickerId + "/android/sticker.png;compress=true"
+        var caption = ct["is_from"]["text"].format(message_json.userName)
+        if (ALL.massage_time) {
+          t = get_time_txt(message_json.timestamp, GMT)
+          caption += "\n" + t
+        }
+        sendPhoto(chat_id, sticker_png_url, notification, caption)
+        //https://stickershop.line-scdn.net/stickershop/v1/sticker/
+        // 3214753/android/sticker.png;compress=true
+        //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
+        //"stickerId":"502","packageId":"2"}
+      } else if (message_json.type == "audio") { //這裡看看能不能改
+        //處理文件
         var file_id = message_json.ID
         var blob = DriveApp.getFileById(file_id).getBlob();
-        sendVideo(chat_id, blob, notification, caption)
-      }
-      //刪除"正在傳送XXX" 整潔舒爽!
-      deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
+        var send_ed = sendtext(chat_id, ct["sendAudio_ing"])
+        // ^ (正在傳送音檔，請稍後...)
+        //處理caption
+        caption = message_json.userName + '\n'
+        if (ALL.massage_time) {
+          caption += get_time_txt(message_json.timestamp, GMT)
+        }
 
-      //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
-      //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
-    } else if (message_json.type == "file") {
-      //處理文件
-      var file_id = message_json.ID
-      var blob = DriveApp.getFileById(file_id).getBlob();
-      var send_ed = sendtext(chat_id, ct["sendFile_ing"])
-      // ^ (正在傳送檔案，請稍後...)
-      //處理caption
-      caption = message_json.userName + '\n'
-      if (ALL.massage_time) {
-        caption += get_time_txt(message_json.timestamp, GMT)
+        sendAudio(chat_id, blob, notification, caption)
+        //刪除"正在傳送XXX" 整潔舒爽!
+        deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
+        //{"type":"audio","message_id":"6548810000783","userName":"永格天@李孟哲",
+        //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk91ZKakE5Q1U"}
+      } else if (message_json.type == "location") {
+        var latitude = message_json.latitude
+        var longitude = message_json.longitude
+        sendLocation(chat_id, latitude, longitude, notification)
+        var text = ct["is_from"]["text"].format(message_json.userName)
+        if (ALL.massage_time) {
+          t = get_time_txt(message_json.timestamp, GMT)
+          text += "\n" + t
+        }
+        if (message_json.address) {
+          text = message_json.address + '\n' + text
+        }
+        sendtext(chat_id, text);
+        //{"type":"location","message_id":"6548803214227","userName":"永格天@李孟哲",
+        //"address":"260台灣宜蘭縣宜蘭市舊城西路107號", <-沒事，這不是我家:P
+        //"latitude":24.759711,"longitude":121.750114}
+      } else if (message_json.type == "video") {
+        var url = message_json.DURL
+        var caption = ct["is_from"]["text"].format(message_json.userName)
+        if (ALL.massage_time) {
+          t = get_time_txt(message_json.timestamp, GMT)
+          caption += "\n" + t
+        }
+        var send_ed = sendtext(chat_id, ct["sendVideo_ing"])
+        try {
+          sendVideo(chat_id, url, notification, caption)
+        } catch (e) {
+          var file_id = message_json.ID
+          var blob = DriveApp.getFileById(file_id).getBlob();
+          sendVideo(chat_id, blob, notification, caption)
+        }
+        //刪除"正在傳送XXX" 整潔舒爽!
+        deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
+
+        //{"type":"video","message_id":"6548802053751","userName":"永格天@李孟哲",
+        //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kL8vc1WQ1U"}
+      } else if (message_json.type == "file") {
+        //處理文件
+        var file_id = message_json.ID
+        var blob = DriveApp.getFileById(file_id).getBlob();
+        var send_ed = sendtext(chat_id, ct["sendFile_ing"])
+        // ^ (正在傳送檔案，請稍後...)
+        //處理caption
+        caption = message_json.userName + '\n'
+        if (ALL.massage_time) {
+          caption += get_time_txt(message_json.timestamp, GMT)
+        }
+        //發送
+        sendDocument(chat_id, blob, notification, caption)
+        //刪除"正在傳送XXX" 整潔舒爽!
+        deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
+      } else if (message_json.type == "leave") {
+        sendtext(chat_id, ct['line_bot_leave']);
+      } else if (message_json.type == "join") {
+        sendtext(chat_id, ct['line_bot_join']);
+      } else if (message_json.type == "memberJoined") {
+        //新人加入啦
+        var cutL = message_json['joined']['members']
+        var members_data_text = get_line_members(message_json, cutL)
+        ct['memberJoined']['text'] = ct['memberJoined']['text'].format(members_data_text)
+        sendtext(chat_id, ct['memberJoined'])
+        // ^ "有新人加入\n{0}"
+      } else if (message_json.type == "memberLeft") {
+        //有人離開啦
+        var cutL = message_json['lefted']['members']
+        var members_data_text = get_line_members(message_json, cutL)
+        ct['memberLeft']['text'] = ct['memberLeft']['text'].format(members_data_text)
+        sendtext(chat_id, ct['memberLeft'])
+        // ^ "有人離開啦\n{0}"
+      } else if (message_json.type == "follow") {
+        ct['follow']['text'] = ct['follow']['text'].format(message_json.userName)
+        sendtext(chat_id, ct['follow']['text']);
+      } else if (message_json.type == "unfollow") {
+        ct['unfollow']['text'] = ct['unfollow']['text'].format(message_json.userName)
+        sendtext(chat_id, ct['unfollow']['text']);
       }
-      //發送
-      sendDocument(chat_id, blob, notification, caption)
-      //刪除"正在傳送XXX" 整潔舒爽!
-      deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
-    } else if (message_json.type == "leave") {
-      sendtext(chat_id, ct['line_bot_leave']);
-    } else if (message_json.type == "join") {
-      sendtext(chat_id, ct['line_bot_join']);
-    } else if (message_json.type == "memberJoined") {
-      //新人加入啦
-      var cutL = message_json['joined']['members']
-      var members_data_text = get_line_members(message_json, cutL)
-      ct['memberJoined']['text'] = ct['memberJoined']['text'].format(members_data_text)
-      sendtext(chat_id, ct['memberJoined'])
-      // ^ "有新人加入\n{0}"
-    } else if (message_json.type == "memberLeft") {
-      //有人離開啦
-      var cutL = message_json['lefted']['members']
-      var members_data_text = get_line_members(message_json, cutL)
-      ct['memberLeft']['text'] = ct['memberLeft']['text'].format(members_data_text)
-      sendtext(chat_id, ct['memberLeft'])
-      // ^ "有人離開啦\n{0}"
-    } else if (message_json.type == "follow") {
-      ct['follow']['text'] = ct['follow']['text'].format(message_json.userName)
-      sendtext(chat_id, ct['follow']['text']);
-    } else if (message_json.type == "unfollow") {
-      ct['unfollow']['text'] = ct['unfollow']['text'].format(message_json.userName)
-      sendtext(chat_id, ct['unfollow']['text']);
+      //最後再"推前"
+      upMessageData(i, col, ed)
     }
-    //最後再"推前"
-    upMessageData(i, col, ed)
-  }
-  //讀取房間的 Amount 歸零
-  ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
-  write_ALL(ALL, doc) //寫入
-  SheetM.getRange(1, col).setValue("[0,0]")
+    //讀取房間的 Amount 歸零
+    ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount = 0;
+    write_ALL(ALL, doc) //寫入
+    SheetM.getRange(1, col).setValue("[0,0]")
 
-  sendtext(chat_id, ct["read_massage_ed"]);
-  // ^ =======讀取完畢=======
+    sendtext(chat_id, ct["read_massage_ed"]);
+    // ^ =======讀取完畢=======
+  } catch (e) {
+    var aims_room_name = ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Name
+    ct["send_to_TG_error"]['text'] = ct["send_to_TG_error"]['text'].format(
+      aims_room_name, JSON.stringify(message_json), e)
+    sendtext(Telegram_id, ct["send_to_TG_error"]);
+    // ^ '傳送失敗...，原因如下\n\n{0}'
+  }
+
+
   return true
 }
 //=================================================================================
