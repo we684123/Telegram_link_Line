@@ -1526,7 +1526,11 @@ function doPost(e) {
         // 對，是 left。不能改。Line為什麼不用lefted ......
       } else if (cutM.type == "memberJoined") {
         message_json.joined = estringa.events[ev]['joined']
+      } else if (cutM.type == "follow") { //真的沒幹嘛...
+      } else if (cutM.type == "unfollow") { //真的沒幹嘛...
       } else {
+        //剩下的事件理論上真的碰不到，碰了也不是本機器人的服務範圍了，除非以後有其他想法
+
         // 以下需要下載
         // 先開資料夾
         var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
@@ -1668,9 +1672,15 @@ function doPost(e) {
               ct['memberLeft']['text'] = ct['memberLeft']['text'].format(members_data_text)
               sendtext(chat_id, ct['memberLeft'])
               // ^ "有人離開啦\n{0}"
-            } else if (message_json.type == "join") {
+            } else if (cutM.type == "join") {
               ct['line_bot_join']['text'] = ct['line_bot_join']['text'].format(cutSource.type)
               sendtext(chat_id, ct['line_bot_join']);
+            } else if (cutM.type == "follow") {
+              ct['follow']['text'] = ct['follow']['text'].format(message_json.userName)
+              sendtext(chat_id, ct['follow']['text']);
+            } else if (cutM.type == "unfollow") {
+              ct['unfollow']['text'] = ct['unfollow']['text'].format(message_json.userName)
+              endtext(chat_id, ct['unfollow']['text']);
             }
           } catch (e) {
             sendtext(Telegram_id, ct["send_to_TG_error"]['text'].format(message_json, e));
@@ -3085,6 +3095,12 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       ct['memberLeft']['text'] = ct['memberLeft']['text'].format(members_data_text)
       sendtext(chat_id, ct['memberLeft'])
       // ^ "有人離開啦\n{0}"
+    } else if (message_json.type == "follow") {
+      ct['follow']['text'] = ct['follow']['text'].format(message_json.userName)
+      sendtext(chat_id, ct['follow']['text']);
+    } else if (message_json.type == "unfollow") {
+      ct['unfollow']['text'] = ct['unfollow']['text'].format(message_json.userName)
+      endtext(chat_id, ct['unfollow']['text']);
     }
     //最後再"推前"
     upMessageData(i, col, ed)
