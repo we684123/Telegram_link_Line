@@ -1477,11 +1477,6 @@ function doPost(e) {
 
       if (cutSource.userId) { //嘗試取得發話人名稱
         var u = cutSource.userId
-        if (cutSource.groupId) { //看是group or room 再取出對應數值
-          var g = cutSource.groupId
-        } else {
-          var g = cutSource.roomId
-        }
         if (cutSource.type == "user") {
           var userName = Get_profile(u)['displayName']; //如果有則用
         } else if (cutSource.type == "room") {
@@ -1489,6 +1484,11 @@ function doPost(e) {
         } else {
           var userName = new_Get_profile(u, 'group', g)['displayName'];
         }
+      }
+      if (cutSource.groupId) { //看是group or room 再取出對應數值
+        var g = cutSource.groupId
+      } else {
+        var g = cutSource.roomId
       }
 
       if (!userName)
@@ -1505,7 +1505,8 @@ function doPost(e) {
         "message_id": cutM.id,
         "userName": userName,
         "timestamp": parseInt(estringa.events[ev].timestamp),
-        "room_type": cutSource.type
+        "room_type": cutSource.type,
+        "room_id": g
       }
 
       // 以下處理資料，分不需要下載跟需要下載處理
@@ -1659,36 +1660,14 @@ function doPost(e) {
             } else if (cutM.type == "memberJoined") {
               //新人加入啦
               var cutL = message_json['joined']['members']
-              var members_data_text = ''
-              for (var i = 0; i < cutL.length; i++) {
-                try {
-                  var j = Get_profile(cutL[i]['userId'])
-                  members_data_text +=
-                    String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-                } catch (e) {
-                  var j = new_Get_profile(cutL[i]['userId'], 'room', g)
-                  members_data_text +=
-                    String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-                }
-              }
+              var members_data_text = get_line_members(message_json, cutL)
               ct['memberJoined']['text'] = ct['memberJoined']['text'].format(members_data_text)
               sendtext(chat_id, ct['memberJoined'])
               // ^ "有新人加入\n{0}"
             } else if (cutM.type == "memberLeft") {
               //有人離開啦
               var cutL = message_json['lefted']['members']
-              var members_data_text = ''
-              for (var i = 0; i < cutL.length; i++) {
-                try {
-                  var j = Get_profile(cutL[i]['userId'])
-                  members_data_text +=
-                    String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-                } catch (e) {
-                  var j = new_Get_profile(cutL[i]['userId'], 'room', g)
-                  members_data_text +=
-                    String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-                }
-              }
+              var members_data_text = get_line_members(message_json, cutL)
               ct['memberLeft']['text'] = ct['memberLeft']['text'].format(members_data_text)
               sendtext(chat_id, ct['memberLeft'])
               // ^ "有人離開啦\n{0}"
@@ -1706,7 +1685,7 @@ function doPost(e) {
           var col = ALL.FastMatch2[line_roomID] + 1; //找欄位
           var LastRowM = SheetM.getRange(1, col).getDisplayValue();
           LastRowM = JSON.parse(LastRowM)
-          SheetM.getRange(LastRowM[0] + 2, col).setValue(String(text)) //更新內容
+          SheetM.getRange(LastRowM[0] + 2, col).setValue(JSON.stringify(message_json)) //更新內容
           LastRowM[0] = LastRowM[0] + 1;
           SheetM.getRange(1, col).setValue(JSON.stringify(LastRowM)) //更新數量
           //以下處理doc==========================================================
@@ -1917,6 +1896,21 @@ function new_Get_profile(userId, rq_mode, groupId) {
     var profile = "未知姓名"
   }
   return profile
+}
+//=================================================================================
+function get_line_members(message_json, cutL) {
+  var members_data_text = ''
+  var room_type = message_json['room_type']
+  for (var i = 0; i < cutL.length; i++) {
+    try {
+      var j = new_Get_profile(cutL[i]['userId'], room_type, message_json['room_id'])
+    } catch (e) {
+      var j = Get_profile(cutL[i]['userId'])
+    }
+    members_data_text +=
+      String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
+  }
+  return members_data_text
 }
 //=================================================================================
 function TG_Send_text_To_Line(Line_id, text) {
@@ -3086,39 +3080,14 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
     } else if (message_json.type == "memberJoined") {
       //新人加入啦
       var cutL = message_json['joined']['members']
-      var members_data_text = ''
-
-      for (var k = 0; k < cutL.length; k++) {
-        try {
-          var j = Get_profile(cutL[k]['userId'])
-          members_data_text +=
-            String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-        } catch (e) {
-          var j = new_Get_profile(cutL[i]['userId'], 'room', g)
-          members_data_text +=
-            String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-        }
-      }
+      var members_data_text = get_line_members(message_json, cutL)
       ct['memberJoined']['text'] = ct['memberJoined']['text'].format(members_data_text)
       sendtext(chat_id, ct['memberJoined'])
       // ^ "有新人加入\n{0}"
     } else if (message_json.type == "memberLeft") {
       //有人離開啦
       var cutL = message_json['lefted']['members']
-      var members_data_text = ''
-
-      for (var k = 0; k < cutL.length; k++) {
-        try {
-          k
-          var j = Get_profile(cutL[k]['userId'])
-          members_data_text +=
-            String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-        } catch (e) {
-          var j = new_Get_profile(cutL[i]['userId'], 'room', g)
-          members_data_text +=
-            String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-        }
-      }
+      var members_data_text = get_line_members(message_json, cutL)
       ct['memberLeft']['text'] = ct['memberLeft']['text'].format(members_data_text)
       sendtext(chat_id, ct['memberLeft'])
       // ^ "有人離開啦\n{0}"
