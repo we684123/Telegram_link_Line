@@ -1462,32 +1462,28 @@ function doPost(e) {
       //Logger.log("cutSource = ",cutSource);
       if (cutSource.type == "user") { //舊格式整理
         var line_roomID = cutSource.userId; //line_roomID = 要發送的地址
-        var userId = cutSource.userId
       } else if (cutSource.type == "room") {
         var line_roomID = cutSource.roomId;
-        if (cutSource.userId) {
-          var userId = cutSource.userId
-        }
+        if (cutSource.userId) {}
       } else {
         var line_roomID = cutSource.groupId;
-        if (cutSource.userId) {
-          var userId = cutSource.userId
-        }
+        if (cutSource.userId) {}
       } //強制轉ID
+      var userId = cutSource.userId
 
+      // room_id跟line_roomID的不同處在於，前者是適用於新格式的，後者是以前三個混用的狀況
       if (cutSource.groupId) { //看是group or room 再取出對應數值
-        var g = cutSource.groupId
+        var room_id = cutSource.groupId
       } else {
-        var g = cutSource.roomId
+        var room_id = cutSource.roomId
       }
-      if (cutSource.userId) { //嘗試取得發話人名稱
-        var u = cutSource.userId
+      if (userId) { //嘗試取得發話人名稱
         if (cutSource.type == "user") {
-          var userName = Get_profile(u)['displayName']; //如果有則用
+          var userName = Get_profile(userId)['displayName']; //如果有則用
         } else if (cutSource.type == "room") {
-          var userName = new_Get_profile(u, 'room', g)['displayName'];
+          var userName = new_Get_profile(userId, 'room', room_id)['displayName'];
         } else {
-          var userName = new_Get_profile(u, 'group', g)['displayName'];
+          var userName = new_Get_profile(userId, 'group', room_id)['displayName'];
         }
       }
 
@@ -1507,7 +1503,7 @@ function doPost(e) {
         "userName": userName,
         "timestamp": parseInt(estringa.events[ev].timestamp),
         "room_type": cutSource.type,
-        "room_id": g
+        "room_id": room_id
       }
 
       // 以下處理資料，分不需要下載跟需要下載處理
@@ -1701,7 +1697,6 @@ function doPost(e) {
           //以下處理關鍵字通知====================================================
           var keyword_notice = ALL.keyword_notice
           if (keyword_notice && message_json.text != undefined) {
-            var txt = text
             var keys = ALL.keyword
             var keys_value = key_word_check(message_json.text, keys)
             if (keys_value.length > 0) {
@@ -2797,7 +2792,7 @@ function AllRead() {
     ALL.data[i].Amount = 0
     row1.splice(i, 0, "[0,0]")
   }
-  var LastCol = Sheet.getLastColumn();
+  //var LastCol = Sheet.getLastColumn();
   Sheet.clear();
   Sheet.appendRow(row1)
 
@@ -2883,8 +2878,6 @@ function up_room_start(ALL) {
 function entities_conversion(text, entities, ct) { //用來處理格式化的網址
   var EC_text = []
   var text_link = []
-  var st_index = 0
-  var ed_index = text.length
   var URL_Quantity = 0
   // 下先分解
   for (var i = entities.length - 1; i >= 0; i--) {
