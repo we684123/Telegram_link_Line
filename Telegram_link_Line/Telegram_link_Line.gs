@@ -248,30 +248,15 @@ function doPost(e) {
           return 0
         }
 
-        try {
+        try { //處理 tryget 指令
           // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
-          var rg = Stext.split("_")
+          var rg = Stext.split("@")[0].split("_")
           if (rg[0] == '/tryget') {
-            // "/resend_video_fliename_123456789"
-            var send_ed = sendtext(chat_id, ct['get_command_ed'])
-            // ^ "已接收指令!\n處理中請稍後..."
-            var line_flie_id = rg[1]
-            var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
-            var file_id = downloadFromLine(
-              CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line', Folder)
-            if (file_id == false) {
-              sendtext(chat_id, ct['tryget_error'])
-              // ^ 目前依舊無法取得，請再等等qwq
-            } else {
-              var blob = DriveApp.getFileById(file_id).getBlob();
-              sendDocument(chat_id, blob)
-            }
-            deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
+            tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN)
             lock.releaseLock();
             return 0
           }
         } catch (e) {}
-
 
         // 下面才是正常的流程
         var n = number
@@ -469,6 +454,16 @@ function doPost(e) {
 
     //再針對不同的情況處理訊息
     if (estringa.message.text) { //如果是文字訊息
+      try { //處理 tryget 指令
+        // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
+        var rg = Stext.split("@")[0].split("_")
+        if (rg[0] == '/tryget') {
+          tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN)
+          lock.releaseLock();
+          return 0
+        }
+      } catch (e) {}
+
       if (mode == "🚀 發送訊息" && Stext != "/exit") {
         //以下準備接收telegram資訊並發到line
 
@@ -480,27 +475,15 @@ function doPost(e) {
           return 0;
         }
 
-        // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
-        var rg = Stext.split("_")
-        if (rg[0] == '/tryget') {
-          // "/resend_video_fliename_123456789"
-          var send_ed = sendtext(chat_id, ct['get_command_ed'])
-          // ^ "已接收指令!\n處理中請稍後..."
-          var line_flie_id = rg[1]
-          var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
-          var file_id = downloadFromLine(
-            CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line', Folder)
-          if (file_id == false) {
-            sendtext(chat_id, ct['tryget_error'])
-            // ^ 目前依舊無法取得，請再等等qwq
-          } else {
-            var blob = DriveApp.getFileById(file_id).getBlob();
-            sendDocument(chat_id, blob)
+        try {
+          // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
+          var rg = Stext.split("@")[0].split("_")
+          if (rg[0] == '/tryget') {
+            tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN)
+            lock.releaseLock();
+            return 0
           }
-          deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
-          lock.releaseLock();
-          return 0
-        }
+        } catch (e) {}
 
         if (estringa.message['entities']) {
           //處理 text 格式化字串連結
@@ -785,10 +768,10 @@ function doPost(e) {
           default:
             sendtext(chat_id, ct['not_eat_this'])
             // ^ "030...\n請不要給我吃怪怪的東西..."
-            deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
             lock.releaseLock();
             return 0;
         }
+        deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
         if (!result[0]) { //意外發生
           var ey = '失敗\n' + result[1]
         } else {
@@ -1205,26 +1188,6 @@ function doPost(e) {
               sendtext(chat_id, ct["incorrect_operation"]);
               // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
             }
-            // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
-            var rg = Stext.split("_")
-            if (rg[0] == '/tryget') {
-              // "/resend_video_fliename_123456789"
-              var send_ed = sendtext(chat_id, ct['get_command_ed'])
-              var line_flie_id = rg[1]
-              var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
-              var file_id = downloadFromLine(
-                CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line', Folder)
-              if (file_id == false) {
-                sendtext(chat_id, ct['tryget_error'])
-                // ^ 目前依舊無法取得，請再等等qwq
-              } else {
-                var blob = DriveApp.getFileById(file_id).getBlob();
-                sendDocument(chat_id, blob)
-              }
-              deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
-              lock.releaseLock();
-              return 0
-            }
 
             //下面處理房間選擇
             var st = Stext.substr(0, 2)
@@ -1462,34 +1425,31 @@ function doPost(e) {
       //Logger.log("cutSource = ",cutSource);
       if (cutSource.type == "user") { //舊格式整理
         var line_roomID = cutSource.userId; //line_roomID = 要發送的地址
-        var userId = cutSource.userId
       } else if (cutSource.type == "room") {
         var line_roomID = cutSource.roomId;
-        if (cutSource.userId) {
-          var userId = cutSource.userId
-        }
+        if (cutSource.userId) {}
       } else {
         var line_roomID = cutSource.groupId;
-        if (cutSource.userId) {
-          var userId = cutSource.userId
-        }
+        if (cutSource.userId) {}
       } //強制轉ID
+      var userId = cutSource.userId
 
-      if (cutSource.userId) { //嘗試取得發話人名稱
-        var u = cutSource.userId
-        if (cutSource.groupId) { //看是group or room 再取出對應數值
-          var g = cutSource.groupId
-        } else {
-          var g = cutSource.roomId
-        }
+      // room_id跟line_roomID的不同處在於，前者是適用於新格式的，後者是以前三個混用的狀況
+      if (cutSource.groupId) { //看是group or room 再取出對應數值
+        var room_id = cutSource.groupId
+      } else {
+        var room_id = cutSource.roomId
+      }
+      if (userId) { //嘗試取得發話人名稱
         if (cutSource.type == "user") {
-          var userName = Get_profile(u)['displayName']; //如果有則用
+          var userName = Get_profile(userId)['displayName']; //如果有則用
         } else if (cutSource.type == "room") {
-          var userName = new_Get_profile(u, 'room', g)['displayName'];
+          var userName = new_Get_profile(userId, 'room', room_id)['displayName'];
         } else {
-          var userName = new_Get_profile(u, 'group', g)['displayName'];
+          var userName = new_Get_profile(userId, 'group', room_id)['displayName'];
         }
       }
+
 
       if (!userName)
         userName = "";
@@ -1505,7 +1465,8 @@ function doPost(e) {
         "message_id": cutM.id,
         "userName": userName,
         "timestamp": parseInt(estringa.events[ev].timestamp),
-        "room_type": cutSource.type
+        "room_type": cutSource.type,
+        "room_id": room_id
       }
 
       // 以下處理資料，分不需要下載跟需要下載處理
@@ -1528,13 +1489,17 @@ function doPost(e) {
         // 對，是 left。不能改。Line為什麼不用lefted ......
       } else if (cutM.type == "memberJoined") {
         message_json.joined = estringa.events[ev]['joined']
+      } else if (cutM.type == "follow") { //真的沒幹嘛...
+      } else if (cutM.type == "unfollow") { //真的沒幹嘛...
       } else {
+        //剩下的事件理論上真的碰不到，碰了也不是本機器人的服務範圍了，除非以後有其他想法
+
         // 以下需要下載
         // 先開資料夾
         var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
         //處理文件
         message_json.ID = downloadFromLine(
-          CHANNEL_ACCESS_TOKEN, cutM.id, cutM.fileName, Folder)
+          CHANNEL_ACCESS_TOKEN, cutM.id, cutM.fileName, Folder)[0]
         message_json.DURL = (
           "https://drive.google.com/uc?export=download&id=" + message_json.ID)
       }
@@ -1659,45 +1624,32 @@ function doPost(e) {
             } else if (cutM.type == "memberJoined") {
               //新人加入啦
               var cutL = message_json['joined']['members']
-              var members_data_text = ''
-              for (var i = 0; i < cutL.length; i++) {
-                try {
-                  var j = Get_profile(cutL[i]['userId'])
-                  members_data_text +=
-                    String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-                } catch (e) {
-                  var j = new_Get_profile(cutL[i]['userId'], 'room', g)
-                  members_data_text +=
-                    String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-                }
-              }
+              var members_data_text = get_line_members(message_json, cutL)
               ct['memberJoined']['text'] = ct['memberJoined']['text'].format(members_data_text)
               sendtext(chat_id, ct['memberJoined'])
               // ^ "有新人加入\n{0}"
             } else if (cutM.type == "memberLeft") {
               //有人離開啦
               var cutL = message_json['lefted']['members']
-              var members_data_text = ''
-              for (var i = 0; i < cutL.length; i++) {
-                try {
-                  var j = Get_profile(cutL[i]['userId'])
-                  members_data_text +=
-                    String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-                } catch (e) {
-                  var j = new_Get_profile(cutL[i]['userId'], 'room', g)
-                  members_data_text +=
-                    String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-                }
-              }
+              var members_data_text = get_line_members(message_json, cutL)
               ct['memberLeft']['text'] = ct['memberLeft']['text'].format(members_data_text)
               sendtext(chat_id, ct['memberLeft'])
               // ^ "有人離開啦\n{0}"
-            } else if (message_json.type == "join") {
+            } else if (cutM.type == "join") {
               ct['line_bot_join']['text'] = ct['line_bot_join']['text'].format(cutSource.type)
               sendtext(chat_id, ct['line_bot_join']);
+            } else if (cutM.type == "follow") {
+              ct['follow']['text'] = ct['follow']['text'].format(message_json.userName)
+              sendtext(chat_id, ct['follow']['text']);
+            } else if (cutM.type == "unfollow") {
+              ct['unfollow']['text'] = ct['unfollow']['text'].format(message_json.userName)
+              sendtext(chat_id, ct['unfollow']['text']);
             }
           } catch (e) {
-            sendtext(Telegram_id, ct["send_to_TG_error"]['text'].format(message_json, e));
+            var aims_room_name = ALL.data[ALL.FastMatch2[line_roomID]].Name
+            ct["send_to_TG_error"]['text'] = ct["send_to_TG_error"]['text'].format(
+              aims_room_name, JSON.stringify(message_json), e)
+            sendtext(Telegram_id, ct["send_to_TG_error"]);
             // ^ '傳送失敗...，原因如下\n\n{0}'
             // NU$ 例外狀況未加
           }
@@ -1706,7 +1658,7 @@ function doPost(e) {
           var col = ALL.FastMatch2[line_roomID] + 1; //找欄位
           var LastRowM = SheetM.getRange(1, col).getDisplayValue();
           LastRowM = JSON.parse(LastRowM)
-          SheetM.getRange(LastRowM[0] + 2, col).setValue(String(text)) //更新內容
+          SheetM.getRange(LastRowM[0] + 2, col).setValue(JSON.stringify(message_json)) //更新內容
           LastRowM[0] = LastRowM[0] + 1;
           SheetM.getRange(1, col).setValue(JSON.stringify(LastRowM)) //更新數量
           //以下處理doc==========================================================
@@ -1721,7 +1673,6 @@ function doPost(e) {
           //以下處理關鍵字通知====================================================
           var keyword_notice = ALL.keyword_notice
           if (keyword_notice && message_json.text != undefined) {
-            var txt = text
             var keys = ALL.keyword
             var keys_value = key_word_check(message_json.text, keys)
             if (keys_value.length > 0) {
@@ -1917,6 +1868,21 @@ function new_Get_profile(userId, rq_mode, groupId) {
     var profile = "未知姓名"
   }
   return profile
+}
+//=================================================================================
+function get_line_members(message_json, cutL) {
+  var members_data_text = ''
+  var room_type = message_json['room_type']
+  for (var i = 0; i < cutL.length; i++) {
+    try {
+      var j = new_Get_profile(cutL[i]['userId'], room_type, message_json['room_id'])
+    } catch (e) {
+      var j = Get_profile(cutL[i]['userId'])
+    }
+    members_data_text +=
+      String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
+  }
+  return members_data_text
 }
 //=================================================================================
 function TG_Send_text_To_Line(Line_id, text) {
@@ -2362,18 +2328,22 @@ function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
   //--------------------------------------------------
   var blob = UrlFetchApp.fetch(url, options);
   if (blob.getResponseCode() != 200) {
-    console.log('Line server 出問題了!，或有意外的類型的post。');
     console.log(blob.getResponseCode())
     console.log(blob.getContentText())
+    var i = blob.getResponseCode()
+    console.log(i)
+    var j = blob.getContentText()
+    console.log(j)
     console.log('-------------')
-    return false
+    var k = "ResponseCode:\n{0}\nContentText:\n{1}".format(i, j)
+    return [false, k]
   }
 
   var f = Folder.createFile(blob).setName(fileName)
   if (fileName == 'wait_Line' || fileName == undefined) {
     f.setName(f.getMimeType())
   }
-  return f.getId()
+  return [f.getId()]
 }
 //=================================================================================
 
@@ -2397,6 +2367,27 @@ function downloadFromTG(Telegram_bot_key, tg_file_id, fileName, Folder) {
 function get_time_txt(timestamp, GMT) {
   var formattedDate = Utilities.formatDate(new Date(timestamp), GMT, "yyyy-MM-dd' 'HH:mm:ss");
   return formattedDate;
+}
+//=================================================================================
+function tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN) {
+  // "/resend_video_fliename_123456789"
+  var send_ed = sendtext(chat_id, ct['get_command_ed'])
+  // ^ "已接收指令!\n處理中請稍後..."
+  var line_flie_id = rg[1]
+  var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
+  var tryget_file_id = downloadFromLine(
+    CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line', Folder)
+  var file_id = tryget_file_id[0]
+  if (tryget_file_id[0] == false) {
+    var error = tryget_file_id[1]
+    ct['tryget_error']['text'] = ct['tryget_error']['text'].format(error)
+    sendtext(chat_id, ct['tryget_error'])
+    // ^ 目前依舊無法取得，請再等等qwq
+  } else {
+    var blob = DriveApp.getFileById(file_id).getBlob();
+    sendDocument(chat_id, blob)
+  }
+  return deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
 }
 //=================================================================================
 function sendtext(chat_id, ct, reply_to_message_id) {
@@ -2802,7 +2793,7 @@ function AllRead() {
     ALL.data[i].Amount = 0
     row1.splice(i, 0, "[0,0]")
   }
-  var LastCol = Sheet.getLastColumn();
+  //var LastCol = Sheet.getLastColumn();
   Sheet.clear();
   Sheet.appendRow(row1)
 
@@ -2888,8 +2879,6 @@ function up_room_start(ALL) {
 function entities_conversion(text, entities, ct) { //用來處理格式化的網址
   var EC_text = []
   var text_link = []
-  var st_index = 0
-  var ed_index = text.length
   var URL_Quantity = 0
   // 下先分解
   for (var i = entities.length - 1; i >= 0; i--) {
@@ -3086,42 +3075,23 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
     } else if (message_json.type == "memberJoined") {
       //新人加入啦
       var cutL = message_json['joined']['members']
-      var members_data_text = ''
-
-      for (var k = 0; k < cutL.length; k++) {
-        try {
-          var j = Get_profile(cutL[k]['userId'])
-          members_data_text +=
-            String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-        } catch (e) {
-          var j = new_Get_profile(cutL[i]['userId'], 'room', g)
-          members_data_text +=
-            String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-        }
-      }
+      var members_data_text = get_line_members(message_json, cutL)
       ct['memberJoined']['text'] = ct['memberJoined']['text'].format(members_data_text)
       sendtext(chat_id, ct['memberJoined'])
       // ^ "有新人加入\n{0}"
     } else if (message_json.type == "memberLeft") {
       //有人離開啦
       var cutL = message_json['lefted']['members']
-      var members_data_text = ''
-
-      for (var k = 0; k < cutL.length; k++) {
-        try {
-          k
-          var j = Get_profile(cutL[k]['userId'])
-          members_data_text +=
-            String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-        } catch (e) {
-          var j = new_Get_profile(cutL[i]['userId'], 'room', g)
-          members_data_text +=
-            String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
-        }
-      }
+      var members_data_text = get_line_members(message_json, cutL)
       ct['memberLeft']['text'] = ct['memberLeft']['text'].format(members_data_text)
       sendtext(chat_id, ct['memberLeft'])
       // ^ "有人離開啦\n{0}"
+    } else if (message_json.type == "follow") {
+      ct['follow']['text'] = ct['follow']['text'].format(message_json.userName)
+      sendtext(chat_id, ct['follow']['text']);
+    } else if (message_json.type == "unfollow") {
+      ct['unfollow']['text'] = ct['unfollow']['text'].format(message_json.userName)
+      sendtext(chat_id, ct['unfollow']['text']);
     }
     //最後再"推前"
     upMessageData(i, col, ed)

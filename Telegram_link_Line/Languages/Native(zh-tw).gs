@@ -676,8 +676,8 @@ function language() {
       },
       "send_to_TG_error": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-        "text": '傳送失敗...\n\n處理失敗的資料：\n{0}\n\n結果：\n{1}',
-        // {0} = 出錯的訊息 , {1} = 失敗原因
+        "text": '傳送失敗...\n\n原本欲傳送到TG的:\n{0}\n\n處理失敗的資料：\n{1}\n\n結果：\n{2}',
+        // {0} = 傳送目標的房間 , {1} = 出錯的訊息 , {2} = 失敗原因
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -820,7 +820,19 @@ function language() {
       },
       "tryget_error": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-        "text": "目前依舊無法取得，請再等等qwq", // 自定義文字內容
+        "text": "目前依舊無法取得\n狀況：\n{0}\n如果getResponseCode為500是line的問題，請在等等qwq，404的話則可能後面的id有誤", // {0} = 出現的狀況
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "follow": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "{0} 加(follow)你的line_bot好友了!", // {0} = line的某人
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "unfollow": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "{0} 移除(unfollow)你的line_bot好友了!", // {0} = line的某人
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
