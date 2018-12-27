@@ -248,30 +248,15 @@ function doPost(e) {
           return 0
         }
 
-        try {
+        try { //處理 tryget 指令
           // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
           var rg = Stext.split("@")[0].split("_")
           if (rg[0] == '/tryget') {
-            // "/resend_video_fliename_123456789"
-            var send_ed = sendtext(chat_id, ct['get_command_ed'])
-            // ^ "已接收指令!\n處理中請稍後..."
-            var line_flie_id = rg[1]
-            var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
-            var file_id = downloadFromLine(
-              CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line', Folder)
-            if (file_id == false) {
-              sendtext(chat_id, ct['tryget_error'])
-              // ^ 目前依舊無法取得，請再等等qwq
-            } else {
-              var blob = DriveApp.getFileById(file_id).getBlob();
-              sendDocument(chat_id, blob)
-            }
-            deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
+            tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN)
             lock.releaseLock();
             return 0
           }
         } catch (e) {}
-
 
         // 下面才是正常的流程
         var n = number
@@ -469,6 +454,16 @@ function doPost(e) {
 
     //再針對不同的情況處理訊息
     if (estringa.message.text) { //如果是文字訊息
+      try { //處理 tryget 指令
+        // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
+        var rg = Stext.split("@")[0].split("_")
+        if (rg[0] == '/tryget') {
+          tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN)
+          lock.releaseLock();
+          return 0
+        }
+      } catch (e) {}
+
       if (mode == "🚀 發送訊息" && Stext != "/exit") {
         //以下準備接收telegram資訊並發到line
 
@@ -480,27 +475,15 @@ function doPost(e) {
           return 0;
         }
 
-        // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
-        var rg = Stext.split("_")
-        if (rg[0] == '/tryget') {
-          // "/resend_video_fliename_123456789"
-          var send_ed = sendtext(chat_id, ct['get_command_ed'])
-          // ^ "已接收指令!\n處理中請稍後..."
-          var line_flie_id = rg[1]
-          var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
-          var file_id = downloadFromLine(
-            CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line', Folder)
-          if (file_id == false) {
-            sendtext(chat_id, ct['tryget_error'])
-            // ^ 目前依舊無法取得，請再等等qwq
-          } else {
-            var blob = DriveApp.getFileById(file_id).getBlob();
-            sendDocument(chat_id, blob)
+        try {
+          // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
+          var rg = Stext.split("@")[0].split("_")
+          if (rg[0] == '/tryget') {
+            tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN)
+            lock.releaseLock();
+            return 0
           }
-          deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
-          lock.releaseLock();
-          return 0
-        }
+        } catch (e) {}
 
         if (estringa.message['entities']) {
           //處理 text 格式化字串連結
@@ -1205,26 +1188,6 @@ function doPost(e) {
               sendtext(chat_id, ct["incorrect_operation"]);
               // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
             }
-            // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
-            var rg = Stext.split("_")
-            if (rg[0] == '/tryget') {
-              // "/resend_video_fliename_123456789"
-              var send_ed = sendtext(chat_id, ct['get_command_ed'])
-              var line_flie_id = rg[1]
-              var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
-              var file_id = downloadFromLine(
-                CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line', Folder)
-              if (file_id == false) {
-                sendtext(chat_id, ct['tryget_error'])
-                // ^ 目前依舊無法取得，請再等等qwq
-              } else {
-                var blob = DriveApp.getFileById(file_id).getBlob();
-                sendDocument(chat_id, blob)
-              }
-              deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
-              lock.releaseLock();
-              return 0
-            }
 
             //下面處理房間選擇
             var st = Stext.substr(0, 2)
@@ -1536,7 +1499,7 @@ function doPost(e) {
         var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
         //處理文件
         message_json.ID = downloadFromLine(
-          CHANNEL_ACCESS_TOKEN, cutM.id, cutM.fileName, Folder)
+          CHANNEL_ACCESS_TOKEN, cutM.id, cutM.fileName, Folder)[0]
         message_json.DURL = (
           "https://drive.google.com/uc?export=download&id=" + message_json.ID)
       }
@@ -2365,18 +2328,22 @@ function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
   //--------------------------------------------------
   var blob = UrlFetchApp.fetch(url, options);
   if (blob.getResponseCode() != 200) {
-    console.log('Line server 出問題了!，或有意外的類型的post。');
     console.log(blob.getResponseCode())
     console.log(blob.getContentText())
+    var i = blob.getResponseCode()
+    console.log(i)
+    var j = blob.getContentText()
+    console.log(j)
     console.log('-------------')
-    return false
+    var k = "ResponseCode:\n{0}\nContentText:\n{1}".format(i, j)
+    return [false, k]
   }
 
   var f = Folder.createFile(blob).setName(fileName)
   if (fileName == 'wait_Line' || fileName == undefined) {
     f.setName(f.getMimeType())
   }
-  return f.getId()
+  return [f.getId()]
 }
 //=================================================================================
 
@@ -2400,6 +2367,27 @@ function downloadFromTG(Telegram_bot_key, tg_file_id, fileName, Folder) {
 function get_time_txt(timestamp, GMT) {
   var formattedDate = Utilities.formatDate(new Date(timestamp), GMT, "yyyy-MM-dd' 'HH:mm:ss");
   return formattedDate;
+}
+//=================================================================================
+function tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN) {
+  // "/resend_video_fliename_123456789"
+  var send_ed = sendtext(chat_id, ct['get_command_ed'])
+  // ^ "已接收指令!\n處理中請稍後..."
+  var line_flie_id = rg[1]
+  var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
+  var tryget_file_id = downloadFromLine(
+    CHANNEL_ACCESS_TOKEN, line_flie_id, 'wait_Line', Folder)
+  var file_id = tryget_file_id[0]
+  if (tryget_file_id[0] == false) {
+    var error = tryget_file_id[1]
+    ct['tryget_error']['text'] = ct['tryget_error']['text'].format(error)
+    sendtext(chat_id, ct['tryget_error'])
+    // ^ 目前依舊無法取得，請再等等qwq
+  } else {
+    var blob = DriveApp.getFileById(file_id).getBlob();
+    sendDocument(chat_id, blob)
+  }
+  return deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
 }
 //=================================================================================
 function sendtext(chat_id, ct, reply_to_message_id) {

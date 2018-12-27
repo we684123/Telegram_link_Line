@@ -818,6 +818,12 @@ function language() {
         // {3} = "發送者姓名"
         // "/tryget_{2}" <- 請不要改，謝謝!
       },
+      "tryget_error": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "目前依舊無法取得\n狀況：\n{0}\n如果getResponseCode為500是line的問題，請在等等qwq，404的話則可能後面的id有誤", // {0} = 出現的狀況
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "follow": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "{0} 加(follow)你的line_bot好友了!", // {0} = line的某人
