@@ -768,10 +768,10 @@ function doPost(e) {
           default:
             sendtext(chat_id, ct['not_eat_this'])
             // ^ "030...\n請不要給我吃怪怪的東西..."
-            deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
             lock.releaseLock();
             return 0;
         }
+        deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
         if (!result[0]) { //意外發生
           var ey = '失敗\n' + result[1]
         } else {
