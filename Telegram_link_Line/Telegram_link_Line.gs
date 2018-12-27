@@ -250,7 +250,7 @@ function doPost(e) {
 
         try {
           // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
-          var rg = Stext.split("_")
+          var rg = Stext.split("@")[0].split("_")
           if (rg[0] == '/tryget') {
             // "/resend_video_fliename_123456789"
             var send_ed = sendtext(chat_id, ct['get_command_ed'])
