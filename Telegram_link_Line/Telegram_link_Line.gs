@@ -1680,10 +1680,13 @@ function doPost(e) {
               sendtext(chat_id, ct['follow']['text']);
             } else if (cutM.type == "unfollow") {
               ct['unfollow']['text'] = ct['unfollow']['text'].format(message_json.userName)
-              endtext(chat_id, ct['unfollow']['text']);
+              sendtext(chat_id, ct['unfollow']['text']);
             }
           } catch (e) {
-            sendtext(Telegram_id, ct["send_to_TG_error"]['text'].format(message_json, e));
+            var aims_room_name = ALL.data[ALL.FastMatch2[line_roomID]].Name
+            ct["send_to_TG_error"]['text'] = ct["send_to_TG_error"]['text'].format(
+              aims_room_name, JSON.stringify(message_json), e)
+            sendtext(Telegram_id, ct["send_to_TG_error"]);
             // ^ '傳送失敗...，原因如下\n\n{0}'
             // NU$ 例外狀況未加
           }
@@ -3100,7 +3103,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification) {
       sendtext(chat_id, ct['follow']['text']);
     } else if (message_json.type == "unfollow") {
       ct['unfollow']['text'] = ct['unfollow']['text'].format(message_json.userName)
-      endtext(chat_id, ct['unfollow']['text']);
+      sendtext(chat_id, ct['unfollow']['text']);
     }
     //最後再"推前"
     upMessageData(i, col, ed)
