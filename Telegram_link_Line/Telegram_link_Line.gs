@@ -318,7 +318,7 @@ function doPost(e) {
           var photo_id = p[max].file_id
           var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
           var gfid = downloadFromTG(Telegram_bot_key, photo_id, fileName, Folder)
-          var Durl = G_drive_Durl + gfid
+          var Durl = get_200_url(G_drive_Durl + gfid)
           TG_Send_Photo_To_Line(Line_id, photo_id, Durl)
           if (ALL.data[n]["Display_name"]) {
             TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
@@ -1279,7 +1279,7 @@ function doPost(e) {
         var photo_id = p[max].file_id
         var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
         var gfid = downloadFromTG(Telegram_bot_key, photo_id, fileName, Folder)
-        var Durl = G_drive_Durl + gfid
+        var Durl = get_200_url(G_drive_Durl + gfid)
         TG_Send_Photo_To_Line(Line_id, photo_id, Durl)
 
         if (estringa.message.caption)
@@ -2922,6 +2922,29 @@ function entities_conversion(text, entities, ct) { //用來處理格式化的網
     return text + assemble_text
   }
 
+}
+//=================================================================================
+function get_200_url(url) {
+  // X的，受夠了! Line怎麼就不順便轉址一下
+  // 明明手機的就會自己轉，電腦版的就不行，X
+  //console.log("----------------------")
+  var options = {
+    'followRedirects': false,
+    'method': 'get'
+  }
+  var ruse = UrlFetchApp.fetch(url, options);
+  var i1 = ruse.getResponseCode()
+  var i2 = ruse.getHeaders()
+
+  if (i1 == 302 && i1 != 200) {
+    url = get_200_url(i2["Location"])
+  } else if (i1 == 200) {
+    return url
+  } else {
+    console.log("fetch結果非預期的回應")
+    console.log(url)
+  }
+  return url
 }
 //=================================================================================
 function rt_text_reduce(text, rt_max_chats) {
