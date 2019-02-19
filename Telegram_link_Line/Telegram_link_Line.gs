@@ -1689,6 +1689,9 @@ function doPost(e) {
         }
 
       } else { //以下處理未登記的(新資料)=======================
+        if ( message_json.type == 'leave') {
+          return 0;
+        }
         var newcol = Object.keys(ALL.FastMatch2).length;
         //以下處理FastMatch2==================================
         ALL.FastMatch2[line_roomID] = newcol
@@ -3097,6 +3100,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
       } else if (message_json.type == "leave") {
         sendtext(chat_id, ct['line_bot_leave']);
       } else if (message_json.type == "join") {
+        ct['line_bot_join'].text = ct['line_bot_join'].text.format(message_json.room_type)
         sendtext(chat_id, ct['line_bot_join']);
       } else if (message_json.type == "memberJoined") {
         //新人加入啦
