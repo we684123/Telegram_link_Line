@@ -1672,7 +1672,7 @@ function doPost(e) {
           }
           //以下處理關鍵字通知====================================================
           var keyword_notice = ALL.keyword_notice
-          if (keyword_notice && message_json.text != undefined) {
+          if (keyword_notice && message_json.text != undefined && message_json.type == 'text') {
             var keys = ALL.keyword
             var keys_value = key_word_check(message_json.text, keys)
             if (keys_value.length > 0) {
@@ -2939,6 +2939,7 @@ function get_200_url(url) {
   if (i1 == 302 && i1 != 200) {
     url = get_200_url(i2["Location"])
   } else if (i1 == 200) {
+
     return url
   } else {
     console.log("fetch結果非預期的回應")
