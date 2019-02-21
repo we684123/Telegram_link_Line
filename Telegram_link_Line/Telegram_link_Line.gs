@@ -1672,7 +1672,7 @@ function doPost(e) {
           }
           //以下處理關鍵字通知====================================================
           var keyword_notice = ALL.keyword_notice
-          if (keyword_notice && message_json.text != undefined) {
+          if (keyword_notice && message_json.text != undefined && message_json.type == 'text') {
             var keys = ALL.keyword
             var keys_value = key_word_check(message_json.text, keys)
             if (keys_value.length > 0) {
@@ -1689,6 +1689,9 @@ function doPost(e) {
         }
 
       } else { //以下處理未登記的(新資料)=======================
+        if ( message_json.type == 'leave') {
+          return 0;
+        }
         var newcol = Object.keys(ALL.FastMatch2).length;
         //以下處理FastMatch2==================================
         ALL.FastMatch2[line_roomID] = newcol
@@ -2939,6 +2942,7 @@ function get_200_url(url) {
   if (i1 == 302 && i1 != 200) {
     url = get_200_url(i2["Location"])
   } else if (i1 == 200) {
+
     return url
   } else {
     console.log("fetch結果非預期的回應")
@@ -3096,6 +3100,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
       } else if (message_json.type == "leave") {
         sendtext(chat_id, ct['line_bot_leave']);
       } else if (message_json.type == "join") {
+        ct['line_bot_join'].text = ct['line_bot_join'].text.format(message_json.room_type)
         sendtext(chat_id, ct['line_bot_join']);
       } else if (message_json.type == "memberJoined") {
         //新人加入啦
