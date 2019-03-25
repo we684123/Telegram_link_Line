@@ -123,7 +123,7 @@
   ![Imgur](https://i.imgur.com/WgT109q.png)
 
   再一次
-  按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱(推薦叫"Languages") -> 將"[Native(zh-tw).gs](https://github.com/we684123/Telegram_link_Line/blob/redev2/Telegram_link_Line(version3)/Languages/Native(zh-tw).gs)"內容複製上去__    
+  按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱(推薦叫"Languages") -> 將"[Native(zh-tw).gs](https://github.com/we684123/Telegram_link_Line/blob/master/Telegram_link_Line/Languages/Native(zh-tw).gs)"內容複製上去__    
 
   ![Imgur](https://i.imgur.com/KCwcCEz.png)
 
