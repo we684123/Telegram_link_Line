@@ -1,7 +1,7 @@
 function base() {
   //前期準備，不懂看README
   var sheet_key = "(都填入2個雙引號之間，也就是這裡)"; //你的sheet ID
-  var doc_key = "(跟上面一樣，下面依此類推)"; //你的doc ID
+  var doc_key = "(跟上面格式一樣，下面依此類推)"; //你的doc ID
   var Telegram_bot_key = ""; //Telegram bot的token
   var Telegram_id = ""; //你的Telegram帳號ID(要通知你)
   var Line_id = ""; //你的line ID
@@ -29,26 +29,5 @@ function setWebhook() {
   var Telegram_bot_key = base_json.Telegram_bot_key
   var gsURL = base_json.gsURL
   UrlFetchApp.fetch("https://api.telegram.org/bot" + Telegram_bot_key + "/setWebhook?url=" + gsURL + "&max_connections=1")
-}
-//============================================================================
-function TTTTTTT() {
-  var base_json = base()
-  var sheet_key = base_json.sheet_key
-  var doc_key = base_json.doc_key
-  var email = base_json.email
-  var Telegram_bot_key = base_json.Telegram_bot_key
-  var Telegram_id = base_json.Telegram_id
-  var Line_id = base_json.Line_id
-  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-  var FolderId = base_json.FolderId
-
-  //*//
-  //123
-  var gsURL = ""
-  var Stext = ""
-  var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + Stext + "/setWebhook?" + gsURL)
-  var responseCode = response.getResponseCode()
-  var responseBody = response.getContentText()
-  //*/
 }
 //============================================================================
