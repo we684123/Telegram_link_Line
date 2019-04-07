@@ -1689,7 +1689,7 @@ function doPost(e) {
         }
 
       } else { //以下處理未登記的(新資料)=======================
-        if ( message_json.type == 'leave') {
+        if (message_json.type == 'leave') {
           return 0;
         }
         var newcol = Object.keys(ALL.FastMatch2).length;
@@ -2421,16 +2421,35 @@ function sendtext(chat_id, ct, reply_to_message_id) {
   } else {
     var text = ct["text"]
   }
-
-  var payload = {
-    "method": "sendMessage",
-    'chat_id': String(chat_id),
-    'text': text,
-    'disable_notification': notification,
-    "parse_mode": parse_mode,
-    'reply_to_message_id': reply_to_message_id
+  if (text.length > 4000) {
+    var text_list = []
+    var index = 0
+    for (var i = 0; index < text.length; i++) {
+      text_list[i] = text.substr(index, 4000)
+      index += 4000
+    }
+    for (var j = 0; j < text_list.length; j++) {
+      var payload = {
+        "method": "sendMessage",
+        'chat_id': String(chat_id),
+        'text': String(text_list[j]),
+        'disable_notification': notification,
+        "parse_mode": parse_mode,
+        'reply_to_message_id': reply_to_message_id
+      }
+      var results = start(payload);
+    }
+  } else {
+    var payload = {
+      "method": "sendMessage",
+      'chat_id': String(chat_id),
+      'text': text,
+      'disable_notification': notification,
+      "parse_mode": parse_mode,
+      'reply_to_message_id': reply_to_message_id
+    }
+    return start(payload)
   }
-  return start(payload);
 }
 //=================================================================
 function sendPhoto(chat_id, url, notification, caption) {
