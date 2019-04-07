@@ -32,7 +32,7 @@
 |知道Line群人員異動 |     |      |       |     |  ✓  |    
 | /tryget_XXX 功能 |     |      |       |     |  ✓  |    
 * V2、V3有時會不知道是誰發言是因為對方[版本](https://goo.gl/noYa7L)不夠新。
-* 註1：目前確定 "安卓8.5.3" 可以正常看貼圖，"Windows 5.10.0.1789" 則無法，其他未知。
+* 註1：目前確定 "安卓的line版本8.5.3" 可以正常看貼圖，"Windows的line版本 5.10.0.1789" 則無法，其他未知。
 * 註2：LINE發送到TG僅會收到GIF的第一格的畫面。
 
 
@@ -100,16 +100,18 @@
 
 ![Imgur](https://i.imgur.com/U1oJeU5.png)
 
+**事前聲明：下列4個步驟的檔案必須在同一個google帳號下，或者有存取權，bot才會正常運作。**    
+
 1.  一個doc檔，並將v3中的"doc.gs"內容複製上去。
 
 2.  一個sheet檔
     * 在sheet中新增5個分頁(page)：    
   __"Debug"、"Log"、"紀錄發送的訊息"、"Line訊息區"、"JSON備份"__      
-    [說明圖](https://i.imgur.com/UD8X3KO.png)
+    [說明圖](https://i.imgur.com/UD8X3KO.png) (上方文字請用複製比較保險)
     * 其中 "Line訊息區" 在其"A1"中填入 "[0,0]" (字串)，然後選取所有儲存格的格式設為字串(純文字)。      
     [說明圖](https://i.imgur.com/CnrhMB7.png)    
 
-3.  一個資料夾(用來放來自Line的媒體)，推薦名稱叫 "download_from_line"
+3.  一個資料夾(用來放來自Line的媒體)，推薦名稱叫 "download_from_line"(如果Google空間爆了bot會罷工喔，一般帳號有15G應該還好，如果是這個bot的東西占滿空間可以去"自己的TGbot"->"更多設定"->"丟棄舊檔"來丟到垃圾桶)
 
 4.  三個gs檔(google apps script)，並將v3其中的"Telegram_link_Line.gs"的內容複製在一開始給你的"程式碼"區內。    
   ![Imgur](https://i.imgur.com/V3KF0rh.png)
@@ -318,7 +320,7 @@ wait_to_Bind =
 當TG端按下升級房間時，則會將待綁定的房間資料塞入此處等待綁定，會被 /debug 或 /unsetroom 指令消除。
 
 GMT =
-此預設 GMT+8 若不再該時區可自行調整(預計下一版會可以在TG端調整)
+此預設 GMT+8 若不再該時區可自行在 TGbot "更多設定" 中調整
 
 code_version =     
 該程式的版本，用來驗證配對語言包正確性。
