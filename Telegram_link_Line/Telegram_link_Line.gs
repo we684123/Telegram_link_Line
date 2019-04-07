@@ -1689,7 +1689,7 @@ function doPost(e) {
         }
 
       } else { //以下處理未登記的(新資料)=======================
-        if ( message_json.type == 'leave') {
+        if (message_json.type == 'leave') {
           return 0;
         }
         var newcol = Object.keys(ALL.FastMatch2).length;
@@ -1891,28 +1891,56 @@ function get_line_members(message_json, cutL) {
 function TG_Send_text_To_Line(Line_id, text) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+  var max_chat = 1950
 
   var url = 'https://api.line.me/v2/bot/message/push';
-  //--------------------------------------------------
-  var retMsg = [{
-    'type': 'text',
-    'text': text
-  }];
   var header = {
     'Content-Type': 'application/json; charset=UTF-8',
     'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
   }
-  var payload = {
-    'to': Line_id,
-    'messages': retMsg
-  }
-  var options = {
-    'headers': header,
-    'method': 'post',
-    'payload': JSON.stringify(payload)
-  }
   //--------------------------------------------------
-  UrlFetchApp.fetch(url, options);
+  if (text.length > max_chat) {
+    var text_list = []
+    var index = 0
+    for (var i = 0; index < text.length; i++) {
+      text_list[i] = text.substr(index, max_chat)
+      index += max_chat
+    }
+    for (var j = 0; j < text_list.length; j++) {
+      var retMsg = [{
+        'type': 'text',
+        'text': text_list[j]
+      }];
+
+      var payload = {
+        'to': Line_id,
+        'messages': retMsg
+      }
+      var options = {
+        'headers': header,
+        'method': 'post',
+        'payload': JSON.stringify(payload)
+      }
+      var results = UrlFetchApp.fetch(url, options);
+    }
+    return results
+  } else {
+    var retMsg = [{
+      'type': 'text',
+      'text': text
+    }];
+
+    var payload = {
+      'to': Line_id,
+      'messages': retMsg
+    }
+    var options = {
+      'headers': header,
+      'method': 'post',
+      'payload': JSON.stringify(payload)
+    }
+    return UrlFetchApp.fetch(url, options);
+  }
 }
 //=================================================================================
 function TG_Send_Photo_To_Line(Line_id, photo_id, G_drive_Durl) {
@@ -2422,15 +2450,37 @@ function sendtext(chat_id, ct, reply_to_message_id) {
     var text = ct["text"]
   }
 
-  var payload = {
-    "method": "sendMessage",
-    'chat_id': String(chat_id),
-    'text': text,
-    'disable_notification': notification,
-    "parse_mode": parse_mode,
-    'reply_to_message_id': reply_to_message_id
+  var max_chat = 4000
+  if (text.length > max_chat) {
+    var text_list = []
+    var index = 0
+    for (var i = 0; index < text.length; i++) {
+      text_list[i] = text.substr(index, max_chat)
+      index += max_chat
+    }
+    for (var j = 0; j < text_list.length; j++) {
+      var payload = {
+        "method": "sendMessage",
+        'chat_id': String(chat_id),
+        'text': String(text_list[j]),
+        'disable_notification': notification,
+        "parse_mode": parse_mode,
+        'reply_to_message_id': reply_to_message_id
+      }
+      var results = start(payload);
+    }
+    return results
+  } else {
+    var payload = {
+      "method": "sendMessage",
+      'chat_id': String(chat_id),
+      'text': text,
+      'disable_notification': notification,
+      "parse_mode": parse_mode,
+      'reply_to_message_id': reply_to_message_id
+    }
+    return start(payload)
   }
-  return start(payload);
 }
 //=================================================================
 function sendPhoto(chat_id, url, notification, caption) {

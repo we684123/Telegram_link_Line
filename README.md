@@ -2,7 +2,7 @@
 >用Telegram來收發Line的訊息。
 >use telegram to Send and receive messages(from Line).
 *****
-此為針對 v3.2.1 的README。    
+此為針對 v3.2.4 的README。    
 如果是 Telegram_Bot 新手推薦看完 [這個影片](https://youtu.be/On9yeMtG2Wg)後在來使用。    
 
 如果想要獲取更新資訊，可以加入這個頻道  https://t.me/TG_link_Line
@@ -327,6 +327,14 @@ code_version =
 
 ---
 # 版本資訊
+
+  ##### 2019/04/07 - (hotfix)(V3.2.4)     
+ * 修正 TG、Line 端傳送字串太長導致失敗的問題
+
+ 更新方式：
+ 1. Telegram_link_Line.gs 修改    
+ 2. **重部署版本** (版本是 "新增" )
+
 
   ##### 2019/02/21 - (V3.2.3)     
    * 修正 刪除房間後還會觸發"關鍵字"的問題    
