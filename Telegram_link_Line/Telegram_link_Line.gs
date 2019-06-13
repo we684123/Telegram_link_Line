@@ -51,13 +51,13 @@ function up_version() {
     // /debug
     ALL.mode = 0
     ALL.wait_to_Bind = {}
-    var xfjhxgfh = REST_FastMatch1and2and3(ALL);
-    var ydjdyf = REST_keyboard(xfjhxgfh[1]);
-    var r = JSON.stringify(ydjdyf[1]);
+    var REST_F = REST_FastMatch1and2and3(ALL);
+    var REST_k = REST_keyboard(REST_F[1]);
+    var r = JSON.stringify(REST_k[1]);
     doc.setText(r); //寫入
-    sendtext(Telegram_id, ct["debug_ed"]["text"].format(xfjhxgfh[0], ydjdyf[0]));
+    sendtext(Telegram_id, ct["debug_ed"]["text"].format(REST_F[0], REST_k[0]));
     // 🔮 開啟主選單
-    keyboard_main(Telegram_id, ct["🔮 開啟主選單"], ydjdyf[1])
+    keyboard_main(Telegram_id, ct["🔮 開啟主選單"], REST_k[1])
   }
 
   // 寫入ALL
@@ -982,11 +982,11 @@ function doPost(e) {
           case '/debug':
             ALL.mode = 0
             ALL.wait_to_Bind = {}
-            var xfjhxgfh = REST_FastMatch1and2and3(ALL); //強制等待，不知道為什麼有時候不會執行
-            var ydjdyf = REST_keyboard(xfjhxgfh[1]); //強制等待，不知道為什麼有時候不會執行
-            var r = JSON.stringify(ydjdyf[1]);
+            var REST_F = REST_FastMatch1and2and3(ALL); //強制等待，不知道為什麼有時候不會執行
+            var REST_k = REST_keyboard(REST_F[1]); //強制等待，不知道為什麼有時候不會執行
+            var r = JSON.stringify(REST_k[1]);
             doc.setText(r); //寫入
-            sendtext(chat_id, ct["debug_ed"]["text"].format(xfjhxgfh[0], ydjdyf[0]));
+            sendtext(chat_id, ct["debug_ed"]["text"].format(REST_F[0], REST_k[0]));
             // ^ "已debug\nREST_FastMatch1and2and3() : {0}\nREST_keyboard() : {1}",
             break;
           case '/AllRead':
@@ -2152,10 +2152,32 @@ function get_Line_quota() {
   //--------------------------------------------------
   try {
     return UrlFetchApp.fetch(url, options);
-  } catch (e) { 
+  } catch (e) {
     return e
   }
+}
+//=================================================================
+function get_Line_consumption() {
 
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+
+  var url = 'https://api.line.me/v2/bot/message/quota/consumption';
+  //--------------------------------------------------
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var options = {
+    'headers': header,
+    'method': 'get'
+  }
+  //--------------------------------------------------
+  try {
+    return UrlFetchApp.fetch(url, options);
+  } catch (e) {
+    return e
+  }
 }
 //=================================================================
 function getpath(id, Telegram_bot_key) {
