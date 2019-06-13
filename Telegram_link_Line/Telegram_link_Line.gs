@@ -1411,9 +1411,9 @@ function doPost(e) {
     lock.releaseLock();
     return 0;
 
-    //=====================================================================================================
-    //=====================================================================================================
-    //=====================================================================================================
+    //=====================================================================
+    //=====================================================================
+    //=====================================================================
   } else if (estringa.events[0].timestamp) {
     //以下來自line
     var from = 'line';
@@ -1760,7 +1760,7 @@ function doPost(e) {
 }
 
 //以下各類函式支援
-//=====================================================================================================
+//=====================================================================
 function Log(ee, from, sheet_key, email) {
   var d = new Date();
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -1831,7 +1831,7 @@ function mv_all_uproom() {
   write_ALL(ALL, doc) //寫入
 
 }
-//=================================================================================
+//=================================================================
 function Get_profile(userId) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
@@ -1851,7 +1851,7 @@ function Get_profile(userId) {
   }
   return profile
 }
-//=================================================================================
+//=================================================================
 function new_Get_profile(userId, rq_mode, groupId) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
@@ -1872,7 +1872,7 @@ function new_Get_profile(userId, rq_mode, groupId) {
   }
   return profile
 }
-//=================================================================================
+//=================================================================
 function get_line_members(message_json, cutL) {
   var members_data_text = ''
   var room_type = message_json['room_type']
@@ -1887,7 +1887,7 @@ function get_line_members(message_json, cutL) {
   }
   return members_data_text
 }
-//=================================================================================
+//=================================================================
 function TG_Send_text_To_Line(Line_id, text) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
@@ -1942,7 +1942,7 @@ function TG_Send_text_To_Line(Line_id, text) {
     return UrlFetchApp.fetch(url, options);
   }
 }
-//=================================================================================
+//=================================================================
 function TG_Send_Photo_To_Line(Line_id, photo_id, G_drive_Durl) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
@@ -1972,7 +1972,7 @@ function TG_Send_Photo_To_Line(Line_id, photo_id, G_drive_Durl) {
   //--------------------------------------------------
   UrlFetchApp.fetch(url, options);
 }
-//=================================================================================
+//=================================================================
 function TG_Send_video_To_Line(Line_id, video_id, thumb_id) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
@@ -2003,7 +2003,7 @@ function TG_Send_video_To_Line(Line_id, video_id, thumb_id) {
   //--------------------------------------------------
   UrlFetchApp.fetch(url, options);
 }
-//=================================================================================
+//=================================================================
 function TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
@@ -2035,7 +2035,7 @@ function TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key) {
   //--------------------------------------------------
   UrlFetchApp.fetch(url, options);
 }
-//=================================================================================
+//=================================================================
 function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
@@ -2066,7 +2066,7 @@ function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_addres
   //--------------------------------------------------
   UrlFetchApp.fetch(url, options);
 }
-//=================================================================================
+//=================================================================
 function TG_Send_Sticker_To_Line(Line_id, sticker_id) { //舊款function 先留著
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
@@ -2095,7 +2095,7 @@ function TG_Send_Sticker_To_Line(Line_id, sticker_id) { //舊款function 先留�
   //--------------------------------------------------
   UrlFetchApp.fetch(url, options);
 }
-//=================================================================================
+//=================================================================
 function Line_leave(room_or_groupID) {
 
   var base_json = base()
@@ -2133,7 +2133,31 @@ function Line_leave(room_or_groupID) {
     return "成功"
   }
 }
-//=================================================================================
+//=================================================================
+function get_Line_quota() {
+
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+
+  var url = 'https://api.line.me/v2/bot/message/quota';
+  //--------------------------------------------------
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var options = {
+    'headers': header,
+    'method': 'get'
+  }
+  //--------------------------------------------------
+  try {
+    return UrlFetchApp.fetch(url, options);
+  } catch (e) { 
+    return e
+  }
+
+}
+//=================================================================
 function getpath(id, Telegram_bot_key) {
   if (Telegram_bot_key === void 0) {
     var base_json = base()
@@ -2145,7 +2169,7 @@ function getpath(id, Telegram_bot_key) {
   var path = html.result.file_path
   return path;
 }
-//=================================================================================
+//=================================================================
 function TGdownloadURL(path, Telegram_bot_key) {
   if (Telegram_bot_key === void 0) {
     var base_json = base()
@@ -2154,7 +2178,7 @@ function TGdownloadURL(path, Telegram_bot_key) {
   var TGDurl = "https://api.telegram.org/file/bot" + Telegram_bot_key + "/" + path
   return TGDurl;
 }
-//=================================================================================
+//=================================================================
 
 /**
  * create_Folder - 創資料夾
@@ -2174,7 +2198,7 @@ function create_Folder(Folder, Name, Description) {
 
   return Folder.createFolder(Name).setDescription(Description)
 }
-//=================================================================================
+//=================================================================
 
 /**
  * get_folder_info - 得到目標資料夾的詳細資料
@@ -2194,7 +2218,7 @@ function get_folder_info(Folder) {
   }
   return folder_info
 }
-//=================================================================================
+//=================================================================
 
 /**
  * list_folder - 得到目標資料夾下所有資料夾的詳細資料
@@ -2214,7 +2238,7 @@ function list_folder(Description_Folder) {
   }
   return Folders_list
 }
-//=================================================================================
+//=================================================================
 
 /**
  * clear_folders - 目標資料夾下所有資料夾塞入垃圾桶
@@ -2236,7 +2260,7 @@ function clear_folders(Description_Folder) {
   }
   return [true]
 }
-//=================================================================================
+//=================================================================
 
 /**
  * clear_files - 目標資料夾下所有檔案塞入垃圾桶
@@ -2258,7 +2282,7 @@ function clear_files(Description_Folder) {
   }
   return [true]
 }
-//=================================================================================
+//=================================================================
 
 /**
  * clear_files_by_mode - 依模式、時間、來源清理檔案
@@ -2311,7 +2335,7 @@ function clear_files_by_mode(Description_Folder, mode, time) {
   }
   return [true]
 }
-//=================================================================================
+//=================================================================
 
 /**
  * copy_file - 複製檔案到目標資料夾
@@ -2333,7 +2357,7 @@ function copy_file(file, destination_folder) {
   }
   return [true]
 }
-//=================================================================================
+//=================================================================
 
 /**
  * downloadFromLine - 下載Line的東西。
@@ -2376,7 +2400,7 @@ function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
   }
   return [f.getId()]
 }
-//=================================================================================
+//=================================================================
 
 /**
  * downloadFromTG - 從TG下載到google_drive
@@ -2394,12 +2418,12 @@ function downloadFromTG(Telegram_bot_key, tg_file_id, fileName, Folder) {
   var f = Folder.createFile(blob).setName(fileName)
   return f.getId()
 }
-//=================================================================================
+//=================================================================
 function get_time_txt(timestamp, GMT) {
   var formattedDate = Utilities.formatDate(new Date(timestamp), GMT, "yyyy-MM-dd' 'HH:mm:ss");
   return formattedDate;
 }
-//=================================================================================
+//=================================================================
 function tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN) {
   // "/resend_video_fliename_123456789"
   var send_ed = sendtext(chat_id, ct['get_command_ed'])
@@ -2420,7 +2444,7 @@ function tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_T
   }
   return deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
 }
-//=================================================================================
+//=================================================================
 function sendtext(chat_id, ct, reply_to_message_id) {
   reply_to_message_id === void 0 ? reply_to_message_id : ''
 
@@ -2496,7 +2520,7 @@ function sendPhoto(chat_id, url, notification, caption) {
   }
   return start(payload);
 }
-//=================================================================================
+//=================================================================
 function sendAudio(chat_id, url_or_bolb, notification, caption, duration) {
   if (notification === void 0)
     notification = false
@@ -2557,7 +2581,7 @@ function sendDocument(chat_id, url_or_bolb, notification, caption) {
   }
   return start(payload);
 }
-//=================================================================================
+//=================================================================
 function sendAnimation(chat_id, url, notification, caption) {
   /* Use this method to send animation files
    * (GIF or H.264/MPEG-4 AVC video without sound).
@@ -2651,7 +2675,7 @@ function ReplyKeyboardRemove(chat_id, ct) {
   }
   return start(payload);
 }
-//=================================================================================
+//=================================================================
 function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, ct) {
   if (chat_id === void 0)
     throw new Error("chat_id未給")
@@ -2700,14 +2724,14 @@ function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboa
   }
   return start(payload);
 }
-//=================================================================================
+//=================================================================
 function keyboard_main(chat_id, ct, ALL) {
   var keyboard_main = ALL.RoomKeyboard
   var resize_keyboard = false
   var one_time_keyboard = false
   ReplyKeyboardMakeup(chat_id, keyboard_main, resize_keyboard, one_time_keyboard, ct)
 }
-//=================================================================================
+//=================================================================
 
 /**
  * REST_keyboard - 重新整理主鍵盤
@@ -2769,7 +2793,7 @@ function REST_keyboard(ALL) {
   ALL.RoomKeyboard = keyboard //寫回RoomKeynoard
   return ['成功', ALL]
 }
-//=================================================================================
+//=================================================================
 function REST_FastMatch1and2and3(ALL) { //重製快速索引
   var data_len = ALL.data.length
   ALL.FastMatch = {}
@@ -2792,7 +2816,7 @@ function REST_FastMatch1and2and3(ALL) { //重製快速索引
   return ["成功", ALL]
 }
 
-//=================================================================================
+//=================================================================
 //喔乾，感謝 Kevin Tseng 開源這個用法
 //來源:
 // https://kevintsengtw.blogspot.com/2011/09/javascript-stringformat.html?
@@ -2819,7 +2843,7 @@ function cleanStringFormatResult(txt) {
   if (txt == null) return "";
   return txt.replace(getStringFormatPlaceHolderRegEx("\\d+"), "");
 }
-//=================================================================================
+//=================================================================
 // 我印象中有找到一種方式來分割字串的，但不知道是哪個指令...
 // 用法是 text.xxxx(10) -> 回傳 [字串前10個字 , 後10個到底的字]
 String.prototype.nslice = function() {
@@ -2828,7 +2852,7 @@ String.prototype.nslice = function() {
   var t2 = txt.slice(arguments[0])
   return [t1, t2];
 }
-//=================================================================================
+//=================================================================
 function AllRead() {
   var base_json = base()
   var sheet_key = base_json.sheet_key
@@ -2852,7 +2876,7 @@ function AllRead() {
 
   write_ALL(ALL, doc) //寫入
 }
-//=================================================================================
+//=================================================================
 function write_ALL(ALL, doc) {
   try {
     var r = JSON.stringify(ALL); //別刪，這是源頭啦!!!
@@ -2862,7 +2886,7 @@ function write_ALL(ALL, doc) {
   }
   return true
 }
-//=================================================================================
+//=================================================================
 function key_word_check(txt, keys) {
   var keys_value = []
   for (var i = 0; i < keys.length; i++) {
@@ -2877,7 +2901,7 @@ function key_word_check(txt, keys) {
   }
   return keys_value
 }
-//=================================================================================
+//=================================================================
 function Random_text(codeLength) {
   var id = ""
   var selectChar = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D',
@@ -2889,7 +2913,7 @@ function Random_text(codeLength) {
   }
   return id
 }
-//=================================================================================
+//=================================================================
 function in_command(text) {
   var ct = language()["correspond_text"] //語言載入
   var command_list = Object.keys(ct)
@@ -2900,7 +2924,7 @@ function in_command(text) {
   }
   return false
 }
-//=================================================================================
+//=================================================================
 function in_name(ALL, text) {
   var ALL_list = Object.keys(ALL["FastMatch"])
   for (var i = 0; i < ALL_list.length; i++) {
@@ -2910,7 +2934,7 @@ function in_name(ALL, text) {
   }
   return false
 }
-//=================================================================================
+//=================================================================
 function get_all_keyword(ALL) {
   var all_word = ''
   for (var i = 0; i < ALL.keyword.length; i++) {
@@ -2918,7 +2942,7 @@ function get_all_keyword(ALL) {
   }
   return all_word
 }
-//=================================================================================
+//=================================================================
 function up_room_start(ALL) {
   var FM3_keys = Object.keys(ALL["FastMatch3"])
   for (var i = 0; i < FM3_keys.length; i++) {
@@ -2928,7 +2952,7 @@ function up_room_start(ALL) {
   }
   return ALL
 }
-//=================================================================================
+//=================================================================
 function entities_conversion(text, entities, ct) { //用來處理格式化的網址
   var EC_text = []
   var text_link = []
@@ -2976,7 +3000,7 @@ function entities_conversion(text, entities, ct) { //用來處理格式化的網
   }
 
 }
-//=================================================================================
+//=================================================================
 function get_200_url(url) {
   // X的，受夠了! Line怎麼就不順便轉址一下
   // 明明手機的就會自己轉，電腦版的就不行，X
@@ -3000,7 +3024,7 @@ function get_200_url(url) {
   }
   return url
 }
-//=================================================================================
+//=================================================================
 function rt_text_reduce(text, rt_max_chats) {
   var max_chat = rt_max_chats
   if (text.length > max_chat) {
@@ -3008,7 +3032,7 @@ function rt_text_reduce(text, rt_max_chats) {
   }
   return text.replace('\n', '%0A').replace(/\n/g, ' ').replace('%0A', '\n')
 }
-//=================================================================================
+//=================================================================
 function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id) {
 
   try {
@@ -3194,7 +3218,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
 
   return true
 }
-//=================================================================================
+//=================================================================
 function start(payload) {
   var base_json = base()
   var Telegram_bot_key = base_json.Telegram_bot_key
@@ -3219,4 +3243,4 @@ function start(payload) {
   Sheet.getRange(LastRow + 1, 2).setValue(returned); //確認有發成功
   //*/
 }
-//=================================================================================
+//=================================================================
