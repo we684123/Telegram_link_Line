@@ -8,7 +8,7 @@ function language() {
     "correspond_text": {
       "backed_up_ing": {
         "type": "to_Telegram",
-        "text": "已備份舊資料，更新doc資料庫中...\n#doc",
+        "text": "已備份舊資料，更新doc資料庫中...\n#doc #TG_Line_bot備份",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -645,6 +645,14 @@ function language() {
       "plz_forward_verification_code": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "請確認我在要綁定的群組中後，再轉發上方的驗證碼到那以進行綁定!\n或按下 /unsetroom 取消升級",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "not_owner": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": ["您好!這是私人用的bot，不對他人開放\n",
+         "若您想要一個自己的 Telegram_link_Line 機器人，請至 \n",
+         "https://github.com/we684123/Telegram_link_Line"], // {0} = line的某人
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },

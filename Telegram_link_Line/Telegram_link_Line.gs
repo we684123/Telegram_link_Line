@@ -111,6 +111,7 @@ function doPost(e) {
   var G_drive_Durl_ex = 'https://drive.google.com/uc?export=download&confirm=YzWC&id='
   var rt_max_chats = 14 //對Line回復時應許的字元數
   var notification = false
+  var nonsense_number = 3
 
   /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -139,9 +140,6 @@ function doPost(e) {
     //以下來自telegram
     var from = 'telegram';
     Log(ee, from, sheet_key, email); //log
-    //var doc = DocumentApp.openById(doc_key)
-    //var f = doc.getText();
-    //var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
     var mode = ALL.mode;
     var GMT = ALL.GMT
     var Stext = estringa.message.text;
@@ -154,10 +152,7 @@ function doPost(e) {
     if (Telegram_id != chat_id && chat_type == "private") {
       //如果不是 發一段話即結束
       lock.releaseLock(); //先結束鎖不影響
-      var text = "您好!這是私人用的bot，不對他人開放\
-      \n若您想要一個自己的 Telegram_link_Line 機器人，請至 \n" +
-        "https://github.com/we684123/Telegram_link_Line "
-      sendtext(chat_id, text)
+      sendtext(chat_id, ct["not_owner"])
       return 0;
     }
 
@@ -211,7 +206,7 @@ function doPost(e) {
           lock.releaseLock();
           return 0;
         } else { //如果沒有隨機碼
-          if (ALL['TG_temporary_docking'][chat_id] == 3) { //容忍3句廢話(#
+          if (ALL['TG_temporary_docking'][chat_id] == nonsense_number) { //容忍3句廢話(#
             delete ALL['TG_temporary_docking'][chat_id]
             TG_leaveChat(chat_id)
             write_ALL(ALL, doc) //寫入
