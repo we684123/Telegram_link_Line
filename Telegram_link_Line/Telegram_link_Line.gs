@@ -802,6 +802,8 @@ function doPost(e) {
 
             break;
           case ct['🔭 訊息狀態']["text"]:
+            var consumption = Number(JSON.parse(get_Line_consumption())['totalUsage'])
+            sendtext(chat_id, ct["consumption"]['text'].format(consumption))
             data_len = ALL.data.length;
             text = ""
             for (var i = 0; i < data_len; i++) {
@@ -2152,6 +2154,12 @@ function get_Line_quota() {
   }
 }
 //================================================================
+
+/**
+ * get_Line_consumption - json格式的已用人次
+ *
+ * @return {type}  json格式的已用人次
+ */
 function get_Line_consumption() {
 
   var base_json = base()

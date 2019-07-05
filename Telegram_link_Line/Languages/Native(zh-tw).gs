@@ -272,6 +272,13 @@ function language() {
         "type": "command(Telegram)",
         "text": "🔭 訊息狀態"
       },
+      "consumption": {
+        "type": "to_Telegram",
+        "text": "已使用人次量：\n{0}",
+        // {0} = 已使用的人次量
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "unread_number": {
         "type": "to_Telegram",
         "text": "{0}{1}\n未讀： {2}\n-------------\n",
@@ -651,8 +658,9 @@ function language() {
       "not_owner": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": ["您好!這是私人用的bot，不對他人開放\n",
-         "若您想要一個自己的 Telegram_link_Line 機器人，請至 \n",
-         "https://github.com/we684123/Telegram_link_Line"], // {0} = line的某人
+          "若您想要一個自己的 Telegram_link_Line 機器人，請至 \n",
+          "https://github.com/we684123/Telegram_link_Line"
+        ], // {0} = line的某人
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
