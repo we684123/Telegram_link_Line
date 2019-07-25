@@ -80,6 +80,9 @@ function up_version() {
     var file2 = File.makeCopy(sticker_sheet_name, Folder)
     File.setTrashed(true)
 
+    var sticker_sheet_doc2 = DocumentApp.openById(file2.getId())
+    sticker_sheet_doc2.setText('{}')
+
     var list = list_folder(Folder)
     for (var i = 0; i < list.length; i++) {
       ALL[list[i]['FolderName']] = list[i]
