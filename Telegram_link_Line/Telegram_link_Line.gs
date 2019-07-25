@@ -103,7 +103,8 @@ function up_version() {
     // 希望能相信一次人性。
     ALL["conservion_server"] = {
       "domain_name": 'we684123.hopto.org',
-      "conservion_api":'/media_conservion',
+      "conservion_api": 'media_conservion',
+      "spare_require": 'https://xxx.xxx' //暫時無用
     }
 
     ALL['code_version'] = 3.3
@@ -3412,6 +3413,50 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
 
 
   return true
+}
+//================================================================
+function conservion_media(media_id, media_blob, new_format, conservion_server,layer) {
+
+  if (media_id === void 0)
+    throw new Error("media_id未給")
+  if (media_blob === void 0)
+    throw new Error("media_blob未給")
+  if (new_format === void 0)
+    throw new Error("new_format未給")
+  if (conservion_server === void 0)
+    throw new Error("conservion_server未給")
+  layer = layer || 0
+
+  if (layer >= 1) {
+    return false
+  }
+
+  var payload = {
+    "media_id": String(media_id),
+    "media_blob": media_blob,
+    "new_format": String(new_format),
+  }
+
+  var data = {
+    "method": "post",
+    "payload": payload
+  }
+
+  var conservion_server_url = "https://{0}/{1}".format(
+    ALL["conservion_server"]["domain_name"], ALL["conservion_server"]["conservion_api"])
+
+  try {
+    var conservion_blob = UrlFetchApp.fetch(conservion_server_url, data);
+    return conservion_blob
+  } catch (e) {
+    if (conservion_blob.getResponseCode() == 500) {
+      layer += 1
+      conservion_server['domain_name'] = UrlFetchApp.fetch(spare_require)["domain_name"]
+      return conservion_media(media_id, media_blob, new_format, conservion_server,layer)
+    }
+    return e
+  }
+
 }
 //================================================================
 function start(payload) {
