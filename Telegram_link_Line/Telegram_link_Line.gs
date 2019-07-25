@@ -93,6 +93,19 @@ function up_version() {
       ALL[list2[j]['FileName']] = list2[j]
     }
 
+    // 這是我的server沒錯，原始碼之後也會公開，各位亦可自行選擇是否自架server
+    // 在此聲明我不會蒐集任何個資
+    // 但有可能保留已轉換的媒體，用來加速轉換的速度(目前沒有留，之後再看看)
+    //
+    // 此外，這是免費資源，但server能力有限
+    // 希望不要有除了 Telegram_link_Line 以外的請求到我的server
+    // 我有限制轉圖的大小於server端。
+    // 希望能相信一次人性。
+    ALL["conservion_server"] = {
+      "domain_name": 'we684123.hopto.org',
+      "conservion_api":'/media_conservion',
+    }
+
     ALL['code_version'] = 3.3
     ALL.mode = 0
     ALL.wait_to_Bind = {}
