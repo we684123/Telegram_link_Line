@@ -60,6 +60,28 @@ function up_version() {
     keyboard_main(Telegram_id, ct["🔮 開啟主選單"], REST_k[1])
   }
 
+  // 下面是 V3.3 所需 ( 終於解決貼圖問題啦~ 撒花ヽ(✿ﾟ▽ﾟ)ノ
+  if (ALL['code_version'] < 3.3) {
+    var ctv = language()["match_version"]
+    if (ctv != 3.3) {
+      throw new Error("請更新 language 文件再來執行此函式!")
+    }
+    var Folder = DriveApp.getFolderById(FolderId);
+    var Description = "{'version': 3.3}"
+    create_Folder(Folder, 'Line貼圖放置區', Description)
+    create_Folder(Folder, 'Telegram貼圖放置區', Description)
+    ALL['code_version'] = 3.2
+    ALL.mode = 0
+    ALL.wait_to_Bind = {}
+    var list = list_folder(Folder)
+    for (var i = 0; i < list.length; i++) {
+      ALL[list[i]['FolderName']] = list[i]
+    }
+    var r = JSON.stringify(ALL);
+    doc.setText(r); //寫入
+    sendtext(Telegram_id, 'V3.3 已升級完成\n終於解決貼圖問題啦~\n撒花ヽ(✿ﾟ▽ﾟ)ノ');
+  }
+
   // 寫入ALL
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
@@ -107,6 +129,8 @@ function doPost(e) {
   var gsURL = base_json.gsURL
   var ct = language()["correspond_text"] //語言載入
   var download_folder_name = '檔案放置區'
+  var DLineSFN = 'Line貼圖放置區' //download_line_Sticker_folder_name
+  var DTGSFN = 'Telegram貼圖放置區' //download_Telegram_Sticker_folder_name
   var G_drive_Durl = 'https://drive.google.com/uc?export=download&id='
   var G_drive_Durl_ex = 'https://drive.google.com/uc?export=download&confirm=YzWC&id='
   var rt_max_chats = 14 //對Line回復時應許的字元數
