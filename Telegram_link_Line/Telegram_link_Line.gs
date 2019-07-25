@@ -10,6 +10,8 @@ function up_version() {
   var ALL = JSON.parse(doc.getText());
   var ct = language()["correspond_text"]
 
+  var lock = LockService.getScriptLock();
+  var success = lock.tryLock(30 * 1000);
 
   // 下面是 V3.1 所需
   if (ALL.FastMatch3 == undefined) {
@@ -31,7 +33,7 @@ function up_version() {
   }
   if (ALL['code_version'] < 3.2) {
     var ctv = language()["match_version"]
-    if (ctv != 3.2) {
+    if (ctv < 3.2) {
       throw new Error("請更新 language 文件再重來!")
     }
     var Folder = DriveApp.getFolderById(FolderId);
@@ -63,28 +65,41 @@ function up_version() {
   // 下面是 V3.3 所需 ( 終於解決貼圖問題啦~ 撒花ヽ(✿ﾟ▽ﾟ)ノ
   if (ALL['code_version'] < 3.3) {
     var ctv = language()["match_version"]
-    if (ctv != 3.3) {
+    if (ctv < 3.3) {
       throw new Error("請更新 language 文件再來執行此函式!")
     }
     var Folder = DriveApp.getFolderById(FolderId);
     var Description = "{'version': 3.3}"
     create_Folder(Folder, 'Line貼圖放置區', Description)
     create_Folder(Folder, 'Telegram貼圖放置區', Description)
-    ALL['code_version'] = 3.2
-    ALL.mode = 0
-    ALL.wait_to_Bind = {}
+
+    var sticker_sheet_name = '貼圖對照表'
+    var sticker_sheet_doc = DocumentApp.create(sticker_sheet_name);
+    var docFileId = sticker_sheet_doc.getId()
+    var File = DriveApp.getFileById(docFileId);
+    var file2 = File.makeCopy(sticker_sheet_name, Folder)
+    File.setTrashed(true)
+
     var list = list_folder(Folder)
     for (var i = 0; i < list.length; i++) {
       ALL[list[i]['FolderName']] = list[i]
     }
-    var r = JSON.stringify(ALL);
-    doc.setText(r); //寫入
+
+    var list2 = list_files(Folder)
+    for (var j = 0; j < list2.length; j++) {
+      ALL[list2[j]['FileName']] = list2[j]
+    }
+
+    ALL['code_version'] = 3.3
+    ALL.mode = 0
+    ALL.wait_to_Bind = {}
     sendtext(Telegram_id, 'V3.3 已升級完成\n終於解決貼圖問題啦~~~\nヽ(✿ﾟ▽ﾟ)ノ (撒花');
   }
 
   // 寫入ALL
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
+  lock.releaseLock();
 }
 //===============================================================
 function doPost(e) {
@@ -131,6 +146,7 @@ function doPost(e) {
   var download_folder_name = '檔案放置區'
   var DLineSFN = 'Line貼圖放置區' //download_line_Sticker_folder_name
   var DTGSFN = 'Telegram貼圖放置區' //download_Telegram_Sticker_folder_name
+  var sticker_sheet = '貼圖對照表'
   var G_drive_Durl = 'https://drive.google.com/uc?export=download&id='
   var G_drive_Durl_ex = 'https://drive.google.com/uc?export=download&confirm=YzWC&id='
   var rt_max_chats = 14 //對Line回復時應許的字元數
@@ -2350,6 +2366,47 @@ function clear_folders(Description_Folder) {
 //================================================================
 
 /**
+ * get_file_info - 得到目標資料夾的詳細資料
+ *
+ * @param  {type} file   欲查看的目標檔案
+ * @return {type}        目標檔案的詳細資料
+ */
+function get_file_info(file) {
+  if (file === void 0)
+    throw new Error("file未給")
+
+  var file_info = {
+    "FileName": file.getName(),
+    "FileId": file.getId(),
+    "FolderUrl": file.getUrl(),
+    "FileDescription": file.getDescription(),
+    "FileMimeType": file.getMimeType()
+  }
+  return file_info
+}
+//================================================================
+
+/**
+ * list_files - 得到目標資料夾下所有檔案的詳細資料
+ *
+ * @param  {Folder} Description_Folder  目標資料夾
+ * @return {Array}           詳細資料陣列
+ */
+function list_files(Description_Folder) {
+  if (Description_Folder === void 0)
+    throw new Error("Description_Folder未給")
+
+  var Files = Description_Folder.getFiles();
+  var Files_list = []
+  while (Files.hasNext()) {
+    var file = Files.next();
+    Files_list.push(get_file_info(file))
+  }
+  return Files_list
+}
+//================================================================
+
+/**
  * clear_files - 目標資料夾下所有檔案塞入垃圾桶
  *
  * @param  {Folder} Description_Folder 目標資料夾
@@ -2434,7 +2491,7 @@ function clear_files_by_mode(Description_Folder, mode, time) {
 function copy_file(file, destination_folder) {
   if (file === void 0)
     throw new Error("file未給")
-  if (Description_Folder === void 0)
+  if (destination_folder === void 0)
     throw new Error("destination_folder未給")
 
   try {
@@ -2616,7 +2673,7 @@ function sendSticker(chat_id, url_or_bolb, notification, reply_to_message_id, re
   if (reply_to_message_id === void 0)
     reply_to_message_id = ''
   if (reply_markup === void 0)
-    reply_markup =''
+    reply_markup = ''
 
   var payload = {
     "method": "sendPhoto",
