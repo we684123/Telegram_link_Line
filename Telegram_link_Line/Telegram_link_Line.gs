@@ -79,7 +79,7 @@ function up_version() {
     }
     var r = JSON.stringify(ALL);
     doc.setText(r); //寫入
-    sendtext(Telegram_id, 'V3.3 已升級完成\n終於解決貼圖問題啦~\n撒花ヽ(✿ﾟ▽ﾟ)ノ');
+    sendtext(Telegram_id, 'V3.3 已升級完成\n終於解決貼圖問題啦~~~\nヽ(✿ﾟ▽ﾟ)ノ (撒花');
   }
 
   // 寫入ALL
@@ -2592,6 +2592,41 @@ function sendtext(chat_id, ct, reply_to_message_id) {
     }
     return start(payload)
   }
+}
+//================================================================
+
+/**
+ * sendSticker - TG傳貼圖
+ *
+ * @param  {type} chat_id             必填，傳送目標 chat_id
+ * @param  {type} url_or_bolb         傳送的貼圖id或bolb
+ * @param  {type} notification        不通知與否?
+ * @param  {type} reply_to_message_id 針對訊息ID回覆
+ * @param  {type} reply_markup        回覆鍵盤
+ * @return {type}                     json格式發送狀態
+ */
+function sendSticker(chat_id, url_or_bolb, notification, reply_to_message_id, reply_markup) {
+  //真不敢相信，我居然到了v3.3才加入貼圖O_O
+  if (chat_id === void 0)
+    throw new Error("chat_id未給")
+  if (url_or_bolb === void 0)
+    throw new Error("url_or_bolb未給")
+  if (notification === void 0)
+    notification = false
+  if (reply_to_message_id === void 0)
+    reply_to_message_id = ''
+  if (reply_markup === void 0)
+    reply_markup =''
+
+  var payload = {
+    "method": "sendPhoto",
+    'chat_id': String(chat_id),
+    'sticker': url_or_bolb,
+    'disable_notification': notification,
+    "reply_to_message_id": reply_to_message_id,
+    "reply_markup": reply_markup
+  }
+  return start(payload);
 }
 //================================================================
 function sendPhoto(chat_id, url, notification, caption) {
