@@ -10,8 +10,6 @@ function up_version() {
   var ALL = JSON.parse(doc.getText());
   var ct = language()["correspond_text"]
 
-  var lock = LockService.getScriptLock();
-  var success = lock.tryLock(30 * 1000);
 
   // 下面是 V3.1 所需
   if (ALL.FastMatch3 == undefined) {
@@ -33,7 +31,7 @@ function up_version() {
   }
   if (ALL['code_version'] < 3.2) {
     var ctv = language()["match_version"]
-    if (ctv < 3.2) {
+    if (ctv != 3.2) {
       throw new Error("請更新 language 文件再重來!")
     }
     var Folder = DriveApp.getFolderById(FolderId);
@@ -53,72 +51,20 @@ function up_version() {
     // /debug
     ALL.mode = 0
     ALL.wait_to_Bind = {}
-    var REST_F = REST_FastMatch1and2and3(ALL);
-    var REST_k = REST_keyboard(REST_F[1]);
-    var r = JSON.stringify(REST_k[1]);
+    var xfjhxgfh = REST_FastMatch1and2and3(ALL);
+    var ydjdyf = REST_keyboard(xfjhxgfh[1]);
+    var r = JSON.stringify(ydjdyf[1]);
     doc.setText(r); //寫入
-    sendtext(Telegram_id, ct["debug_ed"]["text"].format(REST_F[0], REST_k[0]));
+    sendtext(Telegram_id, ct["debug_ed"]["text"].format(xfjhxgfh[0], ydjdyf[0]));
     // 🔮 開啟主選單
-    keyboard_main(Telegram_id, ct["🔮 開啟主選單"], REST_k[1])
-  }
-
-  // 下面是 V3.3 所需 ( 終於解決貼圖問題啦~ 撒花ヽ(✿ﾟ▽ﾟ)ノ
-  if (ALL['code_version'] < 3.3) {
-    var ctv = language()["match_version"]
-    if (ctv < 3.3) {
-      throw new Error("請更新 language 文件再來執行此函式!")
-    }
-    var Folder = DriveApp.getFolderById(FolderId);
-    var Description = "{'version': 3.3}"
-    create_Folder(Folder, 'Line貼圖放置區', Description)
-    create_Folder(Folder, 'Telegram貼圖放置區', Description)
-
-    var sticker_sheet_name = '貼圖對照表'
-    var sticker_sheet_doc = DocumentApp.create(sticker_sheet_name);
-    var docFileId = sticker_sheet_doc.getId()
-    var File = DriveApp.getFileById(docFileId);
-    var file2 = File.makeCopy(sticker_sheet_name, Folder)
-    File.setTrashed(true)
-
-    var sticker_sheet_doc2 = DocumentApp.openById(file2.getId())
-    sticker_sheet_doc2.setText('{}')
-
-    var list = list_folder(Folder)
-    for (var i = 0; i < list.length; i++) {
-      ALL[list[i]['FolderName']] = list[i]
-    }
-
-    var list2 = list_files(Folder)
-    for (var j = 0; j < list2.length; j++) {
-      ALL[list2[j]['FileName']] = list2[j]
-    }
-
-    // 這是我的server沒錯，原始碼之後也會公開，各位亦可自行選擇是否自架server
-    // 在此聲明我不會蒐集任何個資
-    // 但有可能保留已轉換的媒體，用來加速轉換的速度(目前沒有留，之後再看看)
-    //
-    // 此外，這是免費資源，但server能力有限
-    // 希望不要有除了 Telegram_link_Line 以外的請求到我的server
-    // 我有限制轉圖的大小於server端。
-    // 希望能相信一次人性。
-    ALL["conservion_server"] = {
-      "domain_name": 'we684123.hopto.org',
-      "conservion_api": 'media_conservion',
-      "spare_require": 'https://xxx.xxx' //暫時無用
-    }
-
-    ALL['code_version'] = 3.3
-    ALL.mode = 0
-    ALL.wait_to_Bind = {}
-    sendtext(Telegram_id, 'V3.3 已升級完成\n終於解決貼圖問題啦~~~\nヽ(✿ﾟ▽ﾟ)ノ (撒花');
+    keyboard_main(Telegram_id, ct["🔮 開啟主選單"], ydjdyf[1])
   }
 
   // 寫入ALL
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
-  lock.releaseLock();
 }
-//===============================================================
+//==============================================================================
 function doPost(e) {
   //嘗試lock
   var lock = LockService.getScriptLock();
@@ -161,14 +107,10 @@ function doPost(e) {
   var gsURL = base_json.gsURL
   var ct = language()["correspond_text"] //語言載入
   var download_folder_name = '檔案放置區'
-  var DLineSFN = 'Line貼圖放置區' //download_line_Sticker_folder_name
-  var DTGSFN = 'Telegram貼圖放置區' //download_Telegram_Sticker_folder_name
-  var sticker_sheet = '貼圖對照表'
   var G_drive_Durl = 'https://drive.google.com/uc?export=download&id='
   var G_drive_Durl_ex = 'https://drive.google.com/uc?export=download&confirm=YzWC&id='
   var rt_max_chats = 14 //對Line回復時應許的字元數
   var notification = false
-  var nonsense_number = 3
 
   /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -192,11 +134,14 @@ function doPost(e) {
     var ALL = JSON.parse(r);
   }
 
-  //以下正式開始===========================================
+  //以下正式開始================================================================
   if (estringa.update_id) { //利用兩方json不同來判別
     //以下來自telegram
     var from = 'telegram';
     Log(ee, from, sheet_key, email); //log
+    //var doc = DocumentApp.openById(doc_key)
+    //var f = doc.getText();
+    //var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
     var mode = ALL.mode;
     var GMT = ALL.GMT
     var Stext = estringa.message.text;
@@ -205,16 +150,19 @@ function doPost(e) {
     //前期準備完成
 
 
-    //擁有者檢查===================================================
+    //擁有者檢查=================================================================
     if (Telegram_id != chat_id && chat_type == "private") {
       //如果不是 發一段話即結束
       lock.releaseLock(); //先結束鎖不影響
-      sendtext(chat_id, ct["not_owner"])
+      var text = "您好!這是私人用的bot，不對他人開放\
+      \n若您想要一個自己的 Telegram_link_Line 機器人，請至 \n" +
+        "https://github.com/we684123/Telegram_link_Line "
+      sendtext(chat_id, text)
       return 0;
     }
 
 
-    //來源檢查===================================================
+    //來源檢查==================================================================
     if (chat_type == "supergroup" || chat_type == "group") { //現在只剩 群組、超級群組 的可能
       var number = ALL.FastMatch3[chat_id]
       if (number == undefined) { //在不認識的群組時
@@ -263,7 +211,7 @@ function doPost(e) {
           lock.releaseLock();
           return 0;
         } else { //如果沒有隨機碼
-          if (ALL['TG_temporary_docking'][chat_id] == nonsense_number) { //容忍3句廢話(#
+          if (ALL['TG_temporary_docking'][chat_id] == 3) { //容忍3句廢話(#
             delete ALL['TG_temporary_docking'][chat_id]
             TG_leaveChat(chat_id)
             write_ALL(ALL, doc) //寫入
@@ -372,21 +320,13 @@ function doPost(e) {
           var gfid = downloadFromTG(Telegram_bot_key, photo_id, fileName, Folder)
           var Durl = get_200_url(G_drive_Durl + gfid)
           TG_Send_Photo_To_Line(Line_id, photo_id, Durl)
-
-          if (ALL.data[n]["Display_name"] && estringa.message.caption) {
-            var t1 = ct["is_from"]['text'].format(TG_name)
-            var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
-            TG_Send_text_To_Line(Line_id, t2)
-          } else { //如只有 簡介 或 來源 則一同發出
-            if (ALL.data[n]["Display_name"]) {
-              TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
-            }
-            if (estringa.message.caption) { //如有簡介則一同發出
-              var text = by_name + estringa.message.caption
-              TG_Send_text_To_Line(Line_id, text)
-            }
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
           }
-
+          if (estringa.message.caption) { //如有簡介則一同發出
+            var text = by_name + estringa.message.caption
+            TG_Send_text_To_Line(Line_id, text)
+          }
           sendtext(chat_id, ct["sendPhoto_ed"]);
           // ^ "(圖片已發送!)"
         } else if (estringa.message.video) {
@@ -394,18 +334,12 @@ function doPost(e) {
           var file_id = estringa.message.video.file_id
           var thumb_id = estringa.message.video.thumb.file_id
           TG_Send_video_To_Line(Line_id, file_id, thumb_id)
-          if (ALL.data[n]["Display_name"] && estringa.message.caption) {
-            var t1 = ct["is_from"]['text'].format(TG_name)
-            var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
-            TG_Send_text_To_Line(Line_id, t2)
-          } else { //如只有 簡介 或 來源 則一同發出
-            if (ALL.data[n]["Display_name"]) {
-              TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
-            }
-            if (estringa.message.caption) { //如有簡介則一同發出
-              var text = by_name + estringa.message.caption
-              TG_Send_text_To_Line(Line_id, text)
-            }
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+          }
+          if (estringa.message.caption) { //如有簡介則一同發出
+            var text = by_name + estringa.message.caption
+            TG_Send_text_To_Line(Line_id, text)
           }
           sendtext(chat_id, ct["sendVideo_ed"]);
           // ^ "(影片已發送!)"
@@ -414,18 +348,12 @@ function doPost(e) {
           var file_id = estringa.message.video_note.file_id
           var thumb_id = estringa.message.video_note.thumb.file_id
           TG_Send_video_To_Line(Line_id, file_id, thumb_id)
-          if (ALL.data[n]["Display_name"] && estringa.message.caption) {
-            var t1 = ct["is_from"]['text'].format(TG_name)
-            var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
-            TG_Send_text_To_Line(Line_id, t2)
-          } else { //如只有 簡介 或 來源 則一同發出
-            if (ALL.data[n]["Display_name"]) {
-              TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
-            }
-            if (estringa.message.caption) { //如有簡介則一同發出
-              var text = by_name + estringa.message.caption
-              TG_Send_text_To_Line(Line_id, text)
-            }
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+          }
+          if (estringa.message.caption) { //如有簡介則一同發出
+            var text = by_name + estringa.message.caption
+            TG_Send_text_To_Line(Line_id, text)
           }
           sendtext(chat_id, ct["sendVideo_ed"]);
           // ^ "(影片已發送!)"
@@ -442,18 +370,12 @@ function doPost(e) {
           var duration = estringa.message.audio.duration
           var audio_id = estringa.message.audio.file_id
           TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
-          if (ALL.data[n]["Display_name"] && estringa.message.caption) {
-            var t1 = ct["is_from"]['text'].format(TG_name)
-            var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
-            TG_Send_text_To_Line(Line_id, t2)
-          } else { //如只有 簡介 或 來源 則一同發出
-            if (ALL.data[n]["Display_name"]) {
-              TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
-            }
-            if (estringa.message.caption) { //如有簡介則一同發出
-              var text = by_name + estringa.message.caption
-              TG_Send_text_To_Line(Line_id, text)
-            }
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+          }
+          if (estringa.message.caption) { //如有簡介則一同發出
+            var text = by_name + estringa.message.caption
+            TG_Send_text_To_Line(Line_id, text)
           }
           sendtext(chat_id, ct["sendAudio_ed"]);
           // ^ "(音檔已發送!)"
@@ -461,18 +383,12 @@ function doPost(e) {
           var duration = estringa.message.voice.duration
           var audio_id = estringa.message.voice.file_id
           TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
-          if (ALL.data[n]["Display_name"] && estringa.message.caption) {
-            var t1 = ct["is_from"]['text'].format(TG_name)
-            var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
-            TG_Send_text_To_Line(Line_id, t2)
-          } else { //如只有 簡介 或 來源 則一同發出
-            if (ALL.data[n]["Display_name"]) {
-              TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
-            }
-            if (estringa.message.caption) { //如有簡介則一同發出
-              var text = by_name + estringa.message.caption
-              TG_Send_text_To_Line(Line_id, text)
-            }
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+          }
+          if (estringa.message.caption) { //如有簡介則一同發出
+            var text = by_name + estringa.message.caption
+            TG_Send_text_To_Line(Line_id, text)
           }
           sendtext(chat_id, ct["sendVoice_ed"]);
           // ^ "(錄音已發送!)"
@@ -497,18 +413,12 @@ function doPost(e) {
           var file_id = estringa.message.animation.file_id
           var thumb_id = estringa.message.animation.thumb.file_id
           TG_Send_video_To_Line(Line_id, file_id, thumb_id)
-          if (ALL.data[n]["Display_name"] && estringa.message.caption) {
-            var t1 = ct["is_from"]['text'].format(TG_name)
-            var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
-            TG_Send_text_To_Line(Line_id, t2)
-          } else { //如只有 簡介 或 來源 則一同發出
-            if (ALL.data[n]["Display_name"]) {
-              TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
-            }
-            if (estringa.message.caption) { //如有簡介則一同發出
-              var text = by_name + estringa.message.caption
-              TG_Send_text_To_Line(Line_id, text)
-            }
+          if (ALL.data[n]["Display_name"]) {
+            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+          }
+          if (estringa.message.caption) { //如有簡介則一同發出
+            var text = by_name + estringa.message.caption
+            TG_Send_text_To_Line(Line_id, text)
           }
           sendtext(chat_id, ct["sendGIF_ed"]);
           // ^ "(GIF已發送!)"
@@ -537,7 +447,7 @@ function doPost(e) {
       lock.releaseLock();
       return 0;
     }
-    //======================================================
+    //============================================================================
     //以下是私人1對1的時候
     //先定義好往Line的發送對象
     var Line_id = ALL.opposite.RoomId;
@@ -610,7 +520,7 @@ function doPost(e) {
         lock.releaseLock();
         return 0;
 
-        //========================================================
+        //================================================================
       } else if (mode == "🔖 重新命名" && Stext != "/main") {
         if (in_name(ALL, (U + "✅")) || in_name(ALL, (U + "❎")) || in_name(ALL, (U + "⭐️"))) { //排除重名
           sendtext(chat_id, ct["duplicate_name"]);
@@ -638,11 +548,11 @@ function doPost(e) {
 
           ALL.FastMatch = y;
           ALL.mode = 0
-          //以下處理RoomKeyboard====================================
+          //以下處理RoomKeyboard==================================================
           ALL = REST_keyboard(ALL)[1] //重新編排keyborad
           write_ALL(ALL, doc) //寫入
 
-          //=======================================================
+          //=====================================================================
           //var text = "🔖 重新命名完成~\n" + OName + " \n->\n " + Stext + "\n🔮 開啟主選單"
           ct["rename_success"]["text"] = ct["rename_success"]["text"].format(
             ct["🔖 重新命名"]["text"], OName, (Stext + symbol), ct["🔮 開啟主選單"]["text"]);
@@ -651,7 +561,7 @@ function doPost(e) {
         }
         lock.releaseLock();
         return 0;
-        //=========================================================
+        //================================================================
       } else if (mode == "🔥 刪除房間" && Stext == "/delete") {
         var aims = ALL.opposite.RoomId
         var number = ALL.FastMatch2[aims]
@@ -897,8 +807,6 @@ function doPost(e) {
 
             break;
           case ct['🔭 訊息狀態']["text"]:
-            var consumption = Number(JSON.parse(get_Line_consumption())['totalUsage'])
-            sendtext(chat_id, ct["consumption"]['text'].format(consumption))
             data_len = ALL.data.length;
             text = ""
             for (var i = 0; i < data_len; i++) {
@@ -967,7 +875,7 @@ function doPost(e) {
             write_ALL(ALL, doc) //寫入
             sendtext(chat_id, ct["enabled_notification_ed"]["text"].format(OName));
             // ^ "已開啟 {0} 的通知"
-            //以下處理RoomKeyboard=================================
+            //以下處理RoomKeyboard==================================================
 
             break;
           case ct['🔰 暫停通知']["text"]:
@@ -984,7 +892,7 @@ function doPost(e) {
             write_ALL(ALL, doc) //寫入
             sendtext(chat_id, ct["disabled_notification_ed"]["text"].format(OName));
             // ^ "已暫停 {0} 的通知"
-            //以下處理RoomKeyboard==================================
+            //以下處理RoomKeyboard==================================================
 
             break;
           case ct['⭐ 升級房間']["text"]:
@@ -1074,11 +982,11 @@ function doPost(e) {
           case '/debug':
             ALL.mode = 0
             ALL.wait_to_Bind = {}
-            var REST_F = REST_FastMatch1and2and3(ALL); //強制等待，不知道為什麼有時候不會執行
-            var REST_k = REST_keyboard(REST_F[1]); //強制等待，不知道為什麼有時候不會執行
-            var r = JSON.stringify(REST_k[1]);
+            var xfjhxgfh = REST_FastMatch1and2and3(ALL); //強制等待，不知道為什麼有時候不會執行
+            var ydjdyf = REST_keyboard(xfjhxgfh[1]); //強制等待，不知道為什麼有時候不會執行
+            var r = JSON.stringify(ydjdyf[1]);
             doc.setText(r); //寫入
-            sendtext(chat_id, ct["debug_ed"]["text"].format(REST_F[0], REST_k[0]));
+            sendtext(chat_id, ct["debug_ed"]["text"].format(xfjhxgfh[0], ydjdyf[0]));
             // ^ "已debug\nREST_FastMatch1and2and3() : {0}\nREST_keyboard() : {1}",
             break;
           case '/AllRead':
@@ -1503,9 +1411,9 @@ function doPost(e) {
     lock.releaseLock();
     return 0;
 
-    //====================================================================
-    //====================================================================
-    //====================================================================
+    //=====================================================================================================
+    //=====================================================================================================
+    //=====================================================================================================
   } else if (estringa.events[0].timestamp) {
     //以下來自line
     var from = 'line';
@@ -1600,7 +1508,7 @@ function doPost(e) {
 
       var SheetM = SpreadSheet.getSheetByName("Line訊息區");
       var chat_id = Telegram_id
-      //===============================================================
+      //================================================================
       if (ALL.FastMatch2[line_roomID] != undefined) { //以下處理已登記的
         if (ALL.data[ALL.FastMatch2[line_roomID]].status == "已升級房間2" || (
             ALL.mode == "🚀 發送訊息" && line_roomID == ALL.opposite.RoomId)) {
@@ -1777,7 +1685,7 @@ function doPost(e) {
               // ^ "有關鍵字被提及！\n{0}\nby: {1}\n點擊以快速切換至該房間 /d{2}",
             }
           }
-          //==================================================================
+          //===================================================================
         }
 
       } else { //以下處理未登記的(新資料)=======================
@@ -1830,16 +1738,16 @@ function doPost(e) {
 
         ALL.FastMatch[(U + "✅")] = newcol
 
-        //以下處理sheetM的數值===================================================
+        //以下處理sheetM的數值=====================================================
         SheetM.getRange(1, newcol + 1).setValue("[1,0]")
-        //以下處理sheet(寫入訊息)================================================
+        //以下處理sheet(寫入訊息)==================================================
         var col = ALL.FastMatch2[line_roomID] + 1; //找欄位
         SheetM.getRange(2, col).setValue(String(text)) //更新內容
-        //以下處理RoomKeyboard==================================================
+        //以下處理RoomKeyboard====================================================
         ALL = REST_keyboard(ALL)[1]
-        //以下處理doc(寫入訊息)==================================================
+        //以下處理doc(寫入訊息)====================================================
         write_ALL(ALL, doc) //寫入
-        //以下通知有新的ID進來===================================================
+        //以下通知有新的ID進來=====================================================
         text = "已有新ID登入!!! id =\n" + U + "\n請盡快重新命名。"
         sendtext(chat_id, text);
       }
@@ -1852,7 +1760,7 @@ function doPost(e) {
 }
 
 //以下各類函式支援
-//====================================================================
+//=====================================================================================================
 function Log(ee, from, sheet_key, email) {
   var d = new Date();
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -1878,7 +1786,7 @@ function Log(ee, from, sheet_key, email) {
     return SpreadSheet
   }
 }
-//===============================================================
+//==============================================================================
 function CP() {
   var base_json = base()
   var sheet_key = base_json.sheet_key
@@ -1893,7 +1801,7 @@ function CP() {
   Sheet.getRange(LastRow + 1, 1).setValue(d);
   Sheet.getRange(LastRow + 1, 2).setValue(f);
 }
-//===============================================================
+//==============================================================================
 function mv_all_uproom() {
   CP()
   var base_json = base()
@@ -1923,7 +1831,7 @@ function mv_all_uproom() {
   write_ALL(ALL, doc) //寫入
 
 }
-//================================================================
+//=================================================================================
 function Get_profile(userId) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
@@ -1943,7 +1851,7 @@ function Get_profile(userId) {
   }
   return profile
 }
-//================================================================
+//=================================================================================
 function new_Get_profile(userId, rq_mode, groupId) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
@@ -1964,7 +1872,7 @@ function new_Get_profile(userId, rq_mode, groupId) {
   }
   return profile
 }
-//================================================================
+//=================================================================================
 function get_line_members(message_json, cutL) {
   var members_data_text = ''
   var room_type = message_json['room_type']
@@ -1979,7 +1887,7 @@ function get_line_members(message_json, cutL) {
   }
   return members_data_text
 }
-//================================================================
+//=================================================================================
 function TG_Send_text_To_Line(Line_id, text) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
@@ -2034,7 +1942,7 @@ function TG_Send_text_To_Line(Line_id, text) {
     return UrlFetchApp.fetch(url, options);
   }
 }
-//================================================================
+//=================================================================================
 function TG_Send_Photo_To_Line(Line_id, photo_id, G_drive_Durl) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
@@ -2064,7 +1972,7 @@ function TG_Send_Photo_To_Line(Line_id, photo_id, G_drive_Durl) {
   //--------------------------------------------------
   UrlFetchApp.fetch(url, options);
 }
-//================================================================
+//=================================================================================
 function TG_Send_video_To_Line(Line_id, video_id, thumb_id) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
@@ -2095,7 +2003,7 @@ function TG_Send_video_To_Line(Line_id, video_id, thumb_id) {
   //--------------------------------------------------
   UrlFetchApp.fetch(url, options);
 }
-//================================================================
+//=================================================================================
 function TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
@@ -2127,7 +2035,7 @@ function TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key) {
   //--------------------------------------------------
   UrlFetchApp.fetch(url, options);
 }
-//================================================================
+//=================================================================================
 function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
@@ -2158,7 +2066,7 @@ function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_addres
   //--------------------------------------------------
   UrlFetchApp.fetch(url, options);
 }
-//================================================================
+//=================================================================================
 function TG_Send_Sticker_To_Line(Line_id, sticker_id) { //舊款function 先留著
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
@@ -2187,7 +2095,7 @@ function TG_Send_Sticker_To_Line(Line_id, sticker_id) { //舊款function 先留�
   //--------------------------------------------------
   UrlFetchApp.fetch(url, options);
 }
-//================================================================
+//=================================================================================
 function Line_leave(room_or_groupID) {
 
   var base_json = base()
@@ -2225,59 +2133,7 @@ function Line_leave(room_or_groupID) {
     return "成功"
   }
 }
-//================================================================
-function get_Line_quota() {
-
-  var base_json = base()
-  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-
-  var url = 'https://api.line.me/v2/bot/message/quota';
-  //--------------------------------------------------
-  var header = {
-    'Content-Type': 'application/json; charset=UTF-8',
-    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
-  }
-  var options = {
-    'headers': header,
-    'method': 'get'
-  }
-  //--------------------------------------------------
-  try {
-    return UrlFetchApp.fetch(url, options);
-  } catch (e) {
-    return e
-  }
-}
-//================================================================
-
-/**
- * get_Line_consumption - json格式的已用人次
- *
- * @return {type}  json格式的已用人次
- */
-function get_Line_consumption() {
-
-  var base_json = base()
-  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-
-  var url = 'https://api.line.me/v2/bot/message/quota/consumption';
-  //--------------------------------------------------
-  var header = {
-    'Content-Type': 'application/json; charset=UTF-8',
-    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
-  }
-  var options = {
-    'headers': header,
-    'method': 'get'
-  }
-  //--------------------------------------------------
-  try {
-    return UrlFetchApp.fetch(url, options);
-  } catch (e) {
-    return e
-  }
-}
-//================================================================
+//=================================================================================
 function getpath(id, Telegram_bot_key) {
   if (Telegram_bot_key === void 0) {
     var base_json = base()
@@ -2289,7 +2145,7 @@ function getpath(id, Telegram_bot_key) {
   var path = html.result.file_path
   return path;
 }
-//================================================================
+//=================================================================================
 function TGdownloadURL(path, Telegram_bot_key) {
   if (Telegram_bot_key === void 0) {
     var base_json = base()
@@ -2298,7 +2154,7 @@ function TGdownloadURL(path, Telegram_bot_key) {
   var TGDurl = "https://api.telegram.org/file/bot" + Telegram_bot_key + "/" + path
   return TGDurl;
 }
-//================================================================
+//=================================================================================
 
 /**
  * create_Folder - 創資料夾
@@ -2318,7 +2174,7 @@ function create_Folder(Folder, Name, Description) {
 
   return Folder.createFolder(Name).setDescription(Description)
 }
-//================================================================
+//=================================================================================
 
 /**
  * get_folder_info - 得到目標資料夾的詳細資料
@@ -2338,7 +2194,7 @@ function get_folder_info(Folder) {
   }
   return folder_info
 }
-//================================================================
+//=================================================================================
 
 /**
  * list_folder - 得到目標資料夾下所有資料夾的詳細資料
@@ -2358,7 +2214,7 @@ function list_folder(Description_Folder) {
   }
   return Folders_list
 }
-//================================================================
+//=================================================================================
 
 /**
  * clear_folders - 目標資料夾下所有資料夾塞入垃圾桶
@@ -2380,48 +2236,7 @@ function clear_folders(Description_Folder) {
   }
   return [true]
 }
-//================================================================
-
-/**
- * get_file_info - 得到目標資料夾的詳細資料
- *
- * @param  {type} file   欲查看的目標檔案
- * @return {type}        目標檔案的詳細資料
- */
-function get_file_info(file) {
-  if (file === void 0)
-    throw new Error("file未給")
-
-  var file_info = {
-    "FileName": file.getName(),
-    "FileId": file.getId(),
-    "FolderUrl": file.getUrl(),
-    "FileDescription": file.getDescription(),
-    "FileMimeType": file.getMimeType()
-  }
-  return file_info
-}
-//================================================================
-
-/**
- * list_files - 得到目標資料夾下所有檔案的詳細資料
- *
- * @param  {Folder} Description_Folder  目標資料夾
- * @return {Array}           詳細資料陣列
- */
-function list_files(Description_Folder) {
-  if (Description_Folder === void 0)
-    throw new Error("Description_Folder未給")
-
-  var Files = Description_Folder.getFiles();
-  var Files_list = []
-  while (Files.hasNext()) {
-    var file = Files.next();
-    Files_list.push(get_file_info(file))
-  }
-  return Files_list
-}
-//================================================================
+//=================================================================================
 
 /**
  * clear_files - 目標資料夾下所有檔案塞入垃圾桶
@@ -2443,7 +2258,7 @@ function clear_files(Description_Folder) {
   }
   return [true]
 }
-//================================================================
+//=================================================================================
 
 /**
  * clear_files_by_mode - 依模式、時間、來源清理檔案
@@ -2496,7 +2311,7 @@ function clear_files_by_mode(Description_Folder, mode, time) {
   }
   return [true]
 }
-//================================================================
+//=================================================================================
 
 /**
  * copy_file - 複製檔案到目標資料夾
@@ -2508,7 +2323,7 @@ function clear_files_by_mode(Description_Folder, mode, time) {
 function copy_file(file, destination_folder) {
   if (file === void 0)
     throw new Error("file未給")
-  if (destination_folder === void 0)
+  if (Description_Folder === void 0)
     throw new Error("destination_folder未給")
 
   try {
@@ -2518,7 +2333,7 @@ function copy_file(file, destination_folder) {
   }
   return [true]
 }
-//================================================================
+//=================================================================================
 
 /**
  * downloadFromLine - 下載Line的東西。
@@ -2561,7 +2376,7 @@ function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
   }
   return [f.getId()]
 }
-//================================================================
+//=================================================================================
 
 /**
  * downloadFromTG - 從TG下載到google_drive
@@ -2579,12 +2394,12 @@ function downloadFromTG(Telegram_bot_key, tg_file_id, fileName, Folder) {
   var f = Folder.createFile(blob).setName(fileName)
   return f.getId()
 }
-//================================================================
+//=================================================================================
 function get_time_txt(timestamp, GMT) {
   var formattedDate = Utilities.formatDate(new Date(timestamp), GMT, "yyyy-MM-dd' 'HH:mm:ss");
   return formattedDate;
 }
-//================================================================
+//=================================================================================
 function tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN) {
   // "/resend_video_fliename_123456789"
   var send_ed = sendtext(chat_id, ct['get_command_ed'])
@@ -2605,7 +2420,7 @@ function tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_T
   }
   return deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
 }
-//================================================================
+//=================================================================================
 function sendtext(chat_id, ct, reply_to_message_id) {
   reply_to_message_id === void 0 ? reply_to_message_id : ''
 
@@ -2667,42 +2482,7 @@ function sendtext(chat_id, ct, reply_to_message_id) {
     return start(payload)
   }
 }
-//================================================================
-
-/**
- * sendSticker - TG傳貼圖
- *
- * @param  {type} chat_id             必填，傳送目標 chat_id
- * @param  {type} url_or_bolb         傳送的貼圖id或bolb
- * @param  {type} notification        不通知與否?
- * @param  {type} reply_to_message_id 針對訊息ID回覆
- * @param  {type} reply_markup        回覆鍵盤
- * @return {type}                     json格式發送狀態
- */
-function sendSticker(chat_id, url_or_bolb, notification, reply_to_message_id, reply_markup) {
-  //真不敢相信，我居然到了v3.3才加入貼圖O_O
-  if (chat_id === void 0)
-    throw new Error("chat_id未給")
-  if (url_or_bolb === void 0)
-    throw new Error("url_or_bolb未給")
-  if (notification === void 0)
-    notification = false
-  if (reply_to_message_id === void 0)
-    reply_to_message_id = ''
-  if (reply_markup === void 0)
-    reply_markup = ''
-
-  var payload = {
-    "method": "sendPhoto",
-    'chat_id': String(chat_id),
-    'sticker': url_or_bolb,
-    'disable_notification': notification,
-    "reply_to_message_id": reply_to_message_id,
-    "reply_markup": reply_markup
-  }
-  return start(payload);
-}
-//================================================================
+//=================================================================
 function sendPhoto(chat_id, url, notification, caption) {
   if (notification == undefined)
     notification = false
@@ -2716,7 +2496,7 @@ function sendPhoto(chat_id, url, notification, caption) {
   }
   return start(payload);
 }
-//================================================================
+//=================================================================================
 function sendAudio(chat_id, url_or_bolb, notification, caption, duration) {
   if (notification === void 0)
     notification = false
@@ -2734,7 +2514,7 @@ function sendAudio(chat_id, url_or_bolb, notification, caption, duration) {
   }
   return start(payload);
 }
-//================================================================
+//=================================================================
 function sendVideo(chat_id, url_or_bolb, notification, caption) {
   if (notification == undefined)
     notification = false
@@ -2748,7 +2528,7 @@ function sendVideo(chat_id, url_or_bolb, notification, caption) {
   }
   return start(payload);
 }
-//================================================================
+//=================================================================
 function sendVoice(chat_id, url, notification, caption) {
   if (notification == undefined)
     notification = false
@@ -2762,7 +2542,7 @@ function sendVoice(chat_id, url, notification, caption) {
   }
   return start(payload);
 }
-//================================================================
+//=================================================================
 function sendDocument(chat_id, url_or_bolb, notification, caption) {
   if (notification === void 0)
     notification = false
@@ -2777,7 +2557,7 @@ function sendDocument(chat_id, url_or_bolb, notification, caption) {
   }
   return start(payload);
 }
-//================================================================
+//=================================================================================
 function sendAnimation(chat_id, url, notification, caption) {
   /* Use this method to send animation files
    * (GIF or H.264/MPEG-4 AVC video without sound).
@@ -2799,7 +2579,7 @@ function sendAnimation(chat_id, url, notification, caption) {
   }
   start(payload);
 }
-//================================================================
+//=================================================================
 function sendLocation(chat_id, latitude, longitude, notification) {
   if (notification == undefined)
     notification = false
@@ -2812,7 +2592,7 @@ function sendLocation(chat_id, latitude, longitude, notification) {
   }
   return start(payload);
 }
-//================================================================
+//=================================================================
 function deleteMessage(chat_id, message_id) {
   var payload = {
     "method": "deleteMessage",
@@ -2821,7 +2601,7 @@ function deleteMessage(chat_id, message_id) {
   }
   return start(payload);
 }
-//================================================================
+//=================================================================
 function TG_leaveChat(chat_id) {
   var payload = {
     "method": "leaveChat",
@@ -2829,7 +2609,7 @@ function TG_leaveChat(chat_id) {
   }
   return start(payload);
 }
-//================================================================
+//=================================================================
 function ReplyKeyboardRemove(chat_id, ct) {
   if (chat_id === void 0)
     throw new Error("chat_id未給")
@@ -2871,7 +2651,7 @@ function ReplyKeyboardRemove(chat_id, ct) {
   }
   return start(payload);
 }
-//================================================================
+//=================================================================================
 function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, ct) {
   if (chat_id === void 0)
     throw new Error("chat_id未給")
@@ -2920,14 +2700,14 @@ function ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboa
   }
   return start(payload);
 }
-//================================================================
+//=================================================================================
 function keyboard_main(chat_id, ct, ALL) {
   var keyboard_main = ALL.RoomKeyboard
   var resize_keyboard = false
   var one_time_keyboard = false
   ReplyKeyboardMakeup(chat_id, keyboard_main, resize_keyboard, one_time_keyboard, ct)
 }
-//================================================================
+//=================================================================================
 
 /**
  * REST_keyboard - 重新整理主鍵盤
@@ -2989,7 +2769,7 @@ function REST_keyboard(ALL) {
   ALL.RoomKeyboard = keyboard //寫回RoomKeynoard
   return ['成功', ALL]
 }
-//================================================================
+//=================================================================================
 function REST_FastMatch1and2and3(ALL) { //重製快速索引
   var data_len = ALL.data.length
   ALL.FastMatch = {}
@@ -3012,7 +2792,7 @@ function REST_FastMatch1and2and3(ALL) { //重製快速索引
   return ["成功", ALL]
 }
 
-//================================================================
+//=================================================================================
 //喔乾，感謝 Kevin Tseng 開源這個用法
 //來源:
 // https://kevintsengtw.blogspot.com/2011/09/javascript-stringformat.html?
@@ -3023,7 +2803,7 @@ String.prototype.format = function() {
   var txt = this.toString();
   for (var i = 0; i < arguments.length; i++) {
     var exp = getStringFormatPlaceHolderRegEx(i);
-    arguments[i] = String(arguments[i]).replace(/\$/gm,'♒☯◈∭')
+    arguments[i] = arguments[i].replace(/\$/gm,'♒☯◈∭')
     txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
     txt = txt.replace(/♒☯◈∭/gm,'$')
   }
@@ -3041,7 +2821,7 @@ function cleanStringFormatResult(txt) {
   if (txt == null) return "";
   return txt.replace(getStringFormatPlaceHolderRegEx("\\d+"), "");
 }
-//================================================================
+//=================================================================================
 // 我印象中有找到一種方式來分割字串的，但不知道是哪個指令...
 // 用法是 text.xxxx(10) -> 回傳 [字串前10個字 , 後10個到底的字]
 String.prototype.nslice = function() {
@@ -3050,7 +2830,7 @@ String.prototype.nslice = function() {
   var t2 = txt.slice(arguments[0])
   return [t1, t2];
 }
-//================================================================
+//=================================================================================
 function AllRead() {
   var base_json = base()
   var sheet_key = base_json.sheet_key
@@ -3074,7 +2854,7 @@ function AllRead() {
 
   write_ALL(ALL, doc) //寫入
 }
-//================================================================
+//=================================================================================
 function write_ALL(ALL, doc) {
   try {
     var r = JSON.stringify(ALL); //別刪，這是源頭啦!!!
@@ -3084,7 +2864,7 @@ function write_ALL(ALL, doc) {
   }
   return true
 }
-//================================================================
+//=================================================================================
 function key_word_check(txt, keys) {
   var keys_value = []
   for (var i = 0; i < keys.length; i++) {
@@ -3099,7 +2879,7 @@ function key_word_check(txt, keys) {
   }
   return keys_value
 }
-//================================================================
+//=================================================================================
 function Random_text(codeLength) {
   var id = ""
   var selectChar = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D',
@@ -3111,7 +2891,7 @@ function Random_text(codeLength) {
   }
   return id
 }
-//================================================================
+//=================================================================================
 function in_command(text) {
   var ct = language()["correspond_text"] //語言載入
   var command_list = Object.keys(ct)
@@ -3122,7 +2902,7 @@ function in_command(text) {
   }
   return false
 }
-//================================================================
+//=================================================================================
 function in_name(ALL, text) {
   var ALL_list = Object.keys(ALL["FastMatch"])
   for (var i = 0; i < ALL_list.length; i++) {
@@ -3132,7 +2912,7 @@ function in_name(ALL, text) {
   }
   return false
 }
-//================================================================
+//=================================================================================
 function get_all_keyword(ALL) {
   var all_word = ''
   for (var i = 0; i < ALL.keyword.length; i++) {
@@ -3140,7 +2920,7 @@ function get_all_keyword(ALL) {
   }
   return all_word
 }
-//================================================================
+//=================================================================================
 function up_room_start(ALL) {
   var FM3_keys = Object.keys(ALL["FastMatch3"])
   for (var i = 0; i < FM3_keys.length; i++) {
@@ -3150,7 +2930,7 @@ function up_room_start(ALL) {
   }
   return ALL
 }
-//================================================================
+//=================================================================================
 function entities_conversion(text, entities, ct) { //用來處理格式化的網址
   var EC_text = []
   var text_link = []
@@ -3198,7 +2978,7 @@ function entities_conversion(text, entities, ct) { //用來處理格式化的網
   }
 
 }
-//================================================================
+//=================================================================================
 function get_200_url(url) {
   // X的，受夠了! Line怎麼就不順便轉址一下
   // 明明手機的就會自己轉，電腦版的就不行，X
@@ -3222,7 +3002,7 @@ function get_200_url(url) {
   }
   return url
 }
-//================================================================
+//=================================================================================
 function rt_text_reduce(text, rt_max_chats) {
   var max_chat = rt_max_chats
   if (text.length > max_chat) {
@@ -3230,7 +3010,7 @@ function rt_text_reduce(text, rt_max_chats) {
   }
   return text.replace('\n', '%0A').replace(/\n/g, ' ').replace('%0A', '\n')
 }
-//================================================================
+//=================================================================================
 function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id) {
 
   try {
@@ -3416,51 +3196,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
 
   return true
 }
-//================================================================
-function conservion_media(media_id, media_blob, new_format, conservion_server,layer) {
-
-  if (media_id === void 0)
-    throw new Error("media_id未給")
-  if (media_blob === void 0)
-    throw new Error("media_blob未給")
-  if (new_format === void 0)
-    throw new Error("new_format未給")
-  if (conservion_server === void 0)
-    throw new Error("conservion_server未給")
-  layer = layer || 0
-
-  if (layer >= 1) {
-    return false
-  }
-
-  var payload = {
-    "media_id": String(media_id),
-    "media_blob": media_blob,
-    "new_format": String(new_format),
-  }
-
-  var data = {
-    "method": "post",
-    "payload": payload
-  }
-
-  var conservion_server_url = "https://{0}/{1}".format(
-    ALL["conservion_server"]["domain_name"], ALL["conservion_server"]["conservion_api"])
-
-  try {
-    var conservion_blob = UrlFetchApp.fetch(conservion_server_url, data);
-    return conservion_blob
-  } catch (e) {
-    if (conservion_blob.getResponseCode() == 500) {
-      layer += 1
-      conservion_server['domain_name'] = UrlFetchApp.fetch(spare_require)["domain_name"]
-      return conservion_media(media_id, media_blob, new_format, conservion_server,layer)
-    }
-    return e
-  }
-
-}
-//================================================================
+//=================================================================================
 function start(payload) {
   var base_json = base()
   var Telegram_bot_key = base_json.Telegram_bot_key
@@ -3485,4 +3221,4 @@ function start(payload) {
   Sheet.getRange(LastRow + 1, 2).setValue(returned); //確認有發成功
   //*/
 }
-//================================================================
+//=================================================================================
