@@ -3023,7 +3023,7 @@ String.prototype.format = function() {
   var txt = this.toString();
   for (var i = 0; i < arguments.length; i++) {
     var exp = getStringFormatPlaceHolderRegEx(i);
-    arguments[i] = arguments[i].replace(/\$/gm,'♒☯◈∭')
+    arguments[i] = String(arguments[i]).replace(/\$/gm,'♒☯◈∭')
     txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
     txt = txt.replace(/♒☯◈∭/gm,'$')
   }
