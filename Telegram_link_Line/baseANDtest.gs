@@ -7,7 +7,7 @@ function base() {
   var Line_id = ""; //你的line ID
   var CHANNEL_ACCESS_TOKEN = ''; //你的Line token
   var email = "@gmail.com"; //你的email(祈禱永遠別收到來自此的e-mail)
-  var FolderId = ""; //你的選擇要存的資料夾(google_grive_FolderId)，必須獨立不能共用!，且要為"公開"!
+  var FolderId = ""; //你的選擇要存的資料夾(google_grive_FolderId)，必須獨立不能共用!，且要為"知道連結的人均可監視"!
   var gsURL = ""; //該gs檔的發佈網址
   //前期準備完成!==============================================================
   var base_json = {

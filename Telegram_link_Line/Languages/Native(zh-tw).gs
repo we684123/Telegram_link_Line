@@ -8,7 +8,7 @@ function language() {
     "correspond_text": {
       "backed_up_ing": {
         "type": "to_Telegram",
-        "text": "已備份舊資料，更新doc資料庫中...\n#doc",
+        "text": "已備份舊資料，更新doc資料庫中...\n#doc #TG_Line_bot備份",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -272,6 +272,13 @@ function language() {
         "type": "command(Telegram)",
         "text": "🔭 訊息狀態"
       },
+      "consumption": {
+        "type": "to_Telegram",
+        "text": "已使用人次量：\n{0}",
+        // {0} = 已使用的人次量
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "unread_number": {
         "type": "to_Telegram",
         "text": "{0}{1}\n未讀： {2}\n-------------\n",
@@ -340,6 +347,12 @@ function language() {
         "type": "to_Telegram(only_text)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "{1}{0}"
         // {0} = first_name {1} = last_name
+      },
+      "assemble_caption": {
+        "type": "to_Telegram(only_text)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "{0}\n{1}"
+        // {0} = 來源文字(is_from) {1} = 媒體的說明文字(caption)
+        // 跟 "is_from" 有關連。
       },
       "read_massage_ed": {
         "type": "to_Telegram",
@@ -645,6 +658,15 @@ function language() {
       "plz_forward_verification_code": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "請確認我在要綁定的群組中後，再轉發上方的驗證碼到那以進行綁定!\n或按下 /unsetroom 取消升級",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "not_owner": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": ["您好!這是私人用的bot，不對他人開放\n",
+          "若您想要一個自己的 Telegram_link_Line 機器人，請至 \n",
+          "https://github.com/we684123/Telegram_link_Line"
+        ], // {0} = line的某人
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
