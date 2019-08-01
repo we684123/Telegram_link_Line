@@ -73,15 +73,15 @@ function up_version() {
     create_Folder(Folder, 'Line貼圖放置區', Description)
     create_Folder(Folder, 'Telegram貼圖放置區', Description)
 
-    var sticker_sheet_name = '貼圖對照表'
-    var sticker_sheet_doc = DocumentApp.create(sticker_sheet_name);
-    var docFileId = sticker_sheet_doc.getId()
+    var sticker_doc_name = '貼圖對照表'
+    var sticker_doc_1 = DocumentApp.create(sticker_doc_name);
+    var docFileId = sticker_doc_1.getId()
     var File = DriveApp.getFileById(docFileId);
-    var file2 = File.makeCopy(sticker_sheet_name, Folder)
+    var file2 = File.makeCopy(sticker_doc_name, Folder)
     File.setTrashed(true)
 
-    var sticker_sheet_doc2 = DocumentApp.openById(file2.getId())
-    sticker_sheet_doc2.setText('{}')
+    var sticker_doc_2 = DocumentApp.openById(file2.getId())
+    sticker_doc_2.setText('{}')
 
     var list = list_folder(Folder)
     for (var i = 0; i < list.length; i++) {
@@ -163,12 +163,18 @@ function doPost(e) {
   var download_folder_name = '檔案放置區'
   var DLineSFN = 'Line貼圖放置區' //download_line_Sticker_folder_name
   var DTGSFN = 'Telegram貼圖放置區' //download_Telegram_Sticker_folder_name
-  var sticker_sheet = '貼圖對照表'
+  var sticker_doc_name = '貼圖對照表'
   var G_drive_Durl = 'https://drive.google.com/uc?export=download&id='
   var G_drive_Durl_ex = 'https://drive.google.com/uc?export=download&confirm=YzWC&id='
   var rt_max_chats = 14 //對Line回復時應許的字元數
   var notification = false
   var nonsense_number = 3
+  var sticker_need = {
+    "DLineSFN": DLineSFN,
+    "DTGSFN": DTGSFN,
+    "sticker_doc_name": sticker_doc_name,
+    "G_drive_Durl": G_drive_Durl
+  }
 
   /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -431,7 +437,8 @@ function doPost(e) {
           // ^ "(影片已發送!)"
         } else if (estringa.message.sticker) {
           var file_id = estringa.message.sticker.file_id
-          TG_Send_Sticker_To_Line(Line_id, file_id)
+          var TG_sticker_url = get_sticker(ALL, sticker_need, file_id, keep_time)
+          TG_Send_Sticker_To_Line(Line_id, TG_sticker_url)
           if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
             TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
             // ^ "來自: {0}"
@@ -2159,17 +2166,17 @@ function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_addres
   UrlFetchApp.fetch(url, options);
 }
 //================================================================
-function TG_Send_Sticker_To_Line(Line_id, sticker_id) { //舊款function 先留著
+function TG_Send_Sticker_To_Line(Line_id, Sticker_url) { //舊款function 先留著
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-  var G = TGdownloadURL(getpath(sticker_id))
+
 
   var url = 'https://api.line.me/v2/bot/message/push';
   //--------------------------------------------------
   var retMsg = [{
     "type": "image",
-    "originalContentUrl": G,
-    "previewImageUrl": G
+    "originalContentUrl": Sticker_url,
+    "previewImageUrl": Sticker_url
   }];
   var header = {
     'Content-Type': 'application/json; charset=UTF-8',
@@ -3023,9 +3030,9 @@ String.prototype.format = function() {
   var txt = this.toString();
   for (var i = 0; i < arguments.length; i++) {
     var exp = getStringFormatPlaceHolderRegEx(i);
-    arguments[i] = String(arguments[i]).replace(/\$/gm,'♒☯◈∭')
+    arguments[i] = String(arguments[i]).replace(/\$/gm, '♒☯◈∭')
     txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
-    txt = txt.replace(/♒☯◈∭/gm,'$')
+    txt = txt.replace(/♒☯◈∭/gm, '$')
   }
   return cleanStringFormatResult(txt);
 }
@@ -3417,7 +3424,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
   return true
 }
 //================================================================
-function conservion_media(media_id, media_blob, new_format, conservion_server,layer) {
+function conservion_media(media_id, media_blob, new_format, conservion_server, layer) {
 
   if (media_id === void 0)
     throw new Error("media_id未給")
@@ -3445,20 +3452,81 @@ function conservion_media(media_id, media_blob, new_format, conservion_server,la
   }
 
   var conservion_server_url = "https://{0}/{1}".format(
-    ALL["conservion_server"]["domain_name"], ALL["conservion_server"]["conservion_api"])
+    conservion_server["domain_name"], conservion_server["conservion_api"])
 
   try {
     var conservion_blob = UrlFetchApp.fetch(conservion_server_url, data);
     return conservion_blob
   } catch (e) {
+    console.log('conservion_blob error')
+    console.log(e)
     if (conservion_blob.getResponseCode() == 500) {
       layer += 1
-      conservion_server['domain_name'] = UrlFetchApp.fetch(spare_require)["domain_name"]
-      return conservion_media(media_id, media_blob, new_format, conservion_server,layer)
+      conservion_server['domain_name'] = UrlFetchApp.fetch(conservion_server['spare_require'])["domain_name"]
+      return conservion_media(media_id, media_blob, new_format, conservion_server, layer)
     }
     return e
   }
 
+}
+//================================================================
+function get_sticker(ALL, sticker_need, file_id, keep_time) {
+  if (ALL === void 0)
+    throw new Error("ALL 未給")
+
+  if (sticker_need === void 0)
+    throw new Error("sticker_need 未給")
+
+  var DLineSFN = sticker_need['DLineSFN']
+  if (DLineSFN === void 0)
+    throw new Error("DLineSFN 未給")
+
+  var DTGSFN = sticker_need['DTGSFN']
+  if (DTGSFN === void 0)
+    throw new Error("DTGSFN 未給")
+
+  var sticker_doc_name = sticker_need['sticker_doc_name']
+  if (sticker_doc_name === void 0)
+    throw new Error("sticker_doc_name 未給")
+
+  var G_drive_Durl = sticker_need['G_drive_Durl']
+  if (G_drive_Durl === void 0)
+    throw new Error("G_drive_Durl 未給")
+
+  if (file_id === void 0)
+    throw new Error("file_id 未給")
+  keep_time = keep_time || 21600
+  //-----------------------------------------------------------
+
+  var cache = CacheService.getScriptCache();
+  var Stickers = cache.get(sticker_doc_name);
+
+  if (Stickers == null) { //看cached還在不在，不在就拉回來
+    var Stickers_doc_id = ALL[sticker_doc_name]['FileId']
+    var Stickers_doc = DocumentApp.openById(Stickers_doc_id)
+    var Stickers_doc_txt = Stickers_doc.getText()
+
+    cache.put(sticker_doc_name, Stickers_doc_txt, keep_time)
+    var Stickers = Stickers_doc_txt
+  }
+
+  var sticker_json = JSON.parse(Stickers); //第二階段，抓圖存放
+  if (!sticker_json[file_id]) {
+    var TG_sticker = UrlFetchApp.fetch(TGdownloadURL(getpath(file_id)))
+    var TG_sticker_png = conservion_media(file_id, TG_sticker, 'png', ALL["conservion_server"])
+
+    var TG_sticker_Folder = DriveApp.getFolderById(ALL[DTGSFN]['FolderId']);
+    var TG_sticker_png_file = Folder.createFile(TG_sticker_png).setName(file_id)
+    var TG_sticker_png_file_id = TG_sticker_png_file.getId()
+
+    var TG_sticker_url = G_drive_Durl + TG_sticker_png_file_id
+    sticker_json[file_id] = TG_sticker_url
+    Stickers_doc.setText(JSON.stringify(sticker_json))
+    cache.remove(sticker_doc_name)
+    cache.put(sticker_doc_name, Stickers_doc_txt, keep_time)
+  }
+
+  return TG_sticker_png_file_id
 }
 //================================================================
 function start(payload) {
