@@ -104,6 +104,7 @@ function up_version() {
     ALL["conservion_server"] = {
       "domain_name": 'we684123.hopto.org',
       "conservion_api": 'media_conservion',
+      "agree_server_save": false,
       "spare_require": 'https://xxx.xxx' //暫時無用
     }
 
@@ -3444,6 +3445,7 @@ function conservion_media(media_id, media_blob, new_format, conservion_server, l
     "media_id": String(media_id),
     "media_blob": media_blob,
     "new_format": String(new_format),
+    "agree_server_save":conservion_server['agree_server_save'],
   }
 
   var data = {
