@@ -438,7 +438,7 @@ function doPost(e) {
           // ^ "(影片已發送!)"
         } else if (estringa.message.sticker) {
           var file_id = estringa.message.sticker.file_id
-          var TG_sticker_url = get_sticker(ALL, sticker_need, file_id, keep_time)
+          var TG_sticker_url = get_sticker(ALL, sticker_need, file_id)
           TG_Send_Sticker_To_Line(Line_id, TG_sticker_url)
           if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
             TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
@@ -1422,7 +1422,8 @@ function doPost(e) {
     } else if (estringa.message.sticker) { //如果是貼圖
       if (mode == "🚀 發送訊息") {
         var file_id = estringa.message.sticker.file_id
-        TG_Send_Sticker_To_Line(Line_id, file_id)
+        var TG_sticker_url = get_sticker(ALL, sticker_need, file_id)
+        TG_Send_Sticker_To_Line(Line_id, TG_sticker_url)
         sendtext(chat_id, ct["sendSticker_ed"]);
         // ^ "(貼圖已發送!)"
       } else {
@@ -3445,7 +3446,7 @@ function conservion_media(media_id, media_blob, new_format, conservion_server, l
     "media_id": String(media_id),
     "media_blob": media_blob,
     "new_format": String(new_format),
-    "agree_server_save":conservion_server['agree_server_save'],
+    "agree_server_save": conservion_server['agree_server_save'],
   }
 
   var data = {
