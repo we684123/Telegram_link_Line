@@ -3512,21 +3512,29 @@ function get_sticker(ALL, sticker_need, file_id, keep_time) {
 
   var sticker_json = JSON.parse(Stickers); //第二階段，抓圖存放
   if (!sticker_json[file_id]) {
-    var TG_sticker = UrlFetchApp.fetch(TGdownloadURL(getpath(file_id)))
+    var TG_sticker = UrlFetchApp.fetch(TGdownloadURL(getpath(file_id))).getBlob()
     var TG_sticker_png = conservion_media(file_id, TG_sticker, 'png', ALL["conservion_server"])
 
     var TG_sticker_Folder = DriveApp.getFolderById(ALL[DTGSFN]['FolderId']);
-    var TG_sticker_png_file = Folder.createFile(TG_sticker_png).setName(file_id)
+    var TG_sticker_png_file = TG_sticker_Folder.createFile(TG_sticker_png).setName(file_id)
     var TG_sticker_png_file_id = TG_sticker_png_file.getId()
 
     var TG_sticker_url = G_drive_Durl + TG_sticker_png_file_id
     sticker_json[file_id] = TG_sticker_url
+
+    if (!Stickers_doc) {
+      var Stickers_doc_id = ALL[sticker_doc_name]['FileId']
+      var Stickers_doc = DocumentApp.openById(Stickers_doc_id)
+      var Stickers_doc_txt = Stickers_doc.getText()
+    }
     Stickers_doc.setText(JSON.stringify(sticker_json))
     cache.remove(sticker_doc_name)
-    cache.put(sticker_doc_name, Stickers_doc_txt, keep_time)
+    cache.put(sticker_doc_name, JSON.stringify(sticker_json), keep_time)
+  } else {
+    var TG_sticker_url = sticker_json[file_id]
   }
 
-  return TG_sticker_png_file_id
+  return TG_sticker_url
 }
 //================================================================
 function start(payload) {
