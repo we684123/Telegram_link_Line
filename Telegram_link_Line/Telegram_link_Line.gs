@@ -881,6 +881,120 @@ function doPost(e) {
         keyboard_main(chat_id, ct['Trashed_result'], ALL)
         lock.releaseLock();
         return 0;
+      } else if (mode == "🌀 轉圖設定" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+        var conservion_server_url = "https://{0}/{1}".format(
+          ALL['conservion_server']["domain_name"],
+          ALL['conservion_server']["conservion_api"]
+        )
+
+        switch (Stext) {
+          case ct['set_server']["text"]:
+            ReplyKeyboardRemove(chat_id, ct['plz_set_server'])
+            ALL.mode = "🌀 轉圖設定 - set_server"
+            break;
+          case ct['set_require_api']["text"]:
+            ReplyKeyboardRemove(chat_id, ct['plz_set_require_api'])
+            ALL.mode = "🌀 轉圖設定 - set_require_api"
+            break;
+          case ct['set_save_yes']["text"]:
+            ALL['conservion_server']['agree_server_save'] = true
+            sendtext(chat_id, ct['set_save_yes_ed'])
+
+            var ics = ct['image_conversion_status']['text'].format(
+              ALL['conservion_server']['domain_name'],
+              ALL['conservion_server']['conservion_api'],
+              conservion_server_url,
+              String(ALL['conservion_server']['agree_server_save']))
+
+            var image_conversion_keyboard2 = [
+              [{
+                'text': ct["set_server"]["text"]
+              }, {
+                'text': ct["set_require_api"]["text"]
+              }],
+              [{
+                'text': ct['set_save_no']["text"]
+              }, {
+                'text': ct["🔙 返回大廳"]["text"]
+              }]
+            ]
+            ReplyKeyboardMakeup(
+              chat_id, image_conversion_keyboard2, true, false, ics)
+            break;
+          case ct['set_save_no']["text"]:
+            ALL['conservion_server']['agree_server_save'] = false
+            sendtext(chat_id, ct['set_save_no_ed'])
+
+            var ics = ct['image_conversion_status']['text'].format(
+              ALL['conservion_server']['domain_name'],
+              ALL['conservion_server']['conservion_api'],
+              conservion_server_url,
+              String(ALL['conservion_server']['agree_server_save']))
+
+            var image_conversion_keyboard1 = [
+              [{
+                'text': ct["set_server"]["text"]
+              }, {
+                'text': ct["set_require_api"]["text"]
+              }],
+              [{
+                'text': ct['set_save_yes']["text"]
+              }, {
+                'text': ct["🔙 返回大廳"]["text"]
+              }]
+            ]
+            ReplyKeyboardMakeup(
+              chat_id, image_conversion_keyboard1, true, false, ics)
+            break;
+          default:
+            sendtext(chat_id, ct['not_eat_this'])
+            // ^ "030...\n請不要給我吃怪怪的東西..."
+            lock.releaseLock();
+            return 0;
+        }
+        write_ALL(ALL, doc)
+        lock.releaseLock();
+        return 0;
+      } else if (mode == "🌀 轉圖設定 - set_server" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+        ALL['conservion_server']['domain_name'] = Stext
+        ct['plz_set_server_ed']['text'] = ct['plz_set_server_ed']['text'].format(Stext)
+        sendtext(chat_id, ct['plz_set_server_ed'])
+
+        var conservion_server_url = "https://{0}/{1}".format(
+          ALL['conservion_server']["domain_name"],
+          ALL['conservion_server']["conservion_api"]
+        )
+
+        var ics = ct['image_conversion_status']['text'].format(
+          ALL['conservion_server']['domain_name'],
+          ALL['conservion_server']['conservion_api'],
+          conservion_server_url,
+          String(ALL['conservion_server']['agree_server_save']))
+        keyboard_main(chat_id, ics, ALL)
+        ALL.mode = 0
+        write_ALL(ALL, doc)
+        lock.releaseLock();
+        return 0;
+      } else if (mode == "🌀 轉圖設定 - set_require_api" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+        ALL['conservion_server']['conservion_api'] = Stext
+        ct['plz_set_require_api_ed']['text'] = ct['plz_set_require_api_ed']['text'].format(Stext)
+        sendtext(chat_id, ct['plz_set_require_api_ed'])
+
+        var conservion_server_url = "https://{0}/{1}".format(
+          ALL['conservion_server']["domain_name"],
+          ALL['conservion_server']["conservion_api"]
+        )
+
+        var ics = ct['image_conversion_status']['text'].format(
+          ALL['conservion_server']['domain_name'],
+          ALL['conservion_server']['conservion_api'],
+          conservion_server_url,
+          String(ALL['conservion_server']['agree_server_save']))
+        keyboard_main(chat_id, ics, ALL)
+        ALL.mode = 0
+        write_ALL(ALL, doc)
+        lock.releaseLock();
+        return 0;
       } else {
         //以下指令分流
         switch (Stext) {
@@ -1113,6 +1227,8 @@ function doPost(e) {
                 'text': ct["🌋 丟棄舊檔"]["text"]
               }],
               [{
+                'text': ct["🌀 轉圖設定"]["text"]
+              }, {
                 'text': ct["🔙 返回大廳"]["text"]
               }]
             ]
@@ -1291,6 +1407,55 @@ function doPost(e) {
             var ctv = language()["match_version"]
             text = ct["version"]['text'].format(bot_version, language_version, ctv)
             sendtext(chat_id, text);
+          case ct["🌀 轉圖設定"]["text"]:
+            ALL.mode = "🌀 轉圖設定"
+
+            var image_conversion_keyboard1 = [
+              [{
+                'text': ct["set_server"]["text"]
+              }, {
+                'text': ct["set_require_api"]["text"]
+              }],
+              [{
+                'text': ct['set_save_yes']["text"]
+              }, {
+                'text': ct["🔙 返回大廳"]["text"]
+              }]
+            ]
+            var image_conversion_keyboard2 = [
+              [{
+                'text': ct["set_server"]["text"]
+              }, {
+                'text': ct["set_require_api"]["text"]
+              }],
+              [{
+                'text': ct['set_save_no']["text"]
+              }, {
+                'text': ct["🔙 返回大廳"]["text"]
+              }]
+            ]
+
+            if (!ALL['conservion_server']["agree_server_save"]) {
+              var image_conversion_keyboard = image_conversion_keyboard1
+            } else {
+              var image_conversion_keyboard = image_conversion_keyboard2
+            }
+            ReplyKeyboardMakeup(
+              chat_id, image_conversion_keyboard, true, false, ct["image_conversion"])
+
+            var conservion_server_url = "https://{0}/{1}".format(
+              ALL['conservion_server']["domain_name"],
+              ALL['conservion_server']["conservion_api"]
+            )
+
+            var ics = ct['image_conversion_status']['text'].format(
+              ALL['conservion_server']['domain_name'],
+              ALL['conservion_server']['conservion_api'],
+              conservion_server_url,
+              String(ALL['conservion_server']['agree_server_save'])
+            )
+            sendtext(chat_id, ics)
+            write_ALL(ALL, doc) //寫入
             break;
             //-------------------------------------------------------------------
           default:

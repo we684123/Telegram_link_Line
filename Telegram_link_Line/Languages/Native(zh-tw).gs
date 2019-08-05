@@ -865,6 +865,87 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "🌀 轉圖設定": {
+        "type": "command(Telegram)",
+        "text": "🌀 轉圖設定"
+      },
+      "image_conversion": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": [
+          "由於 Line ios 版不吃 webp 格式的關係，",
+          "所以需要把TG的貼圖(webp)轉成 png 格式後再傳送給 Line。\n\n",
+          "但是 google apps script 不支援 webp 轉 png，且撇人還未能無法理解 gzip，",
+          "只好折衷將圖片送到我的 server 進行轉換，*目前並不會儲存你們所傳過來的圖片*。\n\n",
+          "如果未來如果有儲存圖片也只是為了當下一個使用者傳來跟你一樣的圖片時，",
+          "server能夠少下轉換的時間，直接用先前轉好的圖片直接回傳，不會作為其他用途。\n\n",
+          '當然你也可以在下方設定 "不留圖片"，如此便 *不會儲存您的貼圖*。\n\n',
+          "*倘若這還不夠放心，您也可以自架 server，我將公開 server 的原始碼*，",
+          '架好之後，只需在下方設定變更目標伺服器域名即可。\n\n',
+          "在此也希望各位正常使用就好，雖說是免費提供，但真也不希望server垮掉，",
+          "他只是一個小小的 vCPU，請小心愛惜\n(ó﹏ò｡)",
+        ],
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "set_server": {
+        "type": "command(Telegram)",
+        "text": '設定目標域名'
+      },
+      "set_require_api": {
+        "type": "command(Telegram)",
+        "text": '設定目標請求'
+      },
+      "set_save_yes": {
+        "type": "command(Telegram)",
+        "text": '設成保留圖片'
+      },
+      "set_save_no": {
+        "type": "command(Telegram)",
+        "text": '設成不留圖片'
+      },
+      "image_conversion_status": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": '目標伺服器域名:\n{0}\n目標api:\n{1}\n目標伺服器完整網址:\n{2}\n是否讓伺服器存圖:\n{3}',
+        // {0} = 域名 , {1} = 請求網址 , {2} = 完整網址 , {3} = 是否存圖(布林)
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "plz_set_server": {
+        "type": "to_Telegram",
+        "text": "請輸入 server 域名",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "plz_set_require_api": {
+        "type": "to_Telegram",
+        "text": "請輸入 server api",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "set_save_yes_ed": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "已設定成 server 保留圖片", // 自定義文字內容
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "set_save_no_ed": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "已設定成 server 不留圖片", // 自定義文字內容
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "plz_set_server_ed": {
+        "type": "to_Telegram",
+        "text": "server域名已改成:\n{0}", // {0} = 新的域名
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "plz_set_require_api_ed": {
+        "type": "to_Telegram",
+        "text": "server api已改成:\n{0}", // {0} = 新的api
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
     }
   }
   /*
