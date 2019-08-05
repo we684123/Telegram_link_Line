@@ -1,9 +1,9 @@
 function language() {
   var language = { //多包一層看以後有沒有打算擴充...............
     "language_name": "Native(zh-tw)",
-    "language_version": 1.0,
-    "match_version": 3.2,
-    "update_time": 1544636639164,
+    "language_version": 1.1,
+    "match_version": 3.3,
+    "update_time": 1564987373086,
     "author": "永格天",
     "correspond_text": {
       "backed_up_ing": {
@@ -855,6 +855,13 @@ function language() {
       "unfollow": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "{0} 移除(unfollow)你的line_bot好友了!", // {0} = line的某人
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "version": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "Telegram_link_Line 版本:\n{0}\nLanguage 版本:\n{1}\nLanguage 配合code版本:\n{2}",
+        // {0} = Telegram_link_Line 版本 , {1} = Language 版本 , {2} = Language 配合code版本
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },

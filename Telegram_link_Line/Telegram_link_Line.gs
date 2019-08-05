@@ -1282,6 +1282,16 @@ function doPost(e) {
               chat_id, Trashed_keyboard, resize_keyboard, one_time_keyboard, text)
             write_ALL(ALL, doc) //寫入
             break;
+          case '/info':
+          case '/v':
+          case '/V':
+          case '/version':
+            var bot_version = ALL['code_version']
+            var language_version = language()["language_version"]
+            var ctv = language()["match_version"]
+            text = ct["version"]['text'].format(bot_version, language_version, ctv)
+            sendtext(chat_id, text);
+            break;
             //-------------------------------------------------------------------
           default:
             if (Stext == ct['/droproom']['text']) {
