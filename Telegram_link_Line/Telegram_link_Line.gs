@@ -3547,7 +3547,7 @@ function get_sticker(ALL, sticker_need, file_id, keep_time) {
     var TG_sticker_url = sticker_json[file_id]
   }
 
-  return TG_sticker_url
+  return get_200_url(TG_sticker_url)
 }
 //================================================================
 function start(payload) {
