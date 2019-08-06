@@ -1088,7 +1088,8 @@ function doPost(e) {
           }]
         ]
 
-        var text2 = ct['ed_notification_info']['text'].format(
+        var text2 = O_format(
+          ct['ed_notification_info']['text'],
           ALL["ed_notification"]['need'],
           ALL["ed_notification"]['delete_notification'],
           ALL["ed_notification"]['delay'],
@@ -1629,7 +1630,8 @@ function doPost(e) {
               }]
             ]
 
-            var text2 = ct['ed_notification_info']['text'].format(
+            var text2 = O_format(
+              ct['ed_notification_info']['text'],
               ALL["ed_notification"]['need'],
               ALL["ed_notification"]['delete_notification'],
               ALL["ed_notification"]['delay'],
@@ -3412,6 +3414,8 @@ function cleanStringFormatResult(txt) {
 }
 
 // 為了讓 ct 的 [] 物件也可以用特化的
+//ㄜ... 居然會影響其他的物件，改成 function 好了。
+/*
 Object.prototype.format = function() {
   var text = ''
   this.forEach(function(element) {
@@ -3420,6 +3424,23 @@ Object.prototype.format = function() {
   var txt = text
 
   for (var i = 0; i < arguments.length; i++) {
+    var exp = getStringFormatPlaceHolderRegEx(i);
+
+    arguments[i] = String(arguments[i]).replace(/\$/gm, '♒☯◈∭')
+    txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
+    txt = txt.replace(/♒☯◈∭/gm, '$')
+  }
+  return cleanStringFormatResult(txt);
+}
+//*/
+function O_format() {
+  var text = ''
+  arguments[0].forEach(function(element) {
+    text += element
+  });
+  var txt = text
+
+  for (var i = 1; i < arguments.length; i++) {
     var exp = getStringFormatPlaceHolderRegEx(i);
 
     arguments[i] = String(arguments[i]).replace(/\$/gm, '♒☯◈∭')
