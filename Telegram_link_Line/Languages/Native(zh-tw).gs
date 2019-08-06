@@ -895,19 +895,19 @@ function language() {
       },
       "set_server": {
         "type": "command(Telegram)",
-        "text": '設定目標域名'
+        "text": '🚪 設定目標域名'
       },
       "set_require_api": {
         "type": "command(Telegram)",
-        "text": '設定目標請求'
+        "text": '🚲 設定目標請求'
       },
       "set_save_yes": {
         "type": "command(Telegram)",
-        "text": '設成保留圖片'
+        "text": '✔️ 設成保留圖片'
       },
       "set_save_no": {
         "type": "command(Telegram)",
-        "text": '設成不留圖片'
+        "text": '✖️ 設成不留圖片'
       },
       "image_conversion_status": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
@@ -963,6 +963,111 @@ function language() {
         //這個先來留著但不用，這本身就是新版本的一部份，所以只能下次用
         "type": "to_Telegram",
         "text": "Telegram_link_Line 升級失敗! 原因如下:\n{0}", // {0} = catch (e)
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🆗設定提示": {
+        "type": "command(Telegram)",
+        "text": "🆗 設定提示"
+      },
+      "🉑啟用提示": {
+        "type": "command(Telegram)",
+        "text": "🉑 啟用提示"
+      },
+      "🈲停用提示": {
+        "type": "command(Telegram)",
+        "text": "🈲 停用提示"
+      },
+      "🌠自刪提示": {
+        "type": "command(Telegram)",
+        "text": "🌠 自刪提示"
+      },
+      "🌟不要自刪": {
+        "type": "command(Telegram)",
+        "text": "🌟 不要自刪"
+      },
+      "🍵延刪提示": {
+        "type": "command(Telegram)",
+        "text": "🍵 延刪提示"
+      },
+      "☕不要延刪": {
+        "type": "command(Telegram)",
+        "text": "☕ 不要延刪"
+      },
+      "⌛設定延遲": {
+        "type": "command(Telegram)",
+        "text": "⌛ 設定延遲"
+      },
+      "set_del_notification_info": {
+        "type": "to_Telegram",
+        "text": [
+          '在傳送照片、貼圖...等媒體結束時會收到 "(XX已發送!)" 這類的訊息。\n\n',
+          '如果覺得難看想讓他 "不發通知" 或 "發完後刪掉" 或 "發完幾秒內刪掉" 的話，',
+          '可以在這裡設定。'
+        ],
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🉑啟用提示_ed": {
+        "type": "to_Telegram",
+        "text": "已 🉑啟用提示", // 自定義文字內容
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🈲停用提示_ed": {
+        "type": "to_Telegram",
+        "text": "已 🈲停用提示", // 自定義文字內容
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🌠自刪提示_ed": {
+        "type": "to_Telegram",
+        "text": "已 🌠自刪提示，之後會自動刪除提示",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🌟不要自刪_ed": {
+        "type": "to_Telegram",
+        "text": "已 🌟不要自刪，之後不會自動刪除提示",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🍵延刪提示_ed": {
+        "type": "to_Telegram",
+        "text": "已 🍵延刪提示，之後會在 {0} 毫秒後自動刪除",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "☕不要延刪_ed": {
+        "type": "to_Telegram",
+        "text": "已 ☕不要延刪，之後將不會延時刪除",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "⌛設定延遲_ing": {
+        "type": "to_Telegram",
+        "text": "請輸入 100 ~ 5000 的毫秒數以做為延遲時間\n(1秒 = 1000毫秒)",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "⌛設定延遲_ed": {
+        "type": "to_Telegram",
+        "text": "延遲時間設定完成!\n延遲時間: {0} 毫秒",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "set_time_error": {
+        "type": "to_Telegram",
+        "text": "請輸入 100 ~ 5000 內的整數數字，而非其他文字!\n如欲取消設定請 /main",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "ed_notification_info": {
+        "type": "to_Telegram",
+        "text": [
+          "刪除提示的狀態:\n\n是否傳送提示: {0}\n是否自動刪除提示: {1}\n",
+          "是否延遲刪除提示: {2}\n延遲刪除的時間: {3}毫秒"
+        ],
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },

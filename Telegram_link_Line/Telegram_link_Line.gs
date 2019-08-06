@@ -13,6 +13,8 @@ function up_version() {
   var lock = LockService.getScriptLock();
   var success = lock.tryLock(30 * 1000);
 
+  sendtext(Telegram_id, '升級中請稍後...');
+
   // 下面是 V3.1 所需
   if (ALL.FastMatch3 == undefined) {
     ALL.FastMatch3 = {}
@@ -106,6 +108,13 @@ function up_version() {
       "conservion_api": 'media_conservion',
       "agree_server_save": false,
       "spare_require": 'https://xxx.xxx' //暫時無用
+    }
+
+    ALL["ed_notification"] = {
+      "need": true,
+      "delete_notification": true,
+      "delay": true,
+      "delay_time": 1000
     }
 
     ALL['code_version'] = 3.3
@@ -395,8 +404,19 @@ function doPost(e) {
             }
           }
 
-          sendtext(chat_id, ct["sendPhoto_ed"]);
-          // ^ "(圖片已發送!)"
+          if (ALL['ed_notification']['need']) {
+            var send_ed = sendtext(chat_id, ct["sendPhoto_ed"]);
+            // ^ "(圖片已發送!)"
+            if (ALL['ed_notification']['delete_notification']) {
+              if (ALL['ed_notification']['delay']) {
+                lock.releaseLock();
+                Utilities.sleep(ALL['ed_notification']['delay_time'])
+                deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
+              } else {
+                deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
+              }
+            }
+          }
         } else if (estringa.message.video) {
           //以下選擇telegram video並發到line
           var file_id = estringa.message.video.file_id
@@ -996,6 +1016,103 @@ function doPost(e) {
         write_ALL(ALL, doc)
         lock.releaseLock();
         return 0;
+      } else if (mode == "ed_notification" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+        switch (Stext) {
+          case ct['🉑啟用提示']["text"]:
+            ALL['ed_notification']['need'] = true
+            sendtext(chat_id, ct['🉑啟用提示_ed'])
+            break;
+          case ct['🈲停用提示']["text"]:
+            ALL['ed_notification']['need'] = false
+            sendtext(chat_id, ct['🈲停用提示_ed'])
+            break;
+          case ct['🌠自刪提示']["text"]:
+            ALL['ed_notification']['delete_notification'] = true
+            sendtext(chat_id, ct['🌠自刪提示_ed'])
+            break;
+          case ct['🌟不要自刪']["text"]:
+            ALL['ed_notification']['delete_notification'] = false
+            sendtext(chat_id, ct['🌟不要自刪_ed'])
+            break;
+          case ct['🍵延刪提示']["text"]:
+            ALL['ed_notification']['delay'] = true
+            sendtext(chat_id, ct['🍵延刪提示_ed'])
+            break;
+          case ct['☕不要延刪']["text"]:
+            ALL['ed_notification']['delay'] = false
+            sendtext(chat_id, ct['☕不要延刪_ed'])
+            break;
+          case ct['⌛設定延遲']["text"]:
+            ALL.mode = '⌛設定延遲'
+            ReplyKeyboardRemove(chat_id, ct['⌛設定延遲_ing'])
+            write_ALL(ALL, doc)
+            lock.releaseLock();
+            return 0;
+            break;
+          default:
+            sendtext(chat_id, ct['not_eat_this'])
+            // ^ "030...\n請不要給我吃怪怪的東西..."
+            lock.releaseLock();
+            return 0;
+        }
+
+        if (!ALL['ed_notification']['need']) {
+          var k1_1 = ct['🉑啟用提示']["text"]
+        } else {
+          var k1_1 = ct['🈲停用提示']["text"]
+        }
+        if (!ALL['ed_notification']['delete_notification']) {
+          var k1_2 = ct['🌠自刪提示']["text"]
+        } else {
+          var k1_2 = ct['🌟不要自刪']["text"]
+        }
+        if (!ALL['ed_notification']['delay']) {
+          var k2_1 = ct['🍵延刪提示']["text"]
+        } else {
+          var k2_1 = ct['☕不要延刪']["text"]
+        }
+
+        var set_notification_keyborad = [
+          [{
+            'text': k1_1
+          }, {
+            'text': k1_2
+          }],
+          [{
+            'text': k2_1
+          }, {
+            'text': ct["⌛設定延遲"]["text"]
+          }],
+          [{
+            'text': ct["🔙 返回大廳"]["text"]
+          }]
+        ]
+
+        var text2 = ct['ed_notification_info']['text'].format(
+          ALL["ed_notification"]['need'],
+          ALL["ed_notification"]['delete_notification'],
+          ALL["ed_notification"]['delay'],
+          ALL["ed_notification"]['delay_time']
+        )
+
+        ReplyKeyboardMakeup(
+          chat_id, set_notification_keyborad, true, false, text2)
+
+        write_ALL(ALL, doc)
+        lock.releaseLock();
+        return 0;
+      } else if (mode == "⌛設定延遲" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+        try {
+          var milliseconds = parseInt(Stext)
+          if (milliseconds <= 5000 && milliseconds >= 100) {
+            ALL['ed_notification']['delay_time'] = milliseconds
+            ALL.mode = 0
+            ct["⌛設定延遲_ed"]['text'] = ct["⌛設定延遲_ed"]['text'].format(milliseconds)
+            keyboard_main(Telegram_id, ct["⌛設定延遲_ed"], ALL)
+          }
+        } catch (e) {
+          sendtext(chat_id, ct['set_time_error'])
+        }
       } else {
         //以下指令分流
         switch (Stext) {
@@ -1230,6 +1347,9 @@ function doPost(e) {
               [{
                 'text': ct["🌀 轉圖設定"]["text"]
               }, {
+                'text': ct["🆗設定提示"]["text"]
+              }],
+              [{
                 'text': ct["🔙 返回大廳"]["text"]
               }]
             ]
@@ -1408,6 +1528,7 @@ function doPost(e) {
             var ctv = language()["match_version"]
             text = ct["version"]['text'].format(bot_version, language_version, ctv)
             sendtext(chat_id, text);
+            break;
           case ct["🌀 轉圖設定"]["text"]:
             ALL.mode = "🌀 轉圖設定"
 
@@ -1471,6 +1592,54 @@ function doPost(e) {
               sendtext(chat_id, text);
               console.log(text);
             }
+            break;
+          case ct['🆗設定提示']["text"]:
+            var text = ct['set_del_notification_info']
+
+            if (!ALL['ed_notification']['need']) {
+              var k1_1 = ct['🉑啟用提示']["text"]
+            } else {
+              var k1_1 = ct['🈲停用提示']["text"]
+            }
+            if (!ALL['ed_notification']['delete_notification']) {
+              var k1_2 = ct['🌠自刪提示']["text"]
+            } else {
+              var k1_2 = ct['🌟不要自刪']["text"]
+            }
+            if (!ALL['ed_notification']['delay']) {
+              var k2_1 = ct['🍵延刪提示']["text"]
+            } else {
+              var k2_1 = ct['☕不要延刪']["text"]
+            }
+
+            var set_notification_keyborad = [
+              [{
+                'text': k1_1
+              }, {
+                'text': k1_2
+              }],
+              [{
+                'text': k2_1
+              }, {
+                'text': ct["⌛設定延遲"]["text"]
+              }],
+              [{
+                'text': ct["🔙 返回大廳"]["text"]
+              }]
+            ]
+
+            var text2 = ct['ed_notification_info']['text'].format(
+              ALL["ed_notification"]['need'],
+              ALL["ed_notification"]['delete_notification'],
+              ALL["ed_notification"]['delay'],
+              ALL["ed_notification"]['delay_time']
+            )
+            sendtext(chat_id, text2)
+
+            ReplyKeyboardMakeup(
+              chat_id, set_notification_keyborad, true, false, text)
+            ALL.mode = "ed_notification"
+            write_ALL(ALL, doc) //寫入
             break;
             //-------------------------------------------------------------------
           default:
@@ -3239,6 +3408,24 @@ function getStringFormatPlaceHolderRegEx(placeHolderIndex) {
 function cleanStringFormatResult(txt) {
   if (txt == null) return "";
   return txt.replace(getStringFormatPlaceHolderRegEx("\\d+"), "");
+}
+
+// 為了讓 ct 的 [] 物件也可以用特化的
+Object.prototype.format = function() {
+  var text = ''
+  this.forEach(function(element) {
+    text += element
+  });
+  var txt = text
+
+  for (var i = 0; i < arguments.length; i++) {
+    var exp = getStringFormatPlaceHolderRegEx(i);
+
+    arguments[i] = String(arguments[i]).replace(/\$/gm, '♒☯◈∭')
+    txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
+    txt = txt.replace(/♒☯◈∭/gm, '$')
+  }
+  return cleanStringFormatResult(txt);
 }
 //================================================================
 // 我印象中有找到一種方式來分割字串的，但不知道是哪個指令...
