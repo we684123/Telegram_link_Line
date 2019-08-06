@@ -887,6 +887,12 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "first_conversion": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "啊對了，在之後傳新貼圖時第一次會傳比較慢，第二次後就會回覆正常速度了\n_(¦3」∠)_",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "set_server": {
         "type": "command(Telegram)",
         "text": '設定目標域名'
@@ -943,6 +949,20 @@ function language() {
       "plz_set_require_api_ed": {
         "type": "to_Telegram",
         "text": "server api已改成:\n{0}", // {0} = 新的api
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "up_version_ed": {
+        //這個先來留著但不用，這本身就是新版本的一部份，所以只能下次用
+        "type": "to_Telegram",
+        "text": "Telegram_link_Line 已升級至 {0}", // {0} = 版本
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "up_version_error": {
+        //這個先來留著但不用，這本身就是新版本的一部份，所以只能下次用
+        "type": "to_Telegram",
+        "text": "Telegram_link_Line 升級失敗! 原因如下:\n{0}", // {0} = catch (e)
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },

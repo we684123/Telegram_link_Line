@@ -118,6 +118,7 @@ function up_version() {
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
   lock.releaseLock();
+  return ALL['code_version']
 }
 //===============================================================
 function doPost(e) {
@@ -1442,6 +1443,7 @@ function doPost(e) {
             }
             ReplyKeyboardMakeup(
               chat_id, image_conversion_keyboard, true, false, ct["image_conversion"])
+            sendtext(chat_id, ct["first_conversion"])
 
             var conservion_server_url = "https://{0}/{1}".format(
               ALL['conservion_server']["domain_name"],
@@ -1456,6 +1458,19 @@ function doPost(e) {
             )
             sendtext(chat_id, ics)
             write_ALL(ALL, doc) //寫入
+            break;
+          case '/up_version':
+            try {
+              var v = up_version()
+              if (v != undefined) {
+                var text = "Telegram_link_Line 已升級至 {0}".format(v)
+                sendtext(chat_id, text);
+              }
+            } catch (e) {
+              var text = "Telegram_link_Line 升級失敗! 原因如下:\n{0}".format(e)
+              sendtext(chat_id, text);
+              console.log(text);
+            }
             break;
             //-------------------------------------------------------------------
           default:
