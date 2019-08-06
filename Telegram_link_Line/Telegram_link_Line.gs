@@ -403,7 +403,7 @@ function doPost(e) {
               TG_Send_text_To_Line(Line_id, text)
             }
           }
-          ed_notification_tidy(ALL,ct["sendPhoto_ed"])
+          ed_notification_tidy(chat_id, ct["sendPhoto_ed"], ALL, lock)
         } else if (estringa.message.video) {
           //以下選擇telegram video並發到line
           var file_id = estringa.message.video.file_id
@@ -422,7 +422,7 @@ function doPost(e) {
               TG_Send_text_To_Line(Line_id, text)
             }
           }
-          ed_notification_tidy(ALL,ct["sendVideo_ed"])
+          ed_notification_tidy(chat_id, ct["sendVideo_ed"], ALL, lock)
           // ^ "(影片已發送!)"
         } else if (estringa.message.video_note) {
           //以下選擇telegram video並發到line
@@ -442,7 +442,7 @@ function doPost(e) {
               TG_Send_text_To_Line(Line_id, text)
             }
           }
-          ed_notification_tidy(ALL,ct["sendVideo_ed"])
+          ed_notification_tidy(chat_id, ct["sendVideo_ed"], ALL, lock)
           // ^ "(影片已發送!)"
         } else if (estringa.message.sticker) {
           var file_id = estringa.message.sticker.file_id
@@ -452,7 +452,7 @@ function doPost(e) {
             TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
             // ^ "來自: {0}"
           }
-          ed_notification_tidy(ALL,ct["sendSticker_ed"])
+          ed_notification_tidy(chat_id, ct["sendSticker_ed"], ALL, lock)
           // ^ "(貼圖已發送!)"
         } else if (estringa.message.audio) {
           var duration = estringa.message.audio.duration
@@ -471,7 +471,7 @@ function doPost(e) {
               TG_Send_text_To_Line(Line_id, text)
             }
           }
-          ed_notification_tidy(ALL,ct["sendAudio_ed"])
+          ed_notification_tidy(chat_id, ct["sendAudio_ed"], ALL, lock)
           // ^ "(音檔已發送!)"
         } else if (estringa.message.voice) {
           var duration = estringa.message.voice.duration
@@ -490,7 +490,7 @@ function doPost(e) {
               TG_Send_text_To_Line(Line_id, text)
             }
           }
-          ed_notification_tidy(ALL,ct["sendVoice_ed"])
+          ed_notification_tidy(chat_id, ct["sendVoice_ed"], ALL, lock)
           // ^ "(錄音已發送!)"
         } else if (estringa.message.location) {
           var latitude = estringa.message.location.latitude
@@ -509,7 +509,7 @@ function doPost(e) {
           if (ALL.data[n]["Display_name"]) {
             TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
           }
-          ed_notification_tidy(ALL,ct["sendLocation_ed"])
+          ed_notification_tidy(chat_id, ct["sendLocation_ed"], ALL, lock)
           // ^ "(位置已發送!)"
         } else if (estringa.message.animation) {
           var file_id = estringa.message.animation.file_id
@@ -528,7 +528,7 @@ function doPost(e) {
               TG_Send_text_To_Line(Line_id, text)
             }
           }
-          ed_notification_tidy(ALL,ct["sendGIF_ed"])
+          ed_notification_tidy(chat_id, ct["sendGIF_ed"], ALL, lock)
           // ^ "(GIF已發送!)"
         } else if (estringa.message.document) {
           var fileId = estringa.message.document.file_id
@@ -548,7 +548,7 @@ function doPost(e) {
             text = by_name + text
           }
           TG_Send_text_To_Line(Line_id, text)
-          ed_notification_tidy(ALL,ct["sendFile_ed"])
+          ed_notification_tidy(chat_id, ct["sendFile_ed"], ALL, lock)
           // ^ "(File連結已發送!)"
         }
       }
@@ -1736,7 +1736,7 @@ function doPost(e) {
         if (estringa.message.caption)
           TG_Send_text_To_Line(Line_id, estringa.message.caption)
         //如有簡介則一同發出
-        ed_notification_tidy(ALL,ct["sendPhoto_ed"])
+        ed_notification_tidy(chat_id, ct["sendPhoto_ed"], ALL, lock)
         // ^ "(圖片已發送!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
@@ -1750,7 +1750,7 @@ function doPost(e) {
         TG_Send_video_To_Line(Line_id, video_id, thumb_id)
         if (estringa.message.caption)
           TG_Send_text_To_Line(Line_id, estringa.message.caption)
-        ed_notification_tidy(ALL,ct["sendVideo_ed"])
+        ed_notification_tidy(chat_id, ct["sendVideo_ed"], ALL, lock)
         // ^ "(影片已發送!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
@@ -1764,7 +1764,7 @@ function doPost(e) {
         TG_Send_video_To_Line(Line_id, video_id, thumb_id)
         if (estringa.message.caption)
           TG_Send_text_To_Line(Line_id, estringa.message.caption)
-        ed_notification_tidy(ALL,ct["sendVideo_ed"])
+        ed_notification_tidy(chat_id, ct["sendVideo_ed"], ALL, lock)
         // ^ "(影片已發送!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
@@ -1775,7 +1775,7 @@ function doPost(e) {
         var file_id = estringa.message.sticker.file_id
         var TG_sticker_url = get_sticker(ALL, sticker_need, file_id)
         TG_Send_Sticker_To_Line(Line_id, TG_sticker_url)
-        ed_notification_tidy(ALL,ct["sendSticker_ed"])
+        ed_notification_tidy(chat_id, ct["sendSticker_ed"], ALL, lock)
         // ^ "(貼圖已發送!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
@@ -1788,7 +1788,7 @@ function doPost(e) {
         TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
         if (estringa.message.caption)
           TG_Send_text_To_Line(Line_id, estringa.message.caption)
-        ed_notification_tidy(ALL,ct["sendAudio_ed"])
+        ed_notification_tidy(chat_id, ct["sendAudio_ed"], ALL, lock)
         // ^ "(音檔已發送!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
@@ -1801,7 +1801,7 @@ function doPost(e) {
         TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
         if (estringa.message.caption)
           TG_Send_text_To_Line(Line_id, estringa.message.caption)
-        ed_notification_tidy(ALL,ct["sendVoice_ed"])
+        ed_notification_tidy(chat_id, ct["sendVoice_ed"], ALL, lock)
         //sendtext(chat_id, ct["not_support_audio"]);
         // ^ "(暫時不支援audio傳送喔!)"
       } else {
@@ -1821,7 +1821,7 @@ function doPost(e) {
         }
         //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
         TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
-        ed_notification_tidy(ALL,ct["sendLocation_ed"])
+        ed_notification_tidy(chat_id, ct["sendLocation_ed"], ALL, lock)
         // ^ "(位置已發送!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
@@ -1833,7 +1833,7 @@ function doPost(e) {
         var file_id = estringa.message.animation.file_id
         var thumb_id = estringa.message.animation.thumb.file_id
         TG_Send_video_To_Line(Line_id, file_id, thumb_id)
-        ed_notification_tidy(ALL,ct["sendGIF_ed"])
+        ed_notification_tidy(chat_id, ct["sendGIF_ed"], ALL, lock)
         // ^ "(GIF已發送!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
@@ -1855,7 +1855,7 @@ function doPost(e) {
         }
 
         TG_Send_text_To_Line(Line_id, text)
-        ed_notification_tidy(ALL,ct["sendFile_ed"])
+        ed_notification_tidy(chat_id, ct["sendFile_ed"], ALL, lock)
         // ^ "(File連結已發送!)"
       } else {
         sendtext(chat_id, ct["incorrect_operation"]);
@@ -3432,7 +3432,7 @@ function O_format() {
   var txt = text
 
   for (var i = 1; i < arguments.length; i++) {
-    var exp = getStringFormatPlaceHolderRegEx(i-1);
+    var exp = getStringFormatPlaceHolderRegEx(i - 1);
 
     arguments[i] = String(arguments[i]).replace(/\$/gm, '♒☯◈∭')
     txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
@@ -3929,7 +3929,8 @@ function get_sticker(ALL, sticker_need, file_id, keep_time) {
 
   return get_200_url(TG_sticker_url)
 }
-function ed_notification_tidy(ALL,ct){
+//================================================================
+function ed_notification_tidy(chat_id, ct, ALL, lock) {
   if (ALL['ed_notification']['need']) {
     var send_ed = sendtext(chat_id, ct);
     // ^ "(XX已發送!)"
