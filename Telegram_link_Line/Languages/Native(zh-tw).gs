@@ -60,6 +60,12 @@ function language() {
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "sendLocation_ed": {
+        "type": "to_Telegram",
+        "text": "(位置已發送!)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "sendGIF_ed": {
         "type": "to_Telegram",
         "text": "(GIF已發送!)",
