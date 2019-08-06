@@ -1107,6 +1107,7 @@ function doPost(e) {
           if (milliseconds <= 5000 && milliseconds >= 100) {
             ALL['ed_notification']['delay_time'] = milliseconds
             ALL.mode = 0
+            write_ALL(ALL, doc)
             ct["⌛設定延遲_ed"]['text'] = ct["⌛設定延遲_ed"]['text'].format(milliseconds)
             keyboard_main(Telegram_id, ct["⌛設定延遲_ed"], ALL)
           }
