@@ -3911,8 +3911,8 @@ function get_sticker(ALL, sticker_need, from, file_id, keep_time) {
   var sticker_json = JSON.parse(Stickers);
 
   if (from == 'Line') {
-    var file_id = 'Line' + file_id
     var Line_sk_id = file_id
+    var file_id = 'Line' + file_id
   }
 
   if (!sticker_json[file_id]) { //第二階段，抓圖存放
@@ -3934,12 +3934,13 @@ function get_sticker(ALL, sticker_need, from, file_id, keep_time) {
         Line_sk_id + "/iPhone/sticker_animation@2x.png;compress=true"
 
       try {
-        var Apng_blob = UrlFetchApp.fetch(Apng_url).getBlob()
+        var Apng_blob = UrlFetchApp.fetch(Apng_url).getBlob().setName(file_id + '.apng')
         var Line_sticker_gif = conservion_media(
           file_id, Apng_blob, 'gif', ALL["conservion_server"])
 
         var Line_sticker_Folder = DriveApp.getFolderById(ALL[DLineSFN]['FolderId']);
-        var Line_sticker_png_file = Line_sticker_Folder.createFile(Line_sticker_gif).setName(Line_sk_id)
+        var Line_sticker_png_file = Line_sticker_Folder.createFile(Line_sticker_gif)
+        Line_sticker_png_file = Line_sticker_png_file.setName(Line_sk_id+'.gif')
         var Line_sticker_png_file_id = Line_sticker_png_file.getId()
 
         var Line_sticker_url = G_drive_Durl + Line_sticker_png_file_id
