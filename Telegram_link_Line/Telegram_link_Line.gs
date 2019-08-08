@@ -341,6 +341,41 @@ function doPost(e) {
           return 0
         }
 
+        // left_chat_member事件，bot被踢先降房間等級
+        if (estringa['message']['left_chat_member']) {
+          if (estringa['message']['left_chat_member']['id'] == ALL['ctrl_bot_id']) {
+            sendtext(Telegram_id, ct['Emergency_downgrade']['text'].format(
+              ALL.data[number]['Name']
+            ))
+            // ^ ```bot被踢離 {0} 故先強制降級此房間，以免無法留存來自綁定line房間的訊息```
+            var oppid = ALL.data[number]["Bind_groud_chat_id"]
+            var Name = ALL.data[number]["Name"]
+
+            if (ALL.data[number]["Notice"]) { //回復符號
+              ALL.data[number]["Name"] = Name.substr(0, Name.length - 1) + "✅"
+            } else {
+              ALL.data[number]["Name"] = Name.substr(0, Name.length - 1) + "❎"
+            }
+
+            delete ALL.data[number]["Bind_groud_chat_id"]
+            delete ALL.data[number]["Bind_groud_chat_title"]
+            delete ALL.data[number]["Bind_groud_chat_type"]
+            delete ALL.data[number]["Display_name"]
+            delete ALL.FastMatch3[oppid]
+            ALL.data[number].status = "normal"
+            ALL.mode = 0 //讓mode回復正常
+            var REST_result = REST_keyboard(REST_FastMatch1and2and3(ALL)[1])
+            write_ALL(REST_result[1], doc) //寫入
+
+            sendtext(Telegram_id, ct["droproom_success"]["text"].format(
+              JSON.stringify(ALL.data[number]))
+            )
+            // ^ "已降級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
+            lock.releaseLock();
+            return 0;
+          }
+        }
+
         // 下面才是正常的流程
         var n = number
         var Line_id = ALL.data[n]['RoomId'] //目標LINE房間ID

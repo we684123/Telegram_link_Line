@@ -1077,6 +1077,18 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "migrate_to_chat_id_ed": {
+        "type": "to_Telegram",
+        "text": '```\nbot收到該"群組"變更成"超級群組"的命令\n已成功變更資料庫\n```',
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "Emergency_downgrade": {
+        "type": "to_Telegram",
+        "text": '```\n因bot被踢離\ {0}\ 故先強制降級此房間\n以免無法留存來自綁定line房間的訊息```',
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+      },
     }
   }
   /*
