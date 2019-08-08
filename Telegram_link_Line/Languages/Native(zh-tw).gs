@@ -1089,6 +1089,12 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "bot_error": {
+        "type": "to_Telegram",
+        "text": 'bot發生錯誤，訊息如下:\n{0}',
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+      },
     }
   }
   /*
