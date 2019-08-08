@@ -327,6 +327,20 @@ function doPost(e) {
           }
         } catch (e) {}
 
+        // 處理 群組 升 超級群 。
+        if (estringa['message']['migrate_to_chat_id']) {
+          var n = number
+          var mtci = estringa['message']['migrate_to_chat_id']
+          ALL.data[n]['Bind_groud_chat_id'] = mtci
+          ALL.data[n]['Bind_groud_chat_type'] = "supergroup"
+          ALL.FastMatch3[mtci] = n
+          delete ALL.FastMatch3[n]
+          write_ALL(ALL, doc) //寫入
+          lock.releaseLock();
+          sendtext(chat_id, ct['migrate_to_chat_id_ed'])
+          return 0
+        }
+
         // 下面才是正常的流程
         var n = number
         var Line_id = ALL.data[n]['RoomId'] //目標LINE房間ID
@@ -3940,7 +3954,7 @@ function get_sticker(ALL, sticker_need, from, file_id, keep_time) {
 
         var Line_sticker_Folder = DriveApp.getFolderById(ALL[DLineSFN]['FolderId']);
         var Line_sticker_png_file = Line_sticker_Folder.createFile(Line_sticker_gif)
-        Line_sticker_png_file = Line_sticker_png_file.setName(Line_sk_id+'.gif')
+        Line_sticker_png_file = Line_sticker_png_file.setName(Line_sk_id + '.gif')
         var Line_sticker_png_file_id = Line_sticker_png_file.getId()
 
         var Line_sticker_url = G_drive_Durl + Line_sticker_png_file_id
