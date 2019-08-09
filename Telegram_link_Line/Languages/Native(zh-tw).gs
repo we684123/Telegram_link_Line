@@ -84,27 +84,9 @@ function language() {
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "not_support_sticker": {
+      "not_support_animated_sticker": {
         "type": "to_Telegram",
-        "text": "(暫時不支援貼圖傳送喔!)",
-        "notification": false, //不通知? true or false
-        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-      },
-      "not_support_audio": {
-        "type": "to_Telegram",
-        "text": "(暫時不支援audio傳送喔!)",
-        "notification": false, //不通知? true or false
-        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-      },
-      "not_support_voice": {
-        "type": "to_Telegram",
-        "text": "(暫時不支援voice傳送喔!)",
-        "notification": false, //不通知? true or false
-        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-      },
-      "not_support_document": {
-        "type": "to_Telegram",
-        "text": "(暫時不支援document傳送喔!)",
+        "text": "(暫時不支援動態貼圖傳送喔!)",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -439,7 +421,7 @@ function language() {
       },
       "debug_ed": {
         "type": "to_Telegram",
-        "text": "已debug\nREST_FastMatch1and2and3() : {0}\nREST_keyboard() : {1}",
+        "text": "已debug\nREST_FastMatch1and2and3() : {0}\nREST_keyboard() : {1}\nremove_cache : {2}",
         // {0} = REST_FastMatch1and2and3()的回傳結果 , {1} = REST_keyboard()的回傳結果
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
