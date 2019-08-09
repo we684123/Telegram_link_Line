@@ -2069,7 +2069,7 @@ function doPost(e) {
               if (sticker_png_url[1] == 'image/gif') {
                 sendAnimation(chat_id, sticker_png_url[0], notification, caption)
               } else {
-                sendPhoto(chat_id, sticker_png_url[0], notification, caption)
+                sendPhoto(chat_id, sticker_png_url, notification, caption)
               }
 
               //刪除"正在傳送XXX" 整潔舒爽!
