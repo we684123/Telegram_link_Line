@@ -1117,6 +1117,37 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "🍭變換房位": {
+        "type": "command(Telegram)",
+        "text": "🍭 變換房位"
+      },
+      "change_room_position": {
+        "type": "to_Telegram",
+        "text": [
+          '請在下方選擇2個房間，選擇好後這兩個的房間在主選單的位置將對調\n',
+          '如果設定好了要離開請按下 /main 離開'
+        ],
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "choose_room_1": {
+        "type": "to_Telegram",
+        "text": '請選擇第1個房間，或 /main 離開',
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "choose_room_2": {
+        "type": "to_Telegram",
+        "text": '請選擇第2個房間',
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "room_chang_ed": {
+        "type": "to_Telegram",
+        "text": '對調完成！',
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
     }
   }
   /*

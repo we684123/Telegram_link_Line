@@ -119,6 +119,8 @@ function up_version() {
 
     ALL['image_link_mode'] = ct['🎾轉傳連結']["text"]
 
+    ALL['🍭變換房位暫存'] = ''
+
     ALL['code_version'] = 3.3
     ALL.mode = 0
     ALL.wait_to_Bind = {}
@@ -1179,6 +1181,31 @@ function doPost(e) {
           }
           write_ALL(ALL, doc)
           lock.releaseLock();
+        } else if (mode == "🍭變換房位" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+          if (ALL.FastMatch[Stext] != undefined ) {
+            if (ALL['🍭變換房位暫存'] == '') {
+              ALL['🍭變換房位暫存'] = ALL.FastMatch[Stext]
+              sendtext(chat_id, ct['choose_room_2'])
+            } else {
+              var room_1 = ALL['data'][ALL['🍭變換房位暫存']]
+              var room_2 = ALL['data'][ALL.FastMatch[Stext]]
+              ALL['data'][ALL.FastMatch[Stext]] = room_1
+              ALL['data'][ALL['🍭變換房位暫存']] = room_2
+              ALL = REST_keyboard(ALL)[1]
+              ALL = REST_FastMatch1and2and3(ALL)[1]
+              ALL['🍭變換房位暫存'] = ''
+              var substitute_Keyboard = JSON.parse(JSON.stringify(ALL['RoomKeyboard']));
+              substitute_Keyboard.splice(0,1)
+              ReplyKeyboardMakeup(
+                chat_id, substitute_Keyboard, true, false, ct['room_chang_ed'])
+              sendtext(chat_id, ct['choose_room_1'])
+            }
+          } else {
+            sendtext(chat_id, ct['not_eat_this'])
+          }
+
+          write_ALL(ALL, doc)
+          lock.releaseLock();
         } else {
           //以下指令分流
           switch (Stext) {
@@ -1380,6 +1407,7 @@ function doPost(e) {
             case '/debug':
               ALL.mode = 0
               ALL.wait_to_Bind = {}
+              ALL['🍭變換房位暫存'] = ''
               var re_cache_result = rm_cache()
               var REST_F = REST_FastMatch1and2and3(ALL);
               var REST_k = REST_keyboard(REST_F[1]);
@@ -1419,6 +1447,9 @@ function doPost(e) {
                 [{
                   'text': ct["🆗設定提示"]["text"]
                 }, {
+                  'text': ct["🍭變換房位"]["text"]
+                }],
+                [{
                   'text': ct["🔙 返回大廳"]["text"]
                 }]
               ]
@@ -1727,6 +1758,15 @@ function doPost(e) {
               ALL.mode = "🎨傳圖設定"
               write_ALL(ALL, doc) //寫入
               sendtext(chat_id, ct['now_image_mode']['text'].format(ALL['image_link_mode']))
+              break;
+            case ct["🍭變換房位"]["text"]:
+              var substitute_Keyboard = JSON.parse(JSON.stringify(ALL['RoomKeyboard']));
+              substitute_Keyboard.splice(0,1)
+              ReplyKeyboardMakeup(
+                chat_id, substitute_Keyboard, true, false, ct['change_room_position'])
+              ALL.mode = "🍭變換房位"
+              write_ALL(ALL, doc) //寫入
+              sendtext(chat_id, ct['choose_room_1'])
               break;
               //-------------------------------------------------------------------
             default:
