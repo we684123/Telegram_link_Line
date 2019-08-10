@@ -114,7 +114,7 @@ function up_version() {
       "need": true,
       "delete_notification": true,
       "delay": true,
-      "delay_time": 1000
+      "delay_time": 2127
     }
 
     ALL['image_link_mode'] = ct['🎾轉傳連結']["text"]
