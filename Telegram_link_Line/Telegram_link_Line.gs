@@ -117,6 +117,8 @@ function up_version() {
       "delay_time": 1000
     }
 
+    ALL['image_link_mode'] = ct['🎾轉傳連結']["text"]
+
     ALL['code_version'] = 3.3
     ALL.mode = 0
     ALL.wait_to_Bind = {}
@@ -1159,6 +1161,24 @@ function doPost(e) {
           } catch (e) {
             sendtext(chat_id, ct['set_time_error'])
           }
+        } else if (mode == "🎨傳圖設定" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+          switch (Stext) {
+            case ct['🎾轉傳連結']["text"]:
+              ALL['image_link_mode'] = '🎾 轉傳連結'
+              sendtext(chat_id, ct['🎾轉傳連結_ed'])
+              break;
+            case ct['🏀來源連結']["text"]:
+              ALL['image_link_mode'] = '🏀 來源連結'
+              sendtext(chat_id, ct['🏀來源連結_ed'])
+              break;
+            default:
+              sendtext(chat_id, ct['not_eat_this'])
+              // ^ "030...\n請不要給我吃怪怪的東西..."
+              lock.releaseLock();
+              return 0;
+          }
+          write_ALL(ALL, doc)
+          lock.releaseLock();
         } else {
           //以下指令分流
           switch (Stext) {
@@ -1366,7 +1386,7 @@ function doPost(e) {
               var r = JSON.stringify(REST_k[1]);
               doc.setText(r); //寫入
               sendtext(chat_id, ct["debug_ed"]["text"].format(
-                REST_F[0], REST_k[0],re_cache_result));
+                REST_F[0], REST_k[0], re_cache_result));
               break;
             case '/AllRead':
             case '/Allread':
@@ -1394,9 +1414,11 @@ function doPost(e) {
                 [{
                   'text': ct["🌀 轉圖設定"]["text"]
                 }, {
-                  'text': ct["🆗設定提示"]["text"]
+                  'text': ct["🎨傳圖設定"]["text"]
                 }],
                 [{
+                  'text': ct["🆗設定提示"]["text"]
+                }, {
                   'text': ct["🔙 返回大廳"]["text"]
                 }]
               ]
@@ -1688,6 +1710,23 @@ function doPost(e) {
                 chat_id, set_notification_keyborad, true, false, text)
               ALL.mode = "ed_notification"
               write_ALL(ALL, doc) //寫入
+              break;
+            case ct["🎨傳圖設定"]["text"]:
+              var link_keyboard = [
+                [{
+                  'text': ct['🎾轉傳連結']["text"]
+                }, {
+                  'text': ct["🏀來源連結"]["text"]
+                }],
+                [{
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              ReplyKeyboardMakeup(
+                chat_id, link_keyboard, true, false, ct['image_link_set'])
+              ALL.mode = "🎨傳圖設定"
+              write_ALL(ALL, doc) //寫入
+              sendtext(chat_id, ct['now_image_mode']['text'].format(ALL['image_link_mode']))
               break;
               //-------------------------------------------------------------------
             default:
@@ -4044,7 +4083,11 @@ function get_sticker(ALL, sticker_need, from, file_id, keep_time) {
     var extension = sticker_json[file_id]['extension']
   }
 
-  return [get_200_url(sticker_url), extension]
+  if (ALL['image_link_mode'] == '🏀 來源連結') {
+    sticker_url = get_200_url(sticker_url)
+  }
+
+  return [sticker_url, extension]
 }
 //================================================================
 function ed_notification_tidy(chat_id, ct, ALL, lock) {

@@ -1077,6 +1077,46 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "🎨傳圖設定": {
+        "type": "command(Telegram)",
+        "text": "🎨 傳圖設定"
+      },
+      "🎾轉傳連結": {
+        "type": "command(Telegram)",
+        "text": "🎾 轉傳連結"
+      },
+      "🏀來源連結": {
+        "type": "command(Telegram)",
+        "text": "🏀 來源連結"
+      },
+      "🎾轉傳連結_ed": {
+        "type": "to_Telegram",
+        "text": "已修改傳圖模式成 🎾轉傳連結",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🏀來源連結_ed": {
+        "type": "to_Telegram",
+        "text": "已修改傳圖模式成 🏀來源連結",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "image_link_set": {
+        "type": "to_Telegram",
+        "text": [
+          '因為Line電腦版不會302轉址，導致在 "🎾 轉傳連結" 模式下',
+          '電腦版看不到貼圖，若是切到 "🏀來源連結" 模式，雖然全平台看的到',
+          '，但過一段時間貼圖便會失效。\n個人是選擇 "🎾 轉傳連結" 啦...'
+        ],
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "now_image_mode": {
+        "type": "to_Telegram",
+        "text": '目前的 "🎨傳圖設定" 為：\n{0}',
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
     }
   }
   /*
