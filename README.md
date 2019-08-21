@@ -1,7 +1,7 @@
 # Telegram_link_Line
 >用Telegram來收發Line的訊息。    
 >use telegram to Send and receive messages(from Line).    
->或者你要把它當作Line的訊息內容備份也是可啦 :P    
+>或者你要把它當作Line的訊息內容備份也是可啦 😛    
 
 >支援 Telegram、Line 個人及群組    
 >1對1、多對1、1對多、多對多 的訊息傳遞。    
@@ -118,12 +118,18 @@
 
 # 部署教學 (Installing)
 
-### 其他人的教學
+## 其他人的教學
 
  #### [企鵝](https://t.me/penguinF)做了一個非常詳細的[圖文教學](https://hackmd.io/s/Bkc6LwAP7#)(萬分感謝 m(_ \_)m )，可以去看看。    
 
  #### 但是此教學目前過期，不過創建LINEbot的部分是能用的
  #### 另外就是這個版本升級房間時不再使用新的bot，轉成用"新群組"替代！
+
+----
+
+## 部屬教學影片(Install teach video)
+[![Telegram_link_Line部屬教學影片](http://img.youtube.com/vi/tOkCOcP-nmY/0.jpg)](http://bit.ly/2yjI91k)
+$NU錄影片阿
 
 ----
 
