@@ -9,7 +9,7 @@
 如果想要獲取更新資訊，可以加入這個頻道  https://t.me/TG_link_Line
 
 ----
-master
+
 # 目錄(Index)
   1. [功能 (Features)](https://github.com/we684123/Telegram_link_Line/tree/master#%E5%8A%9F%E8%83%BDfeatures)
   2. [實際情況截圖 (Screenshot)](https://github.com/we684123/Telegram_link_Line/tree/master#screenshot)
@@ -19,7 +19,8 @@ master
   6. [程式說明 (Code Introduction)](https://github.com/we684123/Telegram_link_Line/tree/master#%E7%A8%8B%E5%BC%8F%E8%AA%AA%E6%98%8E-code-introduction)
   7. [版本資訊 (Version)](https://github.com/we684123/Telegram_link_Line/tree/master#%E7%89%88%E6%9C%AC%E8%B3%87%E8%A8%8A)
   8. [常見問答 (Q&A)](https://github.com/we684123/Telegram_link_Line/tree/master#%E5%B8%B8%E8%A6%8B%E5%95%8F%E7%AD%94-qa)
-  9. [作者 (Author)](https://github.com/we684123/Telegram_link_Line/tree/master#author)
+  9. [贊助(Donate)]()
+  10. [作者 (Author)](https://github.com/we684123/Telegram_link_Line/tree/master#author)
 
 ----
 
@@ -408,7 +409,7 @@ GMT =
 
 code_version =     
 該程式的版本，用來驗證配對語言包正確性。
-    
+
 **在這之後其實還有一些沒說明的屬性當可以在 up_version 函式中找到。**    
 
 
@@ -615,10 +616,18 @@ code_version =
   但就算沒超過 50 MB，Line server也會處理N久
   我遇過等她處理 32MB 處理整整2小時半的案例過...。
 
-
+# 贊助(Donate)
+hmmm...     
+如果你覺得這對你有幫助的話，...    
+聽說這是 "台灣pay" 的 QRcode.........
+我也沒用過(｡ŏ﹏ŏ) .................................
+![Imgur](https://i.imgur.com/rVmAnh6.jpg)
 
 
 ----
 
 # Author
-[永格天](https://we684123.carrd.co/)
+![](https://avatars3.githubusercontent.com/u/22027801?s=460&v=4)
+[永格天](https://we684123.carrd.co/)    
+一個~~中二病~~水瓶座    
+不太擅長塗鴉(看大頭貼就知道Orz...)    
