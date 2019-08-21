@@ -288,7 +288,7 @@ $NU錄影片阿
 
 如果要理解程式的流程，推薦可以從[V2紀念用](https://github.com/we684123/Telegram_link_Line/releases/tag/V2%E7%B4%80%E5%BF%B5%E7%94%A8)下手，那時只有核心邏輯。
 
-在這支程式中一切都是從 doPost(e) 這個 function 開始的，然後經過前面的一修必要流程(模式選擇、幾本的預設、預處理、讀取doc檔)後，再從 **"if (estringa.update_id) {"** 這裡判斷是TG送來的，還是Line送來的json，並做出對應的處理。
+在這支程式中一切都是從 doPost(e) 這個 function 開始的，然後經過前面的一修必要流程(模式選擇、基本的預設、預處理、讀取doc檔)後，再從 **"if (estringa.update_id) {"** 這裡判斷是TG送來的，還是Line送來的json，並做出對應的處理。
 
 ### 程式規劃
 
