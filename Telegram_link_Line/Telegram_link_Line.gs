@@ -2209,12 +2209,12 @@ function doPost(e) {
               //處理文件
               var file_id = message_json.ID
               var file_body = DriveApp.getFileById(file_id)
-              var fileName = file_body.getName();
+              var fileName = String(file_body.getName())
               var blob = file_body.getBlob();
               var send_ed = sendtext(chat_id, ct["sendFile_ing"])
               // ^ (正在傳送檔案，請稍後...)
               //處理caption
-              caption = message_json.userName + '\n' + fileName + '\n'
+              caption = ct['file_info']['text'].format(message_json.userName, fileName)
               if (ALL.massage_time) {
                 caption += get_time_txt(message_json.timestamp, GMT)
               }
@@ -3908,12 +3908,12 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
         //處理文件
         var file_id = message_json.ID
         var file_body = DriveApp.getFileById(file_id)
-        var fileName = file_body.getName();
+        var fileName = String(file_body.getName())
         var blob = file_body.getBlob();
         var send_ed = sendtext(chat_id, ct["sendFile_ing"])
         // ^ (正在傳送檔案，請稍後...)
         //處理caption
-        caption = message_json.userName + '\n' + fileName + '\n'
+        caption = ct['file_info']['text'].format(message_json.userName, fileName)
         if (ALL.massage_time) {
           caption += get_time_txt(message_json.timestamp, GMT)
         }
