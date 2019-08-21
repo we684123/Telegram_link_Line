@@ -1182,7 +1182,7 @@ function doPost(e) {
           write_ALL(ALL, doc)
           lock.releaseLock();
         } else if (mode == "🍭變換房位" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
-          if (ALL.FastMatch[Stext] != undefined ) {
+          if (ALL.FastMatch[Stext] != undefined) {
             if (ALL['🍭變換房位暫存'] == '') {
               ALL['🍭變換房位暫存'] = ALL.FastMatch[Stext]
               sendtext(chat_id, ct['choose_room_2'])
@@ -1195,7 +1195,7 @@ function doPost(e) {
               ALL = REST_FastMatch1and2and3(ALL)[1]
               ALL['🍭變換房位暫存'] = ''
               var substitute_Keyboard = JSON.parse(JSON.stringify(ALL['RoomKeyboard']));
-              substitute_Keyboard.splice(0,1)
+              substitute_Keyboard.splice(0, 1)
               ReplyKeyboardMakeup(
                 chat_id, substitute_Keyboard, true, false, ct['room_chang_ed'])
               sendtext(chat_id, ct['choose_room_1'])
@@ -1761,7 +1761,7 @@ function doPost(e) {
               break;
             case ct["🍭變換房位"]["text"]:
               var substitute_Keyboard = JSON.parse(JSON.stringify(ALL['RoomKeyboard']));
-              substitute_Keyboard.splice(0,1)
+              substitute_Keyboard.splice(0, 1)
               ReplyKeyboardMakeup(
                 chat_id, substitute_Keyboard, true, false, ct['change_room_position'])
               ALL.mode = "🍭變換房位"
@@ -2208,12 +2208,13 @@ function doPost(e) {
             } else if (message_json.type == "file") {
               //處理文件
               var file_id = message_json.ID
-              var blob = DriveApp.getFileById(file_id).getBlob();
+              var file_body = DriveApp.getFileById(file_id)
+              var fileName = file_body.getName();
+              var blob = file_body.getBlob();
               var send_ed = sendtext(chat_id, ct["sendFile_ing"])
               // ^ (正在傳送檔案，請稍後...)
-
               //處理caption
-              caption = message_json.userName + '\n'
+              caption = message_json.userName + '\n' + fileName + '\n'
               if (ALL.massage_time) {
                 caption += get_time_txt(message_json.timestamp, GMT)
               }
@@ -3906,11 +3907,13 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
       } else if (message_json.type == "file") {
         //處理文件
         var file_id = message_json.ID
-        var blob = DriveApp.getFileById(file_id).getBlob();
+        var file_body = DriveApp.getFileById(file_id)
+        var fileName = file_body.getName();
+        var blob = file_body.getBlob();
         var send_ed = sendtext(chat_id, ct["sendFile_ing"])
         // ^ (正在傳送檔案，請稍後...)
         //處理caption
-        caption = message_json.userName + '\n'
+        caption = message_json.userName + '\n' + fileName + '\n'
         if (ALL.massage_time) {
           caption += get_time_txt(message_json.timestamp, GMT)
         }
