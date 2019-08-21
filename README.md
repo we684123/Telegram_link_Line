@@ -606,7 +606,7 @@ code_version =
   請對 bot 下 /info , /v , /V , /version 中其中一個指令，如果是 V3.2 或 V3.1 的版本，請至 doc 文件尋找 code_version 的值，更早的版本... 只能對照程式碼了(｡ŏ﹏ŏ)
 
   ### 4. bot 突然在某個地方卡住了怎麼辦?
-  原則上應該是不會出現這種狀況(都用全局鎖了qwq)，如果不是網路或TG的問題的話，請 /main + /debug 再繼續操作，要是依舊無解請在 Telegram 上找 @we684123 來協助處理。
+  原則上應該是不會出現這種狀況(都用全局鎖了qwq)，如果不是網路或TG的問題的話，請 /main + /debug 再繼續操作，要是依舊無解請在 Telegram 上找 [@we684123](https://t.me/we684123) 來協助處理。
 
   ### 5. 為什麼我的 line bot 無法加入 line 的群組中?
   這是因為 line 限制一個群組只能加入一個 bot，如果你目前群組內的 bot 是 Telegram_link_Line bot 的話可以請擁有者邀你進入他的TG群，本bot支援 TG 群對 line 群的對話方式。
