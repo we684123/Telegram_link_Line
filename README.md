@@ -1,10 +1,10 @@
 # Telegram_link_Line
->用Telegram來收發Line的訊息。
->use telegram to Send and receive messages(from Line).
->或者你要把它當作Line的訊息內容備份也是可啦 :P
+>用Telegram來收發Line的訊息。    
+>use telegram to Send and receive messages(from Line).    
+>或者你要把它當作Line的訊息內容備份也是可啦 :P    
 
->支援 Telegram、Line 個人及群組
->1對1、多對1、1對多、多對多 的訊息傳遞。
+>支援 Telegram、Line 個人及群組    
+>1對1、多對1、1對多、多對多 的訊息傳遞。    
 
 
 此為針對 v3.3 的README。    
