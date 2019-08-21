@@ -2,6 +2,9 @@
 >用Telegram來收發Line的訊息。
 >use telegram to Send and receive messages(from Line).
 
+>支援 Telegram、Line 個人及群組
+>1對1、多對1、1對多、多對多 的訊息傳遞。
+
 
 此為針對 v3.3 的README。    
 如果是 Telegram_Bot 新手推薦看完 [這個影片](https://youtu.be/On9yeMtG2Wg)後在來使用。    
@@ -19,7 +22,7 @@
   6. [程式說明 (Code Introduction)](https://github.com/we684123/Telegram_link_Line/tree/master#%E7%A8%8B%E5%BC%8F%E8%AA%AA%E6%98%8E-code-introduction)
   7. [版本資訊 (Version)](https://github.com/we684123/Telegram_link_Line/tree/master#%E7%89%88%E6%9C%AC%E8%B3%87%E8%A8%8A)
   8. [常見問答 (Q&A)](https://github.com/we684123/Telegram_link_Line/tree/master#%E5%B8%B8%E8%A6%8B%E5%95%8F%E7%AD%94-qa)
-  9. [贊助(Donate)]()
+  9. [贊助(Donate)](https://github.com/we684123/Telegram_link_Line/tree/master#%E8%B4%8A%E5%8A%A9donate)
   10. [作者 (Author)](https://github.com/we684123/Telegram_link_Line/tree/master#author)
 
 ----
@@ -430,6 +433,9 @@ code_version =
   * 新增 /info , /v , /V , /version 指令，用來查看 bot 程式版本。
   * 改變 "🔭訊息狀態" 現在會顯示目前已使用的人次量。
 
+  **這次有特別新增 server 的程式碼    
+  如果要自架 "轉圖server" 的請至 "image_conversion_server" 資料夾查看！**    
+
   更新方式：
   1. Telegram_link_Line.gs 修改    
   2. Languages.gs 修改    
@@ -619,15 +625,17 @@ code_version =
 # 贊助(Donate)
 hmmm...     
 如果你覺得這對你有幫助的話，...    
-聽說這是 "台灣pay" 的 QRcode.........
-我也沒用過(｡ŏ﹏ŏ) .................................
-![Imgur](https://i.imgur.com/rVmAnh6.jpg)
+聽說這是 "台灣pay" 的 QRcode.........    
+我也沒用過(｡ŏ﹏ŏ) .................................    
+
+![Imgur](https://i.imgur.com/rVmAnh6.jpg)    
 
 
 ----
 
 # Author
-![](https://avatars3.githubusercontent.com/u/22027801?s=460&v=4)
+![](https://avatars3.githubusercontent.com/u/22027801?s=460&v=4)    
+
 [永格天](https://we684123.carrd.co/)    
 一個~~中二病~~水瓶座    
 不太擅長塗鴉(看大頭貼就知道Orz...)    
