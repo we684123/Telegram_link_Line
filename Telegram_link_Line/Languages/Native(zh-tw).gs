@@ -868,7 +868,7 @@ function language() {
       },
       "first_conversion": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-        "text": "啊對了，在之後傳新貼圖時第一次會傳比較慢，第二次後就會回覆正常速度了\n_(¦3」∠)_",
+        "text": "啊對了，在之後傳新貼圖時第一次會傳比較慢，第二次後就會回復正常速度了\n_(¦3」∠)_",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
