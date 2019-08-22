@@ -185,7 +185,7 @@ function language() {
       },
       "add_keyword_success": {
         "type": "to_Telegram",
-        "text": "已成功新增\n\n{0}\n\n如遇離開請按 /main\n或者繼續輸入新增",
+        "text": "已成功新增\n\n{0}\n\n如欲離開請按 /main\n或者繼續輸入新增",
         // {0} = 全部的keyword列表
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
@@ -198,7 +198,7 @@ function language() {
       },
       "delete_keyword_success": {
         "type": "to_Telegram",
-        "text": "已成功移除\n\n{0}\n\n如遇離開請按 /main\n或者繼續輸入移除",
+        "text": "已成功移除\n\n{0}\n\n如欲離開請按 /main\n或者繼續輸入移除",
         // {0} = 全部的keyword列表
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
@@ -259,6 +259,13 @@ function language() {
       "🔭 訊息狀態": {
         "type": "command(Telegram)",
         "text": "🔭 訊息狀態"
+      },
+      "consumption": {
+        "type": "to_Telegram",
+        "text": "已使用人次量：\n{0}",
+        // {0} = 已使用的人次量
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
       "unread_number": {
         "type": "to_Telegram",
@@ -537,7 +544,7 @@ function language() {
       },
       "delete_keyword_ing": {
         "type": "to_Telegram",
-        "text": '請輸入欲移除關鍵字的 **前方編號!!!** \n刪除多組關鍵字請用 "任意符號" 隔開(推薦用","或"，")\n如遇離開請按 /main',
+        "text": '請輸入欲移除關鍵字的 **前方編號!!!** \n刪除多組關鍵字請用 "任意符號" 隔開(推薦用","或"，")\n如欲離開請按 /main',
         "notification": false, //不通知? true or false
         "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
       },

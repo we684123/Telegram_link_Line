@@ -2742,6 +2742,29 @@ function Line_leave(room_or_groupID) {
     return "成功"
   }
 }
+//=================================================================
+function get_Line_consumption() {
+
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
+
+  var url = 'https://api.line.me/v2/bot/message/quota/consumption';
+  //--------------------------------------------------
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var options = {
+    'headers': header,
+    'method': 'get'
+  }
+  //--------------------------------------------------
+  try {
+    return UrlFetchApp.fetch(url, options);
+  } catch (e) {
+    return e
+  }
+}
 //=================================================================================
 function getpath(id, Telegram_bot_key) {
   if (Telegram_bot_key === void 0) {
