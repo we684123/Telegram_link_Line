@@ -444,7 +444,8 @@ code_version =
   **這次有特別新增 server 的程式碼    
   如果要自架 "轉圖server" 的請至 "image_conversion_server" 資料夾查看！**    
 
-  更新方式：
+  更新方式：    
+  0. 在 gs 上執行 [CP()](https://t.me/TG_link_Line/23) 函示備份後再繼續！！！     
   1. Telegram_link_Line.gs 修改    
   2. Languages.gs 修改    
   3. **重部署版本** (版本是 "新增" )
