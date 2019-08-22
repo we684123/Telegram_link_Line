@@ -128,9 +128,9 @@
 
 ----
 
-## 部屬教學影片(Install teach video)
-[![Telegram_link_Line部屬教學影片](http://img.youtube.com/vi/tOkCOcP-nmY/0.jpg)](http://bit.ly/2yjI91k)
-$NU錄影片阿
+## 部屬教學影片(Install teach video)(還沒空錄 先擺著之後補)(undone ,after supplement)
+[![Telegram_link_Line部屬教學影片](http://img.youtube.com/vi/tOkCOcP-nmY/0.jpg)](http://bit.ly/2yjI91k)     
+$NU錄影片阿     
 
 ----
 
