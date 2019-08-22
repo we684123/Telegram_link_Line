@@ -1,9 +1,9 @@
 function language() {
   var language = { //多包一層看以後有沒有打算擴充...............
     "language_name": "Native(zh-tw)",
-    "language_version": 1.0,
-    "match_version": 3.2,
-    "update_time": 1544636639164,
+    "language_version": 1.1,
+    "match_version": 3.3,
+    "update_time": 1564987373086,
     "author": "永格天",
     "correspond_text": {
       "backed_up_ing": {
@@ -60,6 +60,12 @@ function language() {
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "sendLocation_ed": {
+        "type": "to_Telegram",
+        "text": "(位置已發送!)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "sendGIF_ed": {
         "type": "to_Telegram",
         "text": "(GIF已發送!)",
@@ -78,27 +84,9 @@ function language() {
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "not_support_sticker": {
+      "not_support_animated_sticker": {
         "type": "to_Telegram",
-        "text": "(暫時不支援貼圖傳送喔!)",
-        "notification": false, //不通知? true or false
-        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-      },
-      "not_support_audio": {
-        "type": "to_Telegram",
-        "text": "(暫時不支援audio傳送喔!)",
-        "notification": false, //不通知? true or false
-        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-      },
-      "not_support_voice": {
-        "type": "to_Telegram",
-        "text": "(暫時不支援voice傳送喔!)",
-        "notification": false, //不通知? true or false
-        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-      },
-      "not_support_document": {
-        "type": "to_Telegram",
-        "text": "(暫時不支援document傳送喔!)",
+        "text": "(暫時不支援動態貼圖傳送喔!)",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -420,7 +408,7 @@ function language() {
       },
       "debug_ed": {
         "type": "to_Telegram",
-        "text": "已debug\nREST_FastMatch1and2and3() : {0}\nREST_keyboard() : {1}",
+        "text": "已debug\nREST_FastMatch1and2and3() : {0}\nREST_keyboard() : {1}\nremove_cache : {2}",
         // {0} = REST_FastMatch1and2and3()的回傳結果 , {1} = REST_keyboard()的回傳結果
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
@@ -612,6 +600,12 @@ function language() {
       "sendFile_ing": {
         "type": "to_Telegram",
         "text": "(正在傳送檔案，請稍後...)",
+        "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "file_info": {
+        "type": "to_Telegram",
+        "text": "{0}\n檔案名稱： {1}\n", // {0} = 傳送者名稱 , {1} = 檔案名稱
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -833,6 +827,308 @@ function language() {
       "unfollow": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "{0} 移除(unfollow)你的line_bot好友了!", // {0} = line的某人
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "version": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "Telegram_link_Line 版本:\n{0}\nLanguage 版本:\n{1}\nLanguage 配合code版本:\n{2}",
+        // {0} = Telegram_link_Line 版本 , {1} = Language 版本 , {2} = Language 配合code版本
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🌀 轉圖設定": {
+        "type": "command(Telegram)",
+        "text": "🌀 轉圖設定"
+      },
+      "image_conversion": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": [
+          "由於 Line ios 版不吃 webp 格式的關係，",
+          "所以需要把TG的貼圖(webp)轉成 png 格式後再傳送給 Line。\n\n",
+          "但是 google apps script 不支援 webp 轉 png，且撇人還未能無法理解 gzip，",
+          "只好折衷將圖片送到我的 server 進行轉換，*目前並不會儲存你們所傳過來的圖片*。\n\n",
+          "如果未來如果有儲存圖片也只是為了當下一個使用者傳來跟你一樣的圖片時，",
+          "server能夠少下轉換的時間，直接用先前轉好的圖片直接回傳，不會作為其他用途。\n\n",
+          '當然你也可以在下方設定 "不留圖片"，如此便 *不會儲存您的貼圖*。\n\n',
+          "*倘若這還不夠放心，您也可以自架 server，我將公開 server 的原始碼*，",
+          '架好之後，只需在下方設定變更目標伺服器域名即可。\n\n',
+          "在此也希望各位正常使用就好，雖說是免費提供，但真也不希望server垮掉，",
+          "他只是一個小小的 vCPU，請小心愛惜\n(ó﹏ò｡)",
+        ],
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "first_conversion": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "啊對了，在之後傳新貼圖時第一次會傳比較慢，第二次後就會回覆正常速度了\n_(¦3」∠)_",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "set_server": {
+        "type": "command(Telegram)",
+        "text": '🚪 設定目標域名'
+      },
+      "set_require_api": {
+        "type": "command(Telegram)",
+        "text": '🚲 設定目標請求'
+      },
+      "set_save_yes": {
+        "type": "command(Telegram)",
+        "text": '✔️ 設成保留圖片'
+      },
+      "set_save_no": {
+        "type": "command(Telegram)",
+        "text": '✖️ 設成不留圖片'
+      },
+      "image_conversion_status": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": '目標伺服器域名:\n{0}\n目標api:\n{1}\n目標伺服器完整網址:\n{2}\n是否讓伺服器存圖:\n{3}',
+        // {0} = 域名 , {1} = 請求網址 , {2} = 完整網址 , {3} = 是否存圖(布林)
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "plz_set_server": {
+        "type": "to_Telegram",
+        "text": "請輸入 server 域名",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "plz_set_require_api": {
+        "type": "to_Telegram",
+        "text": "請輸入 server api",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "set_save_yes_ed": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "已設定成 server 保留圖片", // 自定義文字內容
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "set_save_no_ed": {
+        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "已設定成 server 不留圖片", // 自定義文字內容
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "plz_set_server_ed": {
+        "type": "to_Telegram",
+        "text": "server域名已改成:\n{0}", // {0} = 新的域名
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "plz_set_require_api_ed": {
+        "type": "to_Telegram",
+        "text": "server api已改成:\n{0}", // {0} = 新的api
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "up_version_ed": {
+        //這個先來留著但不用，這本身就是新版本的一部份，所以只能下次用
+        "type": "to_Telegram",
+        "text": "Telegram_link_Line 已升級至 {0}", // {0} = 版本
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "up_version_error": {
+        //這個先來留著但不用，這本身就是新版本的一部份，所以只能下次用
+        "type": "to_Telegram",
+        "text": "Telegram_link_Line 升級失敗! 原因如下:\n{0}", // {0} = catch (e)
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🆗設定提示": {
+        "type": "command(Telegram)",
+        "text": "🆗 設定提示"
+      },
+      "🉑啟用提示": {
+        "type": "command(Telegram)",
+        "text": "🉑 啟用提示"
+      },
+      "🈲停用提示": {
+        "type": "command(Telegram)",
+        "text": "🈲 停用提示"
+      },
+      "🌠自刪提示": {
+        "type": "command(Telegram)",
+        "text": "🌠 自刪提示"
+      },
+      "🌟不要自刪": {
+        "type": "command(Telegram)",
+        "text": "🌟 不要自刪"
+      },
+      "🍵延刪提示": {
+        "type": "command(Telegram)",
+        "text": "🍵 延刪提示"
+      },
+      "☕不要延刪": {
+        "type": "command(Telegram)",
+        "text": "☕ 不要延刪"
+      },
+      "⌛設定延遲": {
+        "type": "command(Telegram)",
+        "text": "⌛ 設定延遲"
+      },
+      "set_del_notification_info": {
+        "type": "to_Telegram",
+        "text": [
+          '在傳送照片、貼圖...等媒體結束時會收到 "(XX已發送!)" 這類的訊息。\n\n',
+          '如果覺得難看想讓他 "不發通知" 或 "發完後刪掉" 或 "發完幾秒內刪掉" 的話，',
+          '可以在這裡設定。'
+        ],
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🉑啟用提示_ed": {
+        "type": "to_Telegram",
+        "text": "已 🉑啟用提示", // 自定義文字內容
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🈲停用提示_ed": {
+        "type": "to_Telegram",
+        "text": "已 🈲停用提示", // 自定義文字內容
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🌠自刪提示_ed": {
+        "type": "to_Telegram",
+        "text": "已 🌠自刪提示，之後會自動刪除提示",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🌟不要自刪_ed": {
+        "type": "to_Telegram",
+        "text": "已 🌟不要自刪，之後不會自動刪除提示",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🍵延刪提示_ed": {
+        "type": "to_Telegram",
+        "text": "已 🍵延刪提示，之後會在 {0} 毫秒後自動刪除",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "☕不要延刪_ed": {
+        "type": "to_Telegram",
+        "text": "已 ☕不要延刪，之後將不會延時刪除",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "⌛設定延遲_ing": {
+        "type": "to_Telegram",
+        "text": "請輸入 100 ~ 5000 的毫秒數以做為延遲時間\n(1秒 = 1000毫秒)",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "⌛設定延遲_ed": {
+        "type": "to_Telegram",
+        "text": "延遲時間設定完成!\n延遲時間: {0} 毫秒",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "set_time_error": {
+        "type": "to_Telegram",
+        "text": "請輸入 100 ~ 5000 內的整數數字，而非其他文字!\n如欲取消設定請 /main",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "ed_notification_info": {
+        "type": "to_Telegram",
+        "text": [
+          "刪除提示的狀態:\n\n是否傳送提示: {0}\n是否自動刪除提示: {1}\n",
+          "是否延遲刪除提示: {2}\n延遲刪除的時間: {3}毫秒"
+        ],
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "migrate_to_chat_id_ed": {
+        "type": "to_Telegram",
+        "text": '```\nbot收到該"群組"變更成"超級群組"的命令\n已成功變更資料庫\n```',
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "Emergency_downgrade": {
+        "type": "to_Telegram",
+        "text": '```\n因bot被踢離\ {0}\ 故先強制降級此房間\n以免無法留存來自綁定line房間的訊息```',
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "bot_error": {
+        "type": "to_Telegram",
+        "text": 'bot發生錯誤，訊息如下:\n{0}',
+        "notification": false, //不通知? true or false
+        "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🎨傳圖設定": {
+        "type": "command(Telegram)",
+        "text": "🎨 傳圖設定"
+      },
+      "🎾轉傳連結": {
+        "type": "command(Telegram)",
+        "text": "🎾 轉傳連結"
+      },
+      "🏀來源連結": {
+        "type": "command(Telegram)",
+        "text": "🏀 來源連結"
+      },
+      "🎾轉傳連結_ed": {
+        "type": "to_Telegram",
+        "text": "已修改傳圖模式成 🎾轉傳連結",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🏀來源連結_ed": {
+        "type": "to_Telegram",
+        "text": "已修改傳圖模式成 🏀來源連結",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "image_link_set": {
+        "type": "to_Telegram",
+        "text": [
+          '因為Line電腦版不會302轉址，導致在 "🎾 轉傳連結" 模式下',
+          '電腦版看不到貼圖，若是切到 "🏀來源連結" 模式，雖然全平台看的到',
+          '，但過一段時間貼圖便會失效。\n個人是選擇 "🎾 轉傳連結" 啦...'
+        ],
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "now_image_mode": {
+        "type": "to_Telegram",
+        "text": '目前的 "🎨傳圖設定" 為：\n{0}',
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "🍭變換房位": {
+        "type": "command(Telegram)",
+        "text": "🍭 變換房位"
+      },
+      "change_room_position": {
+        "type": "to_Telegram",
+        "text": [
+          '請在下方選擇2個房間，選擇好後這兩個的房間在主選單的位置將對調\n',
+          '如果設定好了要離開請按下 /main 離開'
+        ],
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "choose_room_1": {
+        "type": "to_Telegram",
+        "text": '請選擇第1個房間，或 /main 離開',
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "choose_room_2": {
+        "type": "to_Telegram",
+        "text": '請選擇第2個房間',
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "room_chang_ed": {
+        "type": "to_Telegram",
+        "text": '對調完成！',
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },

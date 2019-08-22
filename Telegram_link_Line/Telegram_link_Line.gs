@@ -11,6 +11,8 @@ function up_version() {
   var ct = language()["correspond_text"]
 
 
+  sendtext(Telegram_id, '升級中請稍後...');
+
   // 下面是 V3.1 所需
   if (ALL.FastMatch3 == undefined) {
     ALL.FastMatch3 = {}
@@ -60,9 +62,74 @@ function up_version() {
     keyboard_main(Telegram_id, ct["🔮 開啟主選單"], ydjdyf[1])
   }
 
+  // 下面是 V3.3 所需 ( 終於解決貼圖問題啦~ 撒花ヽ(✿ﾟ▽ﾟ)ノ
+  if (ALL['code_version'] < 3.3) {
+    var ctv = language()["match_version"]
+    if (ctv < 3.3) {
+      throw new Error("請更新 language 文件再來執行此函式!")
+    }
+    var Folder = DriveApp.getFolderById(FolderId);
+    var Description = "{'version': 3.3}"
+    create_Folder(Folder, 'Line貼圖放置區', Description)
+    create_Folder(Folder, 'Telegram貼圖放置區', Description)
+
+    var sticker_doc_name = '貼圖對照表'
+    var sticker_doc_1 = DocumentApp.create(sticker_doc_name);
+    var docFileId = sticker_doc_1.getId()
+    var File = DriveApp.getFileById(docFileId);
+    var file2 = File.makeCopy(sticker_doc_name, Folder)
+    File.setTrashed(true)
+
+    var sticker_doc_2 = DocumentApp.openById(file2.getId())
+    sticker_doc_2.setText('{}')
+
+    var list = list_folder(Folder)
+    for (var i = 0; i < list.length; i++) {
+      ALL[list[i]['FolderName']] = list[i]
+    }
+
+    var list2 = list_files(Folder)
+    for (var j = 0; j < list2.length; j++) {
+      ALL[list2[j]['FileName']] = list2[j]
+    }
+
+    // 這是我的server沒錯，原始碼之後也會公開，各位亦可自行選擇是否自架server
+    // 在此聲明我不會蒐集任何個資
+    // 但有可能保留已轉換的媒體，用來加速轉換的速度(目前沒有留，之後再看看)
+    //
+    // 此外，這是免費資源，但server能力有限
+    // 希望不要有除了 Telegram_link_Line 以外的請求到我的server
+    // 我有限制轉圖的大小於server端。
+    // 希望能相信一次人性。
+    ALL["conservion_server"] = {
+      "domain_name": 'we684123.hopto.org',
+      "conservion_api": 'media_conservion',
+      "agree_server_save": false,
+      "spare_require": 'https://xxx.xxx' //暫時無用
+    }
+
+    ALL["ed_notification"] = {
+      "need": true,
+      "delete_notification": true,
+      "delay": true,
+      "delay_time": 2127
+    }
+
+    ALL['image_link_mode'] = ct['🎾轉傳連結']["text"]
+
+    ALL['🍭變換房位暫存'] = ''
+
+    ALL['code_version'] = 3.3
+    ALL.mode = 0
+    ALL.wait_to_Bind = {}
+    sendtext(Telegram_id, 'V3.3 已升級完成\n終於解決貼圖問題啦~~~\nヽ(✿ﾟ▽ﾟ)ノ (撒花');
+  }
+
   // 寫入ALL
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
+  lock.releaseLock();
+  return ALL['code_version']
 }
 //==============================================================================
 function doPost(e) {
@@ -107,10 +174,20 @@ function doPost(e) {
   var gsURL = base_json.gsURL
   var ct = language()["correspond_text"] //語言載入
   var download_folder_name = '檔案放置區'
+  var DLineSFN = 'Line貼圖放置區' //download_line_Sticker_folder_name
+  var DTGSFN = 'Telegram貼圖放置區' //download_Telegram_Sticker_folder_name
+  var sticker_doc_name = '貼圖對照表'
   var G_drive_Durl = 'https://drive.google.com/uc?export=download&id='
   var G_drive_Durl_ex = 'https://drive.google.com/uc?export=download&confirm=YzWC&id='
   var rt_max_chats = 14 //對Line回復時應許的字元數
   var notification = false
+  var nonsense_number = 3
+  var sticker_need = {
+    "DLineSFN": DLineSFN,
+    "DTGSFN": DTGSFN,
+    "sticker_doc_name": sticker_doc_name,
+    "G_drive_Durl": G_drive_Durl
+  }
 
   /*/ debug用
   var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -161,93 +238,393 @@ function doPost(e) {
       return 0;
     }
 
+    try {
 
-    //來源檢查==================================================================
-    if (chat_type == "supergroup" || chat_type == "group") { //現在只剩 群組、超級群組 的可能
-      var number = ALL.FastMatch3[chat_id]
-      if (number == undefined) { //在不認識的群組時
-        //如果出現綁定隨機碼，備份並綁定。
-        if (ALL['wait_to_Bind'][Stext] != undefined) {
-          CP();
-          sendtext(Telegram_id, ct["backed_up_ing"])
-          // ^ "已備份舊資料，更新doc資料庫中..."
-          var n = ALL['wait_to_Bind'][Stext] //這邊的Stext是驗證碼
-          //下面"升級房間2"用的資料新入
-          var chat_title = estringa.message.chat.chat_title
-          var Name = ALL.data[n]["Name"]
-          ALL.data[n]["Name"] = Name.substr(0, Name.length - 1) + "⭐"
-          ALL.data[n]["Bind_groud_chat_id"] = chat_id
-          ALL.data[n]["Bind_groud_chat_title"] = chat_title
-          ALL.data[n]["Bind_groud_chat_type"] = chat_type
-          ALL.data[n].status = "已升級房間2"
-          ALL.data[n]["Display_name"] = false
-          ALL.FastMatch3[chat_id] = n //快速存取3寫入
 
-          //下面收拾善後
-          delete ALL.data[n]["Binding_number"]
-          delete ALL['TG_temporary_docking'][chat_id]
-          //下面這行會有如果同時升級兩個會導致另一個失敗的問題\
-          //但想想應該不會有人一次升兩個...吧?
-          ALL['wait_to_Bind'] = {}
-          ALL.mode = 0
-          var REST_result = REST_keyboard(REST_FastMatch1and2and3(ALL)[1])
-          ALL = REST_result[1]
-          write_ALL(ALL, doc) //寫入
-          text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
-          keyboard_main(Telegram_id, text, ALL)
-          // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
-          //   請記得去主控bot選擇這個房間並開啟"☀ 顯示發送者"，
-          //   以免Line端眾不知何人發送。
 
-          if (ALL.data[n]['Amount']) { //如果還有訊息直接傾倒
-            sendtext(chat_id, ct["not_read_all_ed"])
-            var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id)
-            if (j) {
-              ALL.data[n]['Amount'] = 0
-            }
-            write_ALL(ALL, doc) //寫入
-          }
+      //來源檢查===================================================
+      if (chat_type == "supergroup" || chat_type == "group") { //現在只剩 群組、超級群組 的可能
+        var number = ALL.FastMatch3[chat_id]
+        if (number == undefined) { //在不認識的群組時
+          //如果出現綁定隨機碼，備份並綁定。
+          if (ALL['wait_to_Bind'][Stext] != undefined) {
+            CP();
+            sendtext(Telegram_id, ct["backed_up_ing"])
+            // ^ "已備份舊資料，更新doc資料庫中..."
+            var n = ALL['wait_to_Bind'][Stext] //這邊的Stext是驗證碼
+            //下面"升級房間2"用的資料新入
+            var chat_title = estringa.message.chat.chat_title
+            var Name = ALL.data[n]["Name"]
+            ALL.data[n]["Name"] = Name.substr(0, Name.length - 1) + "⭐"
+            ALL.data[n]["Bind_groud_chat_id"] = chat_id
+            ALL.data[n]["Bind_groud_chat_title"] = chat_title
+            ALL.data[n]["Bind_groud_chat_type"] = chat_type
+            ALL.data[n].status = "已升級房間2"
+            ALL.data[n]["Display_name"] = false
+            ALL.FastMatch3[chat_id] = n //快速存取3寫入
 
-          lock.releaseLock();
-          return 0;
-        } else { //如果沒有隨機碼
-          if (ALL['TG_temporary_docking'][chat_id] == 3) { //容忍3句廢話(#
+            //下面收拾善後
+            delete ALL.data[n]["Binding_number"]
             delete ALL['TG_temporary_docking'][chat_id]
-            TG_leaveChat(chat_id)
+            //下面這行會有如果同時升級兩個會導致另一個失敗的問題\
+            //但想想應該不會有人一次升兩個...吧?
+            ALL['wait_to_Bind'] = {}
+            ALL.mode = 0
+            var REST_result = REST_keyboard(REST_FastMatch1and2and3(ALL)[1])
+            ALL = REST_result[1]
             write_ALL(ALL, doc) //寫入
+            text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
+            keyboard_main(Telegram_id, text, ALL)
+            // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
+            //   請記得去主控bot選擇這個房間並開啟"☀ 顯示發送者"，
+            //   以免Line端眾不知何人發送。
+
+            if (ALL.data[n]['Amount']) { //如果還有訊息直接傾倒
+              sendtext(chat_id, ct["not_read_all_ed"])
+              var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id)
+              if (j) {
+                ALL.data[n]['Amount'] = 0
+              }
+              write_ALL(ALL, doc) //寫入
+            }
+
             lock.releaseLock();
             return 0;
-          } else if (ALL['TG_temporary_docking'][chat_id] == undefined) {
-            // 初入群的時候
-            if (estringa.message.left_chat_member) { //不理離開群組的訊息
+          } else { //如果沒有隨機碼
+            if (ALL['TG_temporary_docking'][chat_id] == nonsense_number) { //容忍3句廢話(#
+              delete ALL['TG_temporary_docking'][chat_id]
+              TG_leaveChat(chat_id)
+              write_ALL(ALL, doc) //寫入
+              lock.releaseLock();
+              return 0;
+            } else if (ALL['TG_temporary_docking'][chat_id] == undefined) {
+              // 初入群的時候
+              if (estringa.message.left_chat_member) { //不理離開群組的訊息
+                lock.releaseLock();
+                return 0;
+              }
+              ALL['TG_temporary_docking'][chat_id] = 0
+              write_ALL(ALL, doc) //寫入
+              sendtext(chat_id, ct['not_registered'])
+              // ^ 您好!此群似乎還沒有與資料庫綁定，等主人綁定後我才能在此服務。...
+              lock.releaseLock();
+              return 0;
+            } else { //還是等隨機碼驗證中...
+              ALL['TG_temporary_docking'][chat_id] += 1
+              write_ALL(ALL, doc) //寫入
               lock.releaseLock();
               return 0;
             }
-            ALL['TG_temporary_docking'][chat_id] = 0
-            write_ALL(ALL, doc) //寫入
-            sendtext(chat_id, ct['not_registered'])
-            // ^ 您好!此群似乎還沒有與資料庫綁定，等主人綁定後我才能在此服務。...
-            lock.releaseLock();
-            return 0;
-          } else { //還是等隨機碼驗證中...
-            ALL['TG_temporary_docking'][chat_id] += 1
-            write_ALL(ALL, doc) //寫入
-            lock.releaseLock();
-            return 0;
           }
-        }
-      } else { //已綁定群組中發話
-        if (ALL.data[number]['Amount']) { //如果還有訊息直接傾倒
-          sendtext(chat_id, ct["not_read_all_ed"])
-          var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id)
-          if (j) {
-            ALL.data[number]['Amount'] = 0
+        } else { //已綁定群組中發話
+          if (ALL.data[number]['Amount']) { //如果還有訊息直接傾倒
+            sendtext(chat_id, ct["not_read_all_ed"])
+            var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id)
+            if (j) {
+              ALL.data[number]['Amount'] = 0
+            }
+            write_ALL(ALL, doc) //寫入
+            lock.releaseLock();
+            return 0
           }
-          write_ALL(ALL, doc) //寫入
-          lock.releaseLock();
-          return 0
-        }
 
+          try { //處理 tryget 指令
+            // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
+            var rg = Stext.split("@")[0].split("_")
+            if (rg[0] == '/tryget') {
+              tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN)
+              lock.releaseLock();
+              return 0
+            }
+          } catch (e) {}
+
+          // 處理 群組 升 超級群 。
+          if (estringa['message']['migrate_to_chat_id']) {
+            var n = number
+            var mtci = estringa['message']['migrate_to_chat_id']
+            ALL.data[n]['Bind_groud_chat_id'] = mtci
+            ALL.data[n]['Bind_groud_chat_type'] = "supergroup"
+            ALL.FastMatch3[mtci] = n
+            delete ALL.FastMatch3[n]
+            write_ALL(ALL, doc) //寫入
+            lock.releaseLock();
+            sendtext(chat_id, ct['migrate_to_chat_id_ed'])
+            return 0
+          }
+
+          // left_chat_member事件，bot被踢先降房間等級
+          if (estringa['message']['left_chat_member']) {
+            if (estringa['message']['left_chat_member']['id'] == ALL['ctrl_bot_id']) {
+              sendtext(Telegram_id, ct['Emergency_downgrade']['text'].format(
+                ALL.data[number]['Name']
+              ))
+              // ^ ```bot被踢離 {0} 故先強制降級此房間，以免無法留存來自綁定line房間的訊息```
+              var oppid = ALL.data[number]["Bind_groud_chat_id"]
+              var Name = ALL.data[number]["Name"]
+
+              if (ALL.data[number]["Notice"]) { //回復符號
+                ALL.data[number]["Name"] = Name.substr(0, Name.length - 1) + "✅"
+              } else {
+                ALL.data[number]["Name"] = Name.substr(0, Name.length - 1) + "❎"
+              }
+
+              delete ALL.data[number]["Bind_groud_chat_id"]
+              delete ALL.data[number]["Bind_groud_chat_title"]
+              delete ALL.data[number]["Bind_groud_chat_type"]
+              delete ALL.data[number]["Display_name"]
+              delete ALL.FastMatch3[oppid]
+              ALL.data[number].status = "normal"
+              ALL.mode = 0 //讓mode回復正常
+              var REST_result = REST_keyboard(REST_FastMatch1and2and3(ALL)[1])
+              write_ALL(REST_result[1], doc) //寫入
+
+              sendtext(Telegram_id, ct["droproom_success"]["text"].format(
+                JSON.stringify(ALL.data[number])))
+              // ^ "已降級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
+              lock.releaseLock();
+              return 0;
+            }
+          }
+
+          // 下面才是正常的流程
+          var n = number
+          var Line_id = ALL.data[n]['RoomId'] //目標LINE房間ID
+          if (ALL.data[n]["Display_name"]) { //預先處理名稱問題
+            var last_name = ''
+            var first_name = estringa.message.from.first_name
+            if (estringa.message.from.last_name) {
+              last_name = estringa.message.from.last_name
+            }
+            var by_name = ct['by_name']['text'].format(first_name, last_name)
+            var TG_name = ct['TG_name']['text'].format(first_name, last_name)
+          } else {
+            var by_name = ''
+          }
+
+          //優先處理格式化字串，不然下面要寫一堆
+          if (estringa.message['entities']) {
+            //處理 text 格式化字串連結
+            var entities = estringa.message['entities']
+            Stext = entities_conversion(Stext, entities, ct)
+          }
+          if (estringa.message['caption_entities']) {
+            //處理 caption 格式化字串連結
+            var entities = estringa.message['caption_entities']
+            var caption = estringa.message.caption
+            estringa.message.caption = entities_conversion(caption, entities, ct)
+          }
+
+          //以下處理發話
+          if (estringa.message.text) {
+            try {
+              if (estringa.message.reply_to_message) {
+                var rt = estringa.message.reply_to_message.text
+                var index = rt.search(ct['reduce_seach_chat']['text'])
+                if (index) {
+                  // 處理回覆的字數限制問題(需要跟著名子字數走)
+                  var rt_max_chats = rt_max_chats + parseInt(index)
+                }
+                var rt_text = rt_text_reduce(rt, rt_max_chats)
+                var rt_date = estringa.message.reply_to_message.date
+                var date = get_time_txt(rt_date * 1000, GMT)
+                text = ct["For_this_reply"]["text"].format(rt_text, date, Stext);
+                // ^ "{0}\n{1}\n████針對回復████\n{2}"
+              } else {
+                text = Stext;
+              }
+            } catch (e) {
+              text = Stext;
+            }
+            if (ALL.data[n]["Display_name"]) {
+              text = by_name + text
+            }
+            TG_Send_text_To_Line(Line_id, text)
+          } else if (estringa.message.photo) { //如果是照片
+            //以下選擇telegram照片並發到line
+            var p = estringa.message.photo
+            var max = p.length - 1; //挑品質最好的 //NU$ 須注意照片大小以免傳送失敗
+            var photo_id = p[max].file_id
+            var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
+            var gfid = downloadFromTG(Telegram_bot_key, photo_id, fileName, Folder)
+            var Durl = get_200_url(G_drive_Durl + gfid)
+            TG_Send_Photo_To_Line(Line_id, photo_id, Durl)
+
+            if (ALL.data[n]["Display_name"] && estringa.message.caption) {
+              var t1 = ct["is_from"]['text'].format(TG_name)
+              var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
+              TG_Send_text_To_Line(Line_id, t2)
+            } else { //如只有 簡介 或 來源 則一同發出
+              if (ALL.data[n]["Display_name"]) {
+                TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+              }
+              if (estringa.message.caption) { //如有簡介則一同發出
+                var text = by_name + estringa.message.caption
+                TG_Send_text_To_Line(Line_id, text)
+              }
+            }
+            ed_notification_tidy(chat_id, ct["sendPhoto_ed"], ALL, lock)
+          } else if (estringa.message.video) {
+            //以下選擇telegram video並發到line
+            var file_id = estringa.message.video.file_id
+            var thumb_id = estringa.message.video.thumb.file_id
+            TG_Send_video_To_Line(Line_id, file_id, thumb_id)
+            if (ALL.data[n]["Display_name"] && estringa.message.caption) {
+              var t1 = ct["is_from"]['text'].format(TG_name)
+              var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
+              TG_Send_text_To_Line(Line_id, t2)
+            } else { //如只有 簡介 或 來源 則一同發出
+              if (ALL.data[n]["Display_name"]) {
+                TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+              }
+              if (estringa.message.caption) { //如有簡介則一同發出
+                var text = by_name + estringa.message.caption
+                TG_Send_text_To_Line(Line_id, text)
+              }
+            }
+            ed_notification_tidy(chat_id, ct["sendVideo_ed"], ALL, lock)
+            // ^ "(影片已發送!)"
+          } else if (estringa.message.video_note) {
+            //以下選擇telegram video並發到line
+            var file_id = estringa.message.video_note.file_id
+            var thumb_id = estringa.message.video_note.thumb.file_id
+            TG_Send_video_To_Line(Line_id, file_id, thumb_id)
+            if (ALL.data[n]["Display_name"] && estringa.message.caption) {
+              var t1 = ct["is_from"]['text'].format(TG_name)
+              var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
+              TG_Send_text_To_Line(Line_id, t2)
+            } else { //如只有 簡介 或 來源 則一同發出
+              if (ALL.data[n]["Display_name"]) {
+                TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+              }
+              if (estringa.message.caption) { //如有簡介則一同發出
+                var text = by_name + estringa.message.caption
+                TG_Send_text_To_Line(Line_id, text)
+              }
+            }
+            ed_notification_tidy(chat_id, ct["sendVideo_ed"], ALL, lock)
+            // ^ "(影片已發送!)"
+          } else if (estringa.message.sticker) {
+            var file_id = estringa.message.sticker.file_id
+            if (estringa.message.sticker['is_animated']) {
+              ed_notification_tidy(chat_id, ct["not_support_animated_sticker"], ALL, lock)
+              return 0
+            }
+            var TG_sticker_url = get_sticker(ALL, sticker_need, 'TG', file_id)[0]
+            TG_Send_Sticker_To_Line(Line_id, TG_sticker_url)
+            if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
+              TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
+              // ^ "來自: {0}"
+            }
+            ed_notification_tidy(chat_id, ct["sendSticker_ed"], ALL, lock)
+            // ^ "(貼圖已發送!)"
+          } else if (estringa.message.audio) {
+            var duration = estringa.message.audio.duration
+            var audio_id = estringa.message.audio.file_id
+            TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
+            if (ALL.data[n]["Display_name"] && estringa.message.caption) {
+              var t1 = ct["is_from"]['text'].format(TG_name)
+              var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
+              TG_Send_text_To_Line(Line_id, t2)
+            } else { //如只有 簡介 或 來源 則一同發出
+              if (ALL.data[n]["Display_name"]) {
+                TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+              }
+              if (estringa.message.caption) { //如有簡介則一同發出
+                var text = by_name + estringa.message.caption
+                TG_Send_text_To_Line(Line_id, text)
+              }
+            }
+            ed_notification_tidy(chat_id, ct["sendAudio_ed"], ALL, lock)
+            // ^ "(音檔已發送!)"
+          } else if (estringa.message.voice) {
+            var duration = estringa.message.voice.duration
+            var audio_id = estringa.message.voice.file_id
+            TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
+            if (ALL.data[n]["Display_name"] && estringa.message.caption) {
+              var t1 = ct["is_from"]['text'].format(TG_name)
+              var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
+              TG_Send_text_To_Line(Line_id, t2)
+            } else { //如只有 簡介 或 來源 則一同發出
+              if (ALL.data[n]["Display_name"]) {
+                TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+              }
+              if (estringa.message.caption) { //如有簡介則一同發出
+                var text = by_name + estringa.message.caption
+                TG_Send_text_To_Line(Line_id, text)
+              }
+            }
+            ed_notification_tidy(chat_id, ct["sendVoice_ed"], ALL, lock)
+            // ^ "(錄音已發送!)"
+          } else if (estringa.message.location) {
+            var latitude = estringa.message.location.latitude
+            var longitude = estringa.message.location.longitude
+
+            try {
+              var response = Maps.newGeocoder().setLanguage(
+                'zh-TW').reverseGeocode(latitude, longitude);
+              var formatted_address = response.results[0]['formatted_address']
+            } catch (e) {
+              var formatted_address = '未知地點'
+            }
+
+            //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
+            TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
+            if (ALL.data[n]["Display_name"]) {
+              TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
+            }
+            ed_notification_tidy(chat_id, ct["sendLocation_ed"], ALL, lock)
+            // ^ "(位置已發送!)"
+          } else if (estringa.message.animation) {
+            var file_id = estringa.message.animation.file_id
+            var thumb_id = estringa.message.animation.thumb.file_id
+            TG_Send_video_To_Line(Line_id, file_id, thumb_id)
+            if (ALL.data[n]["Display_name"] && estringa.message.caption) {
+              var t1 = ct["is_from"]['text'].format(TG_name)
+              var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
+              TG_Send_text_To_Line(Line_id, t2)
+            } else { //如只有 簡介 或 來源 則一同發出
+              if (ALL.data[n]["Display_name"]) {
+                TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
+              }
+              if (estringa.message.caption) { //如有簡介則一同發出
+                var text = by_name + estringa.message.caption
+                TG_Send_text_To_Line(Line_id, text)
+              }
+            }
+            ed_notification_tidy(chat_id, ct["sendGIF_ed"], ALL, lock)
+            // ^ "(GIF已發送!)"
+          } else if (estringa.message.document) {
+            var fileId = estringa.message.document.file_id
+            var fileName = estringa.message.document.file_name
+            var file_size = parseInt(estringa.message.document.file_size)
+            var file_size_MB = (file_size / 1024 / 1024).toFixed(3)
+
+
+            var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
+            var gfid = downloadFromTG(Telegram_bot_key, fileId, fileName, Folder)
+            var Durl = G_drive_Durl + gfid
+            text = ct['sendFileToLine']['text'].format(Durl, fileName, file_size, file_size_MB)
+            if (estringa.message.caption) { //如有簡介則一同發出
+              text = text + '\n' + estringa.message.caption
+            }
+            if (ALL.data[n]["Display_name"]) {
+              text = by_name + text
+            }
+            TG_Send_text_To_Line(Line_id, text)
+            ed_notification_tidy(chat_id, ct["sendFile_ed"], ALL, lock)
+            // ^ "(File連結已發送!)"
+          }
+        }
+        lock.releaseLock();
+        return 0;
+      }
+      //======================================================
+      //以下是私人1對1的時候
+      //先定義好往Line的發送對象
+      var Line_id = ALL.opposite.RoomId;
+
+      //再針對不同的情況處理訊息
+      if (estringa.message.text) { //如果是文字訊息
         try { //處理 tryget 指令
           // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
           var rg = Stext.split("@")[0].split("_")
@@ -258,38 +635,41 @@ function doPost(e) {
           }
         } catch (e) {}
 
-        // 下面才是正常的流程
-        var n = number
-        var Line_id = ALL.data[n]['RoomId'] //目標LINE房間ID
-        if (ALL.data[n]["Display_name"]) { //預先處理名稱問題
-          var last_name = ''
-          var first_name = estringa.message.from.first_name
-          if (estringa.message.from.last_name) {
-            last_name = estringa.message.from.last_name
+        if (mode == "🚀 發送訊息" && Stext != "/exit") {
+          //以下準備接收telegram資訊並發到line
+
+          // 檢查是否誤傳
+          if (in_command(Stext) || Stext.substr(0, 2) == "/d") {
+            sendtext(chat_id, ct["plz_exit_and_resend"]);
+            // ^ "請先按下 /exit 離開後再下指令喔!"
+            lock.releaseLock();
+            return 0;
           }
-          var by_name = ct['by_name']['text'].format(first_name, last_name)
-          var TG_name = ct['TG_name']['text'].format(first_name, last_name)
-        } else {
-          var by_name = ''
-        }
 
-        //優先處理格式化字串，不然下面要寫一堆
-        if (estringa.message['entities']) {
-          //處理 text 格式化字串連結
-          var entities = estringa.message['entities']
-          Stext = entities_conversion(Stext, entities, ct)
-        }
-        if (estringa.message['caption_entities']) {
-          //處理 caption 格式化字串連結
-          var entities = estringa.message['caption_entities']
-          var caption = estringa.message.caption
-          estringa.message.caption = entities_conversion(caption, entities, ct)
-        }
-
-        //以下處理發話
-        if (estringa.message.text) {
           try {
-            if (estringa.message.reply_to_message) {
+            // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
+            var rg = Stext.split("@")[0].split("_")
+            if (rg[0] == '/tryget') {
+              tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN)
+              lock.releaseLock();
+              return 0
+            }
+          } catch (e) {}
+
+          if (estringa.message['entities']) {
+            //處理 text 格式化字串連結
+            var entities = estringa.message['entities']
+            Stext = entities_conversion(Stext, entities, ct)
+          }
+          if (estringa.message['caption_entities']) {
+            //處理 caption 格式化字串連結
+            var entities = estringa.message['caption_entities']
+            var caption = estringa.message.caption
+            estringa.message.caption = entities_conversion(caption, entities, ct)
+          }
+
+          try {
+            if (estringa.message.reply_to_message.text) {
               var rt = estringa.message.reply_to_message.text
               var index = rt.search(ct['reduce_seach_chat']['text'])
               if (index) {
@@ -307,95 +687,1272 @@ function doPost(e) {
           } catch (e) {
             text = Stext;
           }
-          if (ALL.data[n]["Display_name"]) {
-            text = by_name + text
-          }
           TG_Send_text_To_Line(Line_id, text)
-        } else if (estringa.message.photo) { //如果是照片
+          lock.releaseLock();
+          return 0;
+
+          //========================================================
+        } else if (mode == "🔖 重新命名" && Stext != "/main") {
+          if (in_name(ALL, (U + "✅")) || in_name(ALL, (U + "❎")) || in_name(ALL, (U + "⭐️"))) { //排除重名
+            sendtext(chat_id, ct["duplicate_name"]);
+            // ^ "名子不可重複，請重新輸入一個!"
+          } else if (in_command(Stext)) { //排除與指令重複
+            sendtext(chat_id, ct["duplicate_command"]);
+            // ^ "名子不可跟命令重複，請重新輸入一個!"
+          } else {
+            // 找目標
+            var OName = ALL.opposite.Name
+            var FM = ALL.FastMatch[OName]
+            // 確認符號
+            if (ALL.data[FM]['status'] == '已升級房間2') {
+              var symbol = "⭐️"
+            } else if (ALL.data[FM]['Notice']) {
+              var symbol = "✅"
+            } else {
+              var symbol = "❎"
+            }
+            // 取代符號
+            ALL.data[FM].Name = Stext + symbol
+            var y = JSON.parse(
+              JSON.stringify(ALL.FastMatch).replace(OName, Stext + symbol)
+            ); //簡化一下當年的技術債... 當紀念吧...
+
+            ALL.FastMatch = y;
+            ALL.mode = 0
+            //以下處理RoomKeyboard====================================
+            ALL = REST_keyboard(ALL)[1] //重新編排keyborad
+            write_ALL(ALL, doc) //寫入
+
+            //=======================================================
+            //var text = "🔖 重新命名完成~\n" + OName + " \n->\n " + Stext + "\n🔮 開啟主選單"
+            ct["rename_success"]["text"] = ct["rename_success"]["text"].format(
+              ct["🔖 重新命名"]["text"], OName, (Stext + symbol), ct["🔮 開啟主選單"]["text"]);
+            text = ct["rename_success"]
+            keyboard_main(chat_id, text, ALL)
+          }
+          lock.releaseLock();
+          return 0;
+          //=========================================================
+        } else if (mode == "🔥 刪除房間" && Stext == "/delete") {
+          var aims = ALL.opposite.RoomId
+          var number = ALL.FastMatch2[aims]
+
+          //doc處理
+          ALL.data.splice(number, 1) //刪除目標
+          ALL.mode = 0
+          //sheet處理
+          var SpreadSheet = SpreadsheetApp.openById(sheet_key);
+          var Sheet = SpreadSheet.getSheetByName("Line訊息區");
+          Sheet.deleteColumn(number + 1);
+          try {
+            var a1 = Line_leave(aims); //從Line中離開
+          } catch (e) {
+            sendtext(chat_id, ct['can_not_leave_from_line'])
+            var a1 = false
+          }
+          var y1 = REST_keyboard(ALL); //重製快速鍵盤
+          var a2 = y1[0]
+          var y2 = REST_FastMatch1and2and3(y1[1]); //重製快速索引
+          var a3 = y2[0]
+          ALL = y2[1]
+
+          write_ALL(ALL, doc) //寫入
+
+          text = ct["delete_room_success"]['text'].format(a1, a2, a3)
+          // ^ "Line_leave：{0}\nREST_keyboard：{1}\nREST_FastMatch1and2and3：{2}\n已刪除此聊天室"
+          keyboard_main(chat_id, text, ALL)
+          lock.releaseLock();
+          return 0;
+        } else if (mode == "⭐ 升級房間" && Stext == "/uproom") {
+          ALL.mode = "/uproom"
+          var FastMatch2_number = ALL.FastMatch2[ALL.opposite.RoomId]
+          var Binding_number = String(Random_text(12))
+          ALL.data[FastMatch2_number]['Binding_number'] = Binding_number //有點多餘但可確保
+          ALL['wait_to_Bind'][Binding_number] = FastMatch2_number
+          write_ALL(ALL, doc) //寫入
+          sendtext(chat_id, Binding_number)
+          sendtext(chat_id, ct["plz_forward_verification_code"]);
+          // ^ "請確認我在要綁定的群組中後，再轉發上方的驗證碼到那以進行綁定! \
+          //   \n或按下 /unsetroom 取消升級"
+          lock.releaseLock();
+          return 0;
+        } else if (mode == "/uproom" && Stext != "/main" && Stext != "/debug") {
+          if (Stext == "/unsetroom") {
+            delete ALL.FastMatch2[ALL.opposite.RoomId].Binding_number
+            ALL.mode = 0
+            write_ALL(ALL, doc) //寫入
+
+            sendtext(chat_id, ct["unsetroom_ed"]);
+            // ^ "已取消設定bot"
+          } else {
+            sendtext(chat_id, ct['in_uproom_but'])
+          }
+          lock.releaseLock();
+          return 0;
+        } else if (mode == "💫 降級房間" && Stext == "/droproom") {
+          var aims = ALL.opposite.RoomId
+          var number = ALL.FastMatch2[aims]
+          var oppid = ALL.data[number]["Bind_groud_chat_id"]
+          var Name = ALL.data[number]["Name"]
+
+          if (ALL.data[number]["Notice"]) { //回復符號
+            ALL.data[number]["Name"] = Name.substr(0, Name.length - 1) + "✅"
+          } else {
+            ALL.data[number]["Name"] = Name.substr(0, Name.length - 1) + "❎"
+          }
+
+          delete ALL.data[number].botToken
+          delete ALL.data[number]["Bind_groud_chat_id"]
+          delete ALL.data[number]["Bind_groud_chat_title"]
+          delete ALL.data[number]["Bind_groud_chat_type"]
+          delete ALL.data[number]["Display_name"]
+          delete ALL.FastMatch3[oppid]
+          ALL.data[number].status = "normal"
+          ALL.mode = 0 //讓mode回復正常
+          var REST_result = REST_keyboard(REST_FastMatch1and2and3(ALL)[1])
+          write_ALL(REST_result[1], doc) //寫入
+
+          keyboard_main(chat_id, ct["droproom_success"]["text"].format(
+            JSON.stringify(ALL.data[number])), ALL)
+          // ^ "已降級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
+          lock.releaseLock();
+          return 0;
+        } else if ((mode == "♻ 移除關鍵字" || mode == "📎 新增關鍵字") && Stext == "/lookkeyword") {
+          text = ct["lookkeyword_result"]['text'].format(get_all_keyword(ALL))
+          sendtext(chat_id, text);
+          lock.releaseLock();
+          return 0;
+        } else if (mode == "📎 新增關鍵字" && Stext != "/main") {
+          try {
+            var addwkey = String(Stext)
+            var tt = addwkey.replace(/，/g, ',')
+            var addwkey_array = tt.split(',')
+
+            if (addwkey.search(",") == -1 && addwkey.search("，") == -1) {
+              ALL.keyword.push(addwkey)
+            } else {
+              for (var i = 0; i < addwkey_array.length; i++) {
+                if (addwkey_array[i] == "") {
+                  continue
+                }
+                ALL.keyword.push(addwkey_array[i])
+              } //新增關鍵字
+            }
+
+            write_ALL(ALL, doc)
+            var li = get_all_keyword(ALL)
+            sendtext(chat_id, ct["add_keyword_success"]["text"].format(li));
+            // ^ "已成功新增\n\n{0}\n\n如遇離開請按 /main\n或者繼續輸入新增",
+          } catch (e) {
+            ct["add_keyword_success"]["text"] = ct["add_keyword_success"]["text"].format(String(e))
+            sendtext(chat_id, ct["add_keyword_success"]);
+            // ^ "新增失敗，原因如下：\n" + String(e)
+          }
+          lock.releaseLock();
+          return 0;
+        } else if (mode == "♻ 移除關鍵字" && Stext != "/main") {
+          try { //移除關鍵字
+            var rmwkey = String(Stext)
+            var tt = rmwkey.replace(/，/g, ',')
+            var re = /\d+/g
+            var rmwkey_array = tt.match(re)
+            rmwkey_array.sort(function(a, b) {
+              return b - a;
+            })
+            for (var i = 0; i < rmwkey_array.length; i++) {
+              if (isNaN(parseInt(rmwkey_array[i]))) {
+                continue
+              }
+              var index = parseInt(rmwkey_array[i]) - 1
+              ALL.keyword.splice(index, 1)
+            }
+
+            write_ALL(ALL, doc)
+            var li = get_all_keyword(ALL)
+            sendtext(chat_id, ct["delete_keyword_success"]["text"].format(li));
+            // ^ "已成功移除\n\n{0}\n\n如遇離開請按 /main\n或者繼續輸入移除",
+          } catch (e) {
+            ct["delete_keyword_fail"]["text"] = ct["delete_keyword_fail"]["text"].format(String(e))
+            sendtext(chat_id, ct["delete_keyword_success"]);
+            // ^ "移除失敗，如遇重新移除請先再次看過關鍵字名單再操作\n
+            //    按下 /lookkeyword 可顯示名單\n
+            //    移除失敗原因如下：\n{0}"
+          }
+          lock.releaseLock();
+          return 0;
+        } else if (mode == "⏰ 訊息時間啟用?" && Stext != "/main") {
+          function mixT(chat_id) {
+            keyboard_main(chat_id, ct["change_message_time_func"]["text"].format(
+              String(Stext)), ALL)
+            // ^ "已成功 " + Stext + " 訊息時間!"
+          }
+          if (Stext == ct["開啟"]["text"]) {
+            ALL.massage_time = true
+            ALL.mode = 0
+            var e = write_ALL(ALL, doc)
+            if (e) {
+              mixT(chat_id)
+            } else {
+              sendtext(chat_id, ct["w_error_status"]);
+              // ^ 寫入失敗，詳情如下：
+            }
+
+          } else if (Stext == ct["關閉"]["text"]) {
+            ALL.massage_time = false
+            ALL.mode = 0
+            var e = write_ALL(ALL, doc)
+            if (e) {
+              mixT(chat_id)
+            } else {
+              sendtext(chat_id, ct["w_error_status"]);
+              // ^ 寫入失敗，詳情如下：
+            }
+          } else {
+            var text = ""
+            sendtext(chat_id, ct["not_eat_this"]);
+            // ^ 030...\n請不要給我吃怪怪的東西...
+          }
+          lock.releaseLock();
+          return 0;
+        } else if (mode == "✈️ 設定GMT" && Stext != "/main") {
+          ALL['GMT'] = 'GMT' + Stext
+          ALL.mode = 0
+          write_ALL(ALL, doc)
+          text = ct["set_GMT_ed"]['text'].format(Stext)
+          keyboard_main(chat_id, text, ALL)
+          lock.releaseLock();
+          return 0;
+        } else if (mode == "🌋 丟棄舊檔" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+          var send_ed = sendtext(chat_id, ct['get_command_ed'])
+          // ^ "已接收指令!\n處理中請稍後..."
+          var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
+          switch (Stext) {
+            case ct['Trashed_10day']["text"]:
+              var result = clear_files_by_mode(Folder, 'time', 10)
+              break;
+            case ct['Trashed_30day']["text"]:
+              var result = clear_files_by_mode(Folder, 'time', 30)
+              break;
+            case ct['Trashed_ALL']["text"]:
+              var result = clear_files_by_mode(Folder, 'All')
+              break;
+            default:
+              sendtext(chat_id, ct['not_eat_this'])
+              // ^ "030...\n請不要給我吃怪怪的東西..."
+              lock.releaseLock();
+              return 0;
+          }
+          deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
+          if (!result[0]) { //意外發生
+            var ey = '失敗\n' + result[1]
+          } else {
+            var ey = '成功'
+          }
+          ct['Trashed_result'] = ct['Trashed_result']['text'].format(ey)
+          ALL.mode = 0
+          write_ALL(ALL, doc)
+          keyboard_main(chat_id, ct['Trashed_result'], ALL)
+          lock.releaseLock();
+          return 0;
+        } else if (mode == "🌀 轉圖設定" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+          var conservion_server_url = "https://{0}/{1}".format(
+            ALL['conservion_server']["domain_name"],
+            ALL['conservion_server']["conservion_api"]
+          )
+
+          switch (Stext) {
+            case ct['set_server']["text"]:
+              ReplyKeyboardRemove(chat_id, ct['plz_set_server'])
+              ALL.mode = "🌀 轉圖設定 - set_server"
+              break;
+            case ct['set_require_api']["text"]:
+              ReplyKeyboardRemove(chat_id, ct['plz_set_require_api'])
+              ALL.mode = "🌀 轉圖設定 - set_require_api"
+              break;
+            case ct['set_save_yes']["text"]:
+              ALL['conservion_server']['agree_server_save'] = true
+              sendtext(chat_id, ct['set_save_yes_ed'])
+
+              var ics = ct['image_conversion_status']['text'].format(
+                ALL['conservion_server']['domain_name'],
+                ALL['conservion_server']['conservion_api'],
+                conservion_server_url,
+                String(ALL['conservion_server']['agree_server_save']))
+
+              var image_conversion_keyboard2 = [
+                [{
+                  'text': ct["set_server"]["text"]
+                }, {
+                  'text': ct["set_require_api"]["text"]
+                }],
+                [{
+                  'text': ct['set_save_no']["text"]
+                }, {
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              ReplyKeyboardMakeup(
+                chat_id, image_conversion_keyboard2, true, false, ics)
+              break;
+            case ct['set_save_no']["text"]:
+              ALL['conservion_server']['agree_server_save'] = false
+              sendtext(chat_id, ct['set_save_no_ed'])
+
+              var ics = ct['image_conversion_status']['text'].format(
+                ALL['conservion_server']['domain_name'],
+                ALL['conservion_server']['conservion_api'],
+                conservion_server_url,
+                String(ALL['conservion_server']['agree_server_save']))
+
+              var image_conversion_keyboard1 = [
+                [{
+                  'text': ct["set_server"]["text"]
+                }, {
+                  'text': ct["set_require_api"]["text"]
+                }],
+                [{
+                  'text': ct['set_save_yes']["text"]
+                }, {
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              ReplyKeyboardMakeup(
+                chat_id, image_conversion_keyboard1, true, false, ics)
+              break;
+            default:
+              sendtext(chat_id, ct['not_eat_this'])
+              // ^ "030...\n請不要給我吃怪怪的東西..."
+              lock.releaseLock();
+              return 0;
+          }
+          write_ALL(ALL, doc)
+          lock.releaseLock();
+          return 0;
+        } else if (mode == "🌀 轉圖設定 - set_server" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+          ALL['conservion_server']['domain_name'] = Stext
+          ct['plz_set_server_ed']['text'] = ct['plz_set_server_ed']['text'].format(Stext)
+          sendtext(chat_id, ct['plz_set_server_ed'])
+
+          var conservion_server_url = "https://{0}/{1}".format(
+            ALL['conservion_server']["domain_name"],
+            ALL['conservion_server']["conservion_api"]
+          )
+
+          var ics = ct['image_conversion_status']['text'].format(
+            ALL['conservion_server']['domain_name'],
+            ALL['conservion_server']['conservion_api'],
+            conservion_server_url,
+            String(ALL['conservion_server']['agree_server_save']))
+          keyboard_main(chat_id, ics, ALL)
+          ALL.mode = 0
+          write_ALL(ALL, doc)
+          lock.releaseLock();
+          return 0;
+        } else if (mode == "🌀 轉圖設定 - set_require_api" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+          ALL['conservion_server']['conservion_api'] = Stext
+          ct['plz_set_require_api_ed']['text'] = ct['plz_set_require_api_ed']['text'].format(Stext)
+          sendtext(chat_id, ct['plz_set_require_api_ed'])
+
+          var conservion_server_url = "https://{0}/{1}".format(
+            ALL['conservion_server']["domain_name"],
+            ALL['conservion_server']["conservion_api"]
+          )
+
+          var ics = ct['image_conversion_status']['text'].format(
+            ALL['conservion_server']['domain_name'],
+            ALL['conservion_server']['conservion_api'],
+            conservion_server_url,
+            String(ALL['conservion_server']['agree_server_save']))
+          keyboard_main(chat_id, ics, ALL)
+          ALL.mode = 0
+          write_ALL(ALL, doc)
+          lock.releaseLock();
+          return 0;
+        } else if (mode == "ed_notification" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+          switch (Stext) {
+            case ct['🉑啟用提示']["text"]:
+              ALL['ed_notification']['need'] = true
+              sendtext(chat_id, ct['🉑啟用提示_ed'])
+              break;
+            case ct['🈲停用提示']["text"]:
+              ALL['ed_notification']['need'] = false
+              sendtext(chat_id, ct['🈲停用提示_ed'])
+              break;
+            case ct['🌠自刪提示']["text"]:
+              ALL['ed_notification']['delete_notification'] = true
+              sendtext(chat_id, ct['🌠自刪提示_ed'])
+              break;
+            case ct['🌟不要自刪']["text"]:
+              ALL['ed_notification']['delete_notification'] = false
+              sendtext(chat_id, ct['🌟不要自刪_ed'])
+              break;
+            case ct['🍵延刪提示']["text"]:
+              ALL['ed_notification']['delay'] = true
+              sendtext(chat_id, ct['🍵延刪提示_ed'])
+              break;
+            case ct['☕不要延刪']["text"]:
+              ALL['ed_notification']['delay'] = false
+              sendtext(chat_id, ct['☕不要延刪_ed'])
+              break;
+            case ct['⌛設定延遲']["text"]:
+              ALL.mode = '⌛設定延遲'
+              ReplyKeyboardRemove(chat_id, ct['⌛設定延遲_ing'])
+              write_ALL(ALL, doc)
+              lock.releaseLock();
+              return 0;
+              break;
+            default:
+              sendtext(chat_id, ct['not_eat_this'])
+              // ^ "030...\n請不要給我吃怪怪的東西..."
+              lock.releaseLock();
+              return 0;
+          }
+
+          if (!ALL['ed_notification']['need']) {
+            var k1_1 = ct['🉑啟用提示']["text"]
+          } else {
+            var k1_1 = ct['🈲停用提示']["text"]
+          }
+          if (!ALL['ed_notification']['delete_notification']) {
+            var k1_2 = ct['🌠自刪提示']["text"]
+          } else {
+            var k1_2 = ct['🌟不要自刪']["text"]
+          }
+          if (!ALL['ed_notification']['delay']) {
+            var k2_1 = ct['🍵延刪提示']["text"]
+          } else {
+            var k2_1 = ct['☕不要延刪']["text"]
+          }
+
+          var set_notification_keyborad = [
+            [{
+              'text': k1_1
+            }, {
+              'text': k1_2
+            }],
+            [{
+              'text': k2_1
+            }, {
+              'text': ct["⌛設定延遲"]["text"]
+            }],
+            [{
+              'text': ct["🔙 返回大廳"]["text"]
+            }]
+          ]
+
+          var text2 = O_format(
+            ct['ed_notification_info']['text'],
+            ALL["ed_notification"]['need'],
+            ALL["ed_notification"]['delete_notification'],
+            ALL["ed_notification"]['delay'],
+            ALL["ed_notification"]['delay_time']
+          )
+
+          ReplyKeyboardMakeup(
+            chat_id, set_notification_keyborad, true, false, text2)
+
+          write_ALL(ALL, doc)
+          lock.releaseLock();
+          return 0;
+        } else if (mode == "⌛設定延遲" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+          try {
+            var milliseconds = parseInt(Stext)
+            if (milliseconds <= 5000 && milliseconds >= 100) {
+              ALL['ed_notification']['delay_time'] = milliseconds
+              ALL.mode = 0
+              write_ALL(ALL, doc)
+              ct["⌛設定延遲_ed"]['text'] = ct["⌛設定延遲_ed"]['text'].format(milliseconds)
+              keyboard_main(Telegram_id, ct["⌛設定延遲_ed"], ALL)
+            }
+          } catch (e) {
+            sendtext(chat_id, ct['set_time_error'])
+          }
+        } else if (mode == "🎨傳圖設定" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+          switch (Stext) {
+            case ct['🎾轉傳連結']["text"]:
+              ALL['image_link_mode'] = '🎾 轉傳連結'
+              sendtext(chat_id, ct['🎾轉傳連結_ed'])
+              break;
+            case ct['🏀來源連結']["text"]:
+              ALL['image_link_mode'] = '🏀 來源連結'
+              sendtext(chat_id, ct['🏀來源連結_ed'])
+              break;
+            default:
+              sendtext(chat_id, ct['not_eat_this'])
+              // ^ "030...\n請不要給我吃怪怪的東西..."
+              lock.releaseLock();
+              return 0;
+          }
+          write_ALL(ALL, doc)
+          lock.releaseLock();
+        } else if (mode == "🍭變換房位" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
+          if (ALL.FastMatch[Stext] != undefined) {
+            if (ALL['🍭變換房位暫存'] == '') {
+              ALL['🍭變換房位暫存'] = ALL.FastMatch[Stext]
+              sendtext(chat_id, ct['choose_room_2'])
+            } else {
+              var room_1 = ALL['data'][ALL['🍭變換房位暫存']]
+              var room_2 = ALL['data'][ALL.FastMatch[Stext]]
+              ALL['data'][ALL.FastMatch[Stext]] = room_1
+              ALL['data'][ALL['🍭變換房位暫存']] = room_2
+              ALL = REST_keyboard(ALL)[1]
+              ALL = REST_FastMatch1and2and3(ALL)[1]
+              ALL['🍭變換房位暫存'] = ''
+              var substitute_Keyboard = JSON.parse(JSON.stringify(ALL['RoomKeyboard']));
+              substitute_Keyboard.splice(0, 1)
+              ReplyKeyboardMakeup(
+                chat_id, substitute_Keyboard, true, false, ct['room_chang_ed'])
+              sendtext(chat_id, ct['choose_room_1'])
+            }
+          } else {
+            sendtext(chat_id, ct['not_eat_this'])
+          }
+
+          write_ALL(ALL, doc)
+          lock.releaseLock();
+        } else {
+          //以下指令分流
+          switch (Stext) {
+            case '/main':
+            case ct['🔃 重新整理']["text"]:
+              if (ALL.mode != 0) {
+                ALL.mode = 0
+                write_ALL(ALL, doc) //寫入
+              }
+              keyboard_main(chat_id, ct["🔮 開啟主選單"], ALL)
+              break;
+            case ct['🔙 返回大廳']["text"]:
+              if (ALL.mode != 0) {
+                ALL.mode = 0
+                write_ALL(ALL, doc) //寫入
+              }
+              var keyboard = ALL.RoomKeyboard;
+              var resize_keyboard = true
+              var one_time_keyboard = false
+              var text = ct["請選擇聊天室"]
+              ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
+
+              break;
+            case ct['🔭 訊息狀態']["text"]:
+              var consumption = Number(JSON.parse(get_Line_consumption())['totalUsage'])
+              sendtext(chat_id, ct["consumption"]['text'].format(consumption))
+              data_len = ALL.data.length;
+              text = ""
+              for (var i = 0; i < data_len; i++) {
+                if (ALL.data[i].Amount == 0) {
+                  continue;
+                }
+                text = ct["unread_number"]["text"].format(text, ALL.data[i].Name, ALL.data[i].Amount)
+                // ^ text + ALL.data[i].Name + '\n' + '未讀：' + ALL.data[i].Amount + '\n' + '-------------\n'
+              }
+              ct["unread_number"]["text"] = text // 覆蓋回去
+              if (text == "") {
+                ct["unread_number"]["text"] = "沒有任何未讀。"
+              }
+              sendtext(chat_id, ct["unread_number"]);
+              break;
+            case ct['✔ 關閉鍵盤']["text"]:
+              var text = ct['colse_Keyboard_ed']
+              ReplyKeyboardRemove(chat_id, text)
+              // ^ "已關閉鍵盤，如欲再次開啟請按 /main"
+              break;
+            case ct['🚀 發送訊息']["text"]:
+              ALL.mode = "🚀 發送訊息"
+              write_ALL(ALL, doc) //寫入
+              ReplyKeyboardRemove(chat_id, ct["sendtext_to_XXX"]["text"].format(ALL.opposite.Name))
+              // ^  "將對 {0} 發送訊息\n如欲離開請輸入 /exit \n請輸入訊息："
+              break;
+            case '/exit':
+              ALL.mode = 0
+              write_ALL(ALL, doc) //寫入
+              keyboard_main(chat_id, ct["exit_room_ed"], ALL)
+              // ^ "======已停止對話!======"
+              break;
+            case ct['📬 讀取留言']["text"]:
+              if (ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount == 0) {
+                sendtext(chat_id, ct["not_need_read"], notification);
+                // ^ "這個房間並沒有未讀的通知喔~ "
+              } else {
+                //獨立出來比較好
+                read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id)
+              }
+              break;
+            case ct['🔖 重新命名']["text"]:
+              var OName = ALL.opposite.Name
+              ALL.mode = "🔖 重新命名"
+              write_ALL(ALL, doc) //寫入
+              ReplyKeyboardRemove(chat_id, ct["rename_room_text"]['text'].format(OName))
+              // ^ "將對 {0} 重新命名!!!\n如要取消命名請按 /main 取消\n請輸入新名子："
+              break;
+            case ct['🔥 刪除房間']["text"]:
+              ALL.mode = "🔥 刪除房間"
+              write_ALL(ALL, doc) //寫入
+              sendtext(chat_id, ct["sure_delete_room?"]["text"].format(ALL.opposite.Name));
+              // ^ 你確定要刪除 {0} 嗎?\n若是請按一下 /delete\n若沒按下則不會刪除!!!"
+              break;
+            case ct['🐳 開啟通知']["text"]:
+              var OName = ALL.opposite.Name
+              var FM = ALL.FastMatch[OName]
+              ALL.data[FM].Notice = true;
+              var u = ALL.data[FM].Name.replace("❎", "✅");
+              ALL.data[FM].Name = u;
+              var y = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace(
+                OName, OName.slice(0, OName.length - 1) + "✅"));
+              ALL.FastMatch = y;
+              ALL.opposite.Name = u;
+              ALL = REST_keyboard(ALL)[1] //重新編排keyborad
+              write_ALL(ALL, doc) //寫入
+              sendtext(chat_id, ct["enabled_notification_ed"]["text"].format(OName));
+              // ^ "已開啟 {0} 的通知"
+              //以下處理RoomKeyboard=================================
+
+              break;
+            case ct['🔰 暫停通知']["text"]:
+              var OName = ALL.opposite.Name
+              var FM = ALL.FastMatch[OName]
+              ALL.data[FM].Notice = false
+              var u = ALL.data[FM].Name.replace("✅", "❎");
+              ALL.data[FM].Name = u;
+              var y = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace(
+                OName, OName.slice(0, OName.length - 1) + "❎"));
+              ALL.FastMatch = y;
+              ALL.opposite.Name = u;
+              ALL = REST_keyboard(ALL)[1] //重新編排keyborad
+              write_ALL(ALL, doc) //寫入
+              sendtext(chat_id, ct["disabled_notification_ed"]["text"].format(OName));
+              // ^ "已暫停 {0} 的通知"
+              //以下處理RoomKeyboard==================================
+
+              break;
+            case ct['⭐ 升級房間']["text"]:
+              if (!ALL.ctrl_bot_id) {
+                var t = ct["not_find_ctrl_id"]['text']
+                var payload = {
+                  "method": "sendMessage",
+                  'chat_id': chat_id,
+                  'text': t,
+                  'disable_notification': ct["not_find_ctrl_id"]['notification']
+                }
+                var data = {
+                  "method": "post",
+                  "payload": payload
+                }
+                var ans = UrlFetchApp.fetch(
+                  "https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
+                var ans_json = JSON.parse(ans)
+                var ctrl_bot_id = ans_json['result'].from.id
+                if (ctrl_bot_id == undefined) {
+                  sendtext(chat_id, ct["get_ctrl_id_error"].format(ans))
+                  return 0
+                }
+                ALL.ctrl_bot_id = ctrl_bot_id
+                write_ALL(ALL, doc) //寫入
+              }
+
+              ALL.mode = "⭐ 升級房間"
+              write_ALL(ALL, doc) //寫入
+
+              sendtext(chat_id, ct["uproom_Introduction"]);
+              // ^ "⭐ 升級房間功能介紹：\n升級房間後，以後來自該對象(Line)的訊息
+              //皆會及時傳到 **新的"群組"聊天室** ，而不會傳到這個"bot"聊天室中，
+              //這個功能是可以回來這裡取消的。
+              sendtext(chat_id, ct['uproom_sure?']["text"].format(ALL.opposite.Name));
+              // ^ "您確定要升級 {0} 嗎?\n若是請按一下 /uproom \n若沒按下則不會進入升級!!!"
+              break;
+            case ct['💫 降級房間']["text"]:
+              ALL.mode = "💫 降級房間"
+              write_ALL(ALL, doc) //寫入
+
+              sendtext(chat_id, ct["droproom_sure?"]["text"].format(ALL.opposite.Name));
+              // ^ "您確定要降級 {0} 嗎?\n若是請按一下 /droproom \n若沒按下則不會降級!!!"
+              break;
+            case ct['☀ 顯示發送者']["text"]:
+              var OName = ALL.opposite.Name
+              var FM = ALL.FastMatch[OName]
+              ALL.data[FM].Display_name = true;
+              ALL.mode = 0
+              write_ALL(ALL, doc) //寫入
+              var keyboard = [
+                [{
+                  'text': ct['💫 降級房間']["text"]
+                }, {
+                  'text': ct["☁ 不顯示發送者"]["text"]
+                }],
+                [{
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              text = ct['Display_name_ch_ed']['text'].format(OName, ct['☀ 顯示發送者']["text"])
+              // ^ {0} 已 {1}
+              var u = undefined
+              ReplyKeyboardMakeup(chat_id, keyboard, u, u, text)
+              break;
+            case ct['☁ 不顯示發送者']["text"]:
+              var OName = ALL.opposite.Name
+              var FM = ALL.FastMatch[OName]
+              ALL.data[FM].Display_name = false;
+              ALL.mode = 0
+              write_ALL(ALL, doc) //寫入
+              var keyboard = [
+                [{
+                  'text': ct['💫 降級房間']["text"]
+                }, {
+                  'text': ct["☀ 顯示發送者"]["text"]
+                }],
+                [{
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              text = ct['Display_name_ch_ed']['text'].format(OName, ct['☁ 不顯示發送者']["text"])
+              // ^ {0} 已 {1}
+              var u = undefined
+              ReplyKeyboardMakeup(chat_id, keyboard, u, u, text)
+              break;
+            case '/debug':
+              ALL.mode = 0
+              ALL.wait_to_Bind = {}
+              ALL['🍭變換房位暫存'] = ''
+              var re_cache_result = rm_cache()
+              var REST_F = REST_FastMatch1and2and3(ALL);
+              var REST_k = REST_keyboard(REST_F[1]);
+              var r = JSON.stringify(REST_k[1]);
+              doc.setText(r); //寫入
+              sendtext(chat_id, ct["debug_ed"]["text"].format(
+                REST_F[0], REST_k[0], re_cache_result));
+              break;
+            case '/AllRead':
+            case '/Allread':
+            case '/allRead':
+            case '/allread':
+              var send_ed = sendtext(chat_id, ct["get_command_ed"]["text"]);
+              // ^ "已接收指令!"
+              AllRead();
+              sendtext(chat_id, ct["allRead_ed"]["text"]);
+              // ^ "已全已讀"
+              deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
+              break;
+            case ct['🔧 更多設定']["text"]:
+              var more_keyboard = [
+                [{
+                  'text': ct["🔑 設定關鍵字提醒"]["text"]
+                }, {
+                  'text': ct['⏰ 訊息時間啟用?']["text"]
+                }],
+                [{
+                  'text': ct["✈️ 設定GMT"]["text"]
+                }, {
+                  'text': ct["🌋 丟棄舊檔"]["text"]
+                }],
+                [{
+                  'text': ct["🌀 轉圖設定"]["text"]
+                }, {
+                  'text': ct["🎨傳圖設定"]["text"]
+                }],
+                [{
+                  'text': ct["🆗設定提示"]["text"]
+                }, {
+                  'text': ct["🍭變換房位"]["text"]
+                }],
+                [{
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              if (ALL.keyword_notice == undefined) {
+                ALL.keyword_notice = false
+                var istrue = true
+              }
+              if (ALL.massage_time == undefined) {
+                ALL.massage_time = false
+                var istrue = true
+              }
+              if (istrue) {
+                write_ALL(ALL, doc) //寫入
+              }
+              text = ct["more_setting_status"]['text'].format(
+                ALL['keyword_notice'], ALL['massage_time'], ALL['GMT'])
+              // ^ '設定狀態：\n● 關鍵字提醒：{0}\n● 訊息時間啟用： {1}\n'
+              var resize_keyboard = true
+              var one_time_keyboard = false
+              ReplyKeyboardMakeup(chat_id, more_keyboard, resize_keyboard, one_time_keyboard, text)
+              break;
+            case ct['⏰ 訊息時間啟用?']["text"]:
+              ALL.mode = "⏰ 訊息時間啟用?"
+              write_ALL(ALL, doc) //寫入
+
+              var massage_time_q_keyboard = [
+                [{
+                  'text': ct["開啟"]["text"]
+                }, {
+                  'text': ct["關閉"]["text"]
+                }]
+              ]
+              text = ct["plz_select_on_off"]
+              // ^  "請選擇開啟或關閉"
+              var resize_keyboard = true
+              var one_time_keyboard = false
+              ReplyKeyboardMakeup(
+                chat_id, massage_time_q_keyboard, resize_keyboard, one_time_keyboard, text)
+              break;
+            case ct["🔑 設定關鍵字提醒"]["text"]:
+              if (ALL.keyword_notice == undefined) { //這一次啟動時的重製
+                ALL.keyword_notice = false
+                write_ALL(ALL, doc) //寫入
+                sendtext(chat_id, ct["first_use_keyword_text"]);
+                // ^ 提醒您，如要啟用關鍵字提醒，請記得按下方按鈕開啟！\n預設為'關閉提醒'"
+              }
+
+              var keyword_keyboard1 = [
+                [{
+                  'text': ct['📎 新增關鍵字']["text"]
+                }, {
+                  'text': ct["♻ 移除關鍵字"]["text"]
+                }],
+                [{
+                  'text': ct["暫停關鍵字提醒"]["text"]
+                }, {
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              var keyword_keyboard2 = [
+                [{
+                  'text': ct['📎 新增關鍵字']["text"]
+                }, {
+                  'text': ct["♻ 移除關鍵字"]["text"]
+                }],
+                [{
+                  'text': ct["啟動關鍵字提醒"]["text"]
+                }, {
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              if (ALL.keyword_notice) {
+                var keyword_keyboard = keyword_keyboard1
+              } else {
+                var keyword_keyboard = keyword_keyboard2
+              }
+
+              var all_word = get_all_keyword(ALL)
+              var resize_keyboard = true
+              var one_time_keyboard = false
+              ReplyKeyboardMakeup(
+                chat_id, keyword_keyboard, resize_keyboard, one_time_keyboard, all_word)
+              break;
+            case ct['📎 新增關鍵字']["text"]:
+              ALL.mode = "📎 新增關鍵字"
+              ReplyKeyboardRemove(chat_id, ct["add_keyword_ing"])
+              // ^ "請輸入欲新增關鍵字\n新增多組關鍵字請用 ',' 或 '，' 號隔開
+              // \n如欲離開請按 /main"
+              write_ALL(ALL, doc)
+              break;
+            case ct['♻ 移除關鍵字']["text"]:
+              ALL.mode = "♻ 移除關鍵字"
+              AllRead();
+              ReplyKeyboardRemove(chat_id, ct["delete_keyword_ing"])
+              // ^ '請輸入欲移除關鍵字的**前方編號!!!**\n刪除多組關鍵字請用 "任意符號" 隔開(推薦用","或"，")\n如遇離開請按 /main'
+              write_ALL(ALL, doc) //寫入
+              break;
+            case ct['啟動關鍵字提醒']["text"]:
+              ALL.keyword_notice = true
+              write_ALL(ALL, doc) //寫入
+              text = ct["turn_on_keyword_ed"]
+              var keyboard = [
+                [{
+                  'text': ct['📎 新增關鍵字']["text"]
+                }, {
+                  'text': ct["♻ 移除關鍵字"]["text"]
+                }],
+                [{
+                  'text': ct["暫停關鍵字提醒"]["text"]
+                }, {
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              var resize_keyboard = true
+              var one_time_keyboard = false
+              ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
+              break;
+            case ct['暫停關鍵字提醒']["text"]:
+              ALL.keyword_notice = false
+              write_ALL(ALL, doc) //寫入
+              text = ct["turn_off_keyword_ed"]
+              var keyboard = [
+                [{
+                  'text': ct['📎 新增關鍵字']["text"]
+                }, {
+                  'text': ct["♻ 移除關鍵字"]["text"]
+                }],
+                [{
+                  'text': ct["啟動關鍵字提醒"]["text"]
+                }, {
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              var resize_keyboard = true
+              var one_time_keyboard = false
+              ReplyKeyboardMakeup(
+                chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
+              break;
+            case '/lookkeyword':
+              text = ct["lookkeyword_result"]['text'].format(get_all_keyword(ALL))
+              sendtext(chat_id, text);
+              break;
+            case ct["✈️ 設定GMT"]["text"]:
+              ALL.mode = "✈️ 設定GMT"
+              sendtext(chat_id, ct["set_GMT_ing_1"]);
+              ReplyKeyboardRemove(chat_id, ct["set_GMT_ing_2"]);
+              write_ALL(ALL, doc) //寫入
+              break;
+            case ct["🌋 丟棄舊檔"]["text"]:
+              ALL.mode = "🌋 丟棄舊檔"
+              text = ct["file_to_Trashed"]
+              var Trashed_keyboard = [
+                [{
+                  'text': ct["Trashed_10day"]["text"]
+                }, {
+                  'text': ct["Trashed_30day"]["text"]
+                }],
+                [{
+                  'text': ct['Trashed_ALL']["text"]
+                }, {
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              var resize_keyboard = true
+              var one_time_keyboard = false
+              ReplyKeyboardMakeup(
+                chat_id, Trashed_keyboard, resize_keyboard, one_time_keyboard, text)
+              write_ALL(ALL, doc) //寫入
+              break;
+            case '/info':
+            case '/v':
+            case '/V':
+            case '/version':
+              var bot_version = ALL['code_version']
+              var language_version = language()["language_version"]
+              var ctv = language()["match_version"]
+              text = ct["version"]['text'].format(bot_version, language_version, ctv)
+              sendtext(chat_id, text);
+              break;
+            case ct["🌀 轉圖設定"]["text"]:
+              ALL.mode = "🌀 轉圖設定"
+
+              var image_conversion_keyboard1 = [
+                [{
+                  'text': ct["set_server"]["text"]
+                }, {
+                  'text': ct["set_require_api"]["text"]
+                }],
+                [{
+                  'text': ct['set_save_yes']["text"]
+                }, {
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              var image_conversion_keyboard2 = [
+                [{
+                  'text': ct["set_server"]["text"]
+                }, {
+                  'text': ct["set_require_api"]["text"]
+                }],
+                [{
+                  'text': ct['set_save_no']["text"]
+                }, {
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+
+              if (!ALL['conservion_server']["agree_server_save"]) {
+                var image_conversion_keyboard = image_conversion_keyboard1
+              } else {
+                var image_conversion_keyboard = image_conversion_keyboard2
+              }
+              ReplyKeyboardMakeup(
+                chat_id, image_conversion_keyboard, true, false, ct["image_conversion"])
+              sendtext(chat_id, ct["first_conversion"])
+
+              var conservion_server_url = "https://{0}/{1}".format(
+                ALL['conservion_server']["domain_name"],
+                ALL['conservion_server']["conservion_api"]
+              )
+
+              var ics = ct['image_conversion_status']['text'].format(
+                ALL['conservion_server']['domain_name'],
+                ALL['conservion_server']['conservion_api'],
+                conservion_server_url,
+                String(ALL['conservion_server']['agree_server_save'])
+              )
+              sendtext(chat_id, ics)
+              write_ALL(ALL, doc) //寫入
+              break;
+            case '/up_version':
+              try {
+                var v = up_version()
+                if (v != undefined) {
+                  var text = "Telegram_link_Line 已升級至 {0}".format(v)
+                  sendtext(chat_id, text);
+                }
+              } catch (e) {
+                var text = "Telegram_link_Line 升級失敗! 原因如下:\n{0}".format(e)
+                sendtext(chat_id, text);
+                console.log(text);
+              }
+              break;
+            case ct['🆗設定提示']["text"]:
+              var text = ct['set_del_notification_info']
+
+              if (!ALL['ed_notification']['need']) {
+                var k1_1 = ct['🉑啟用提示']["text"]
+              } else {
+                var k1_1 = ct['🈲停用提示']["text"]
+              }
+              if (!ALL['ed_notification']['delete_notification']) {
+                var k1_2 = ct['🌠自刪提示']["text"]
+              } else {
+                var k1_2 = ct['🌟不要自刪']["text"]
+              }
+              if (!ALL['ed_notification']['delay']) {
+                var k2_1 = ct['🍵延刪提示']["text"]
+              } else {
+                var k2_1 = ct['☕不要延刪']["text"]
+              }
+
+              var set_notification_keyborad = [
+                [{
+                  'text': k1_1
+                }, {
+                  'text': k1_2
+                }],
+                [{
+                  'text': k2_1
+                }, {
+                  'text': ct["⌛設定延遲"]["text"]
+                }],
+                [{
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+
+              var text2 = O_format(
+                ct['ed_notification_info']['text'],
+                ALL["ed_notification"]['need'],
+                ALL["ed_notification"]['delete_notification'],
+                ALL["ed_notification"]['delay'],
+                ALL["ed_notification"]['delay_time']
+              )
+              sendtext(chat_id, text2)
+
+              ReplyKeyboardMakeup(
+                chat_id, set_notification_keyborad, true, false, text)
+              ALL.mode = "ed_notification"
+              write_ALL(ALL, doc) //寫入
+              break;
+            case ct["🎨傳圖設定"]["text"]:
+              var link_keyboard = [
+                [{
+                  'text': ct['🎾轉傳連結']["text"]
+                }, {
+                  'text': ct["🏀來源連結"]["text"]
+                }],
+                [{
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              ReplyKeyboardMakeup(
+                chat_id, link_keyboard, true, false, ct['image_link_set'])
+              ALL.mode = "🎨傳圖設定"
+              write_ALL(ALL, doc) //寫入
+              sendtext(chat_id, ct['now_image_mode']['text'].format(ALL['image_link_mode']))
+              break;
+            case ct["🍭變換房位"]["text"]:
+              var substitute_Keyboard = JSON.parse(JSON.stringify(ALL['RoomKeyboard']));
+              substitute_Keyboard.splice(0, 1)
+              ReplyKeyboardMakeup(
+                chat_id, substitute_Keyboard, true, false, ct['change_room_position'])
+              ALL.mode = "🍭變換房位"
+              write_ALL(ALL, doc) //寫入
+              sendtext(chat_id, ct['choose_room_1'])
+              break;
+              //-------------------------------------------------------------------
+            default:
+              if (Stext == ct['/droproom']['text']) {
+                sendtext(chat_id, ct["incorrect_operation"]);
+                // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+              }
+
+              //下面處理房間選擇
+              var st = Stext.substr(0, 2)
+              if (ALL.FastMatch[Stext] != undefined || st == "/d") {
+
+                if (ALL.FastMatch[Stext] != undefined) { //一種間接抓，一種直接
+                  var FM = ALL.FastMatch[Stext]
+                } else {
+                  var s_len = Stext.length - 1;
+                  var number = Stext.substr(2, s_len)
+                  var FM = number;
+                }
+
+                var OAmount = ALL.data[FM].Amount
+                var OName = ALL.data[FM].Name
+                var ORoomId = ALL.data[FM].RoomId
+                var Ostatus = ALL.data[FM].status
+                if (ALL.data[FM].Display_name) {
+                  var ODisplay_name = "顯示人名：" + ALL.data[FM].Display_name + '\n'
+                } else {
+                  var ODisplay_name = ""
+                }
+                ALL.opposite.RoomId = ORoomId;
+                ALL.opposite.Name = OName;
+                write_ALL(ALL, doc) //寫入
+                var Notice = ALL.data[FM].Notice
+
+                text = ct["select_room_text"]["text"].format(
+                  OName, OAmount, Notice, ODisplay_name, Ostatus)
+                // ^ "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?"
+                var keyboard = [
+                  [{
+                    'text': ct['🚀 發送訊息']["text"]
+                  }, {
+                    'text': ct['📬 讀取留言']["text"]
+                  }, {
+                    'text': ct['🔖 重新命名']["text"]
+                  }],
+                  [{
+                    'text': ct['⭐ 升級房間']["text"]
+                  }, {
+                    'text': ct['🐳 開啟通知']["text"]
+                  }, {
+                    'text': ct['🔰 暫停通知']["text"]
+                  }],
+                  [{
+                    'text': ct["🔥 刪除房間"]["text"]
+                  }, {
+                    'text': ct["🔙 返回大廳"]["text"]
+                  }]
+                ]
+
+                if (ALL.data[FM]["Bind_groud_chat_id"]) { //如果遇到已升級的則改"降級"
+                  var keyboard2 = [
+                    [{
+                      'text': ct['💫 降級房間']["text"]
+                    }, {
+                      'text': ct["☀ 顯示發送者"]["text"]
+                    }],
+                    [{
+                      'text': ct['🔖 重新命名']["text"]
+                    }, {
+                      'text': ct["🔙 返回大廳"]["text"]
+                    }]
+                  ]
+                  keyboard = keyboard2
+                }
+                if (ALL.data[FM]["Display_name"]) { //改鍵盤人名顯示與否
+                  keyboard2[0][1]['text'] = '☁ 不顯示發送者'
+                }
+                var resize_keyboard = true
+                var one_time_keyboard = false
+                ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
+
+              } else {
+                sendtext(chat_id, ct["incorrect_operation"]);
+                // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+              }
+          }
+          lock.releaseLock();
+          return 0;
+        }
+      } else if (estringa.message.photo) { //如果是照片
+        if (mode == "🚀 發送訊息") {
           //以下選擇telegram照片並發到line
           var p = estringa.message.photo
-          var max = p.length - 1; //挑品質最好的 //NU$ 須注意照片大小以免傳送失敗
+          var max = p.length - 1;
+
           var photo_id = p[max].file_id
           var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
           var gfid = downloadFromTG(Telegram_bot_key, photo_id, fileName, Folder)
           var Durl = get_200_url(G_drive_Durl + gfid)
           TG_Send_Photo_To_Line(Line_id, photo_id, Durl)
-          if (ALL.data[n]["Display_name"]) {
-            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
-          }
-          if (estringa.message.caption) { //如有簡介則一同發出
-            var text = by_name + estringa.message.caption
-            TG_Send_text_To_Line(Line_id, text)
-          }
-          sendtext(chat_id, ct["sendPhoto_ed"]);
+
+          if (estringa.message.caption)
+            TG_Send_text_To_Line(Line_id, estringa.message.caption)
+          //如有簡介則一同發出
+          ed_notification_tidy(chat_id, ct["sendPhoto_ed"], ALL, lock)
           // ^ "(圖片已發送!)"
-        } else if (estringa.message.video) {
+        } else {
+          sendtext(chat_id, ct["incorrect_operation"]);
+          // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        }
+      } else if (estringa.message.video) { //如果是影片
+        if (mode == "🚀 發送訊息") {
           //以下選擇telegram video並發到line
-          var file_id = estringa.message.video.file_id
+          var video_id = estringa.message.video.file_id
           var thumb_id = estringa.message.video.thumb.file_id
-          TG_Send_video_To_Line(Line_id, file_id, thumb_id)
-          if (ALL.data[n]["Display_name"]) {
-            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
-          }
-          if (estringa.message.caption) { //如有簡介則一同發出
-            var text = by_name + estringa.message.caption
-            TG_Send_text_To_Line(Line_id, text)
-          }
-          sendtext(chat_id, ct["sendVideo_ed"]);
+          TG_Send_video_To_Line(Line_id, video_id, thumb_id)
+          if (estringa.message.caption)
+            TG_Send_text_To_Line(Line_id, estringa.message.caption)
+          ed_notification_tidy(chat_id, ct["sendVideo_ed"], ALL, lock)
           // ^ "(影片已發送!)"
-        } else if (estringa.message.video_note) {
+        } else {
+          sendtext(chat_id, ct["incorrect_operation"]);
+          // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        }
+      } else if (estringa.message.video_note) { //如果是影片
+        if (mode == "🚀 發送訊息") {
           //以下選擇telegram video並發到line
-          var file_id = estringa.message.video_note.file_id
+          var video_id = estringa.message.video_note.file_id
           var thumb_id = estringa.message.video_note.thumb.file_id
-          TG_Send_video_To_Line(Line_id, file_id, thumb_id)
-          if (ALL.data[n]["Display_name"]) {
-            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
-          }
-          if (estringa.message.caption) { //如有簡介則一同發出
-            var text = by_name + estringa.message.caption
-            TG_Send_text_To_Line(Line_id, text)
-          }
-          sendtext(chat_id, ct["sendVideo_ed"]);
+          TG_Send_video_To_Line(Line_id, video_id, thumb_id)
+          if (estringa.message.caption)
+            TG_Send_text_To_Line(Line_id, estringa.message.caption)
+          ed_notification_tidy(chat_id, ct["sendVideo_ed"], ALL, lock)
           // ^ "(影片已發送!)"
-        } else if (estringa.message.sticker) {
-          var file_id = estringa.message.sticker.file_id
-          TG_Send_Sticker_To_Line(Line_id, file_id)
-          if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
-            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
-            // ^ "來自: {0}"
+        } else {
+          sendtext(chat_id, ct["incorrect_operation"]);
+          // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        }
+      } else if (estringa.message.sticker) { //如果是貼圖
+        if (mode == "🚀 發送訊息") {
+          if (estringa.message.sticker['is_animated']) {
+            ed_notification_tidy(chat_id, ct["not_support_animated_sticker"], ALL, lock)
+            return 0
           }
-          sendtext(chat_id, ct["sendSticker_ed"]);
+          var file_id = estringa.message.sticker.file_id
+          var TG_sticker_url = get_sticker(ALL, sticker_need, 'TG', file_id)[0]
+          TG_Send_Sticker_To_Line(Line_id, TG_sticker_url)
+          ed_notification_tidy(chat_id, ct["sendSticker_ed"], ALL, lock)
           // ^ "(貼圖已發送!)"
-        } else if (estringa.message.audio) {
+        } else {
+          sendtext(chat_id, ct["incorrect_operation"]);
+          // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        }
+      } else if (estringa.message.audio) { //如果是聲音
+        if (mode == "🚀 發送訊息") {
           var duration = estringa.message.audio.duration
           var audio_id = estringa.message.audio.file_id
           TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
-          if (ALL.data[n]["Display_name"]) {
-            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
-          }
-          if (estringa.message.caption) { //如有簡介則一同發出
-            var text = by_name + estringa.message.caption
-            TG_Send_text_To_Line(Line_id, text)
-          }
-          sendtext(chat_id, ct["sendAudio_ed"]);
+          if (estringa.message.caption)
+            TG_Send_text_To_Line(Line_id, estringa.message.caption)
+          ed_notification_tidy(chat_id, ct["sendAudio_ed"], ALL, lock)
           // ^ "(音檔已發送!)"
-        } else if (estringa.message.voice) {
+        } else {
+          sendtext(chat_id, ct["incorrect_operation"]);
+          // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        }
+      } else if (estringa.message.voice) { //如果是錄音
+        if (mode == "🚀 發送訊息") {
           var duration = estringa.message.voice.duration
           var audio_id = estringa.message.voice.file_id
           TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
-          if (ALL.data[n]["Display_name"]) {
-            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
-          }
-          if (estringa.message.caption) { //如有簡介則一同發出
-            var text = by_name + estringa.message.caption
-            TG_Send_text_To_Line(Line_id, text)
-          }
-          sendtext(chat_id, ct["sendVoice_ed"]);
-          // ^ "(錄音已發送!)"
-        } else if (estringa.message.location) {
+          if (estringa.message.caption)
+            TG_Send_text_To_Line(Line_id, estringa.message.caption)
+          ed_notification_tidy(chat_id, ct["sendVoice_ed"], ALL, lock)
+        } else {
+          sendtext(chat_id, ct["incorrect_operation"]);
+          // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        }
+      } else if (estringa.message.location) { //如果是位置
+        if (mode == "🚀 發送訊息") {
           var latitude = estringa.message.location.latitude
           var longitude = estringa.message.location.longitude
-
           try {
             var response = Maps.newGeocoder().setLanguage(
               'zh-TW').reverseGeocode(latitude, longitude);
@@ -403,31 +1960,32 @@ function doPost(e) {
           } catch (e) {
             var formatted_address = '未知地點'
           }
-
           //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
           TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
-          if (ALL.data[n]["Display_name"]) {
-            TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
-          }
-        } else if (estringa.message.animation) {
+          ed_notification_tidy(chat_id, ct["sendLocation_ed"], ALL, lock)
+          // ^ "(位置已發送!)"
+        } else {
+          sendtext(chat_id, ct["incorrect_operation"]);
+          // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        }
+      } else if (estringa.message.animation) {
+        if (mode == "🚀 發送訊息") {
+          //var duration = estringa.message.animation.duration
           var file_id = estringa.message.animation.file_id
           var thumb_id = estringa.message.animation.thumb.file_id
           TG_Send_video_To_Line(Line_id, file_id, thumb_id)
-          if (ALL.data[n]["Display_name"]) {
-            TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
-          }
-          if (estringa.message.caption) { //如有簡介則一同發出
-            var text = by_name + estringa.message.caption
-            TG_Send_text_To_Line(Line_id, text)
-          }
-          sendtext(chat_id, ct["sendGIF_ed"]);
+          ed_notification_tidy(chat_id, ct["sendGIF_ed"], ALL, lock)
           // ^ "(GIF已發送!)"
-        } else if (estringa.message.document) {
+        } else {
+          sendtext(chat_id, ct["incorrect_operation"]);
+          // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
+        }
+      } else if (estringa.message.document) {
+        if (mode == "🚀 發送訊息") {
           var fileId = estringa.message.document.file_id
           var fileName = estringa.message.document.file_name
           var file_size = parseInt(estringa.message.document.file_size)
           var file_size_MB = (file_size / 1024 / 1024).toFixed(3)
-
 
           var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
           var gfid = downloadFromTG(Telegram_bot_key, fileId, fileName, Folder)
@@ -436,977 +1994,20 @@ function doPost(e) {
           if (estringa.message.caption) { //如有簡介則一同發出
             text = text + '\n' + estringa.message.caption
           }
-          if (ALL.data[n]["Display_name"]) {
-            text = by_name + text
-          }
+
           TG_Send_text_To_Line(Line_id, text)
-          sendtext(chat_id, ct["sendFile_ed"]);
+          ed_notification_tidy(chat_id, ct["sendFile_ed"], ALL, lock)
           // ^ "(File連結已發送!)"
-        }
-      }
-      lock.releaseLock();
-      return 0;
-    }
-    //============================================================================
-    //以下是私人1對1的時候
-    //先定義好往Line的發送對象
-    var Line_id = ALL.opposite.RoomId;
-
-    //再針對不同的情況處理訊息
-    if (estringa.message.text) { //如果是文字訊息
-      try { //處理 tryget 指令
-        // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
-        var rg = Stext.split("@")[0].split("_")
-        if (rg[0] == '/tryget') {
-          tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN)
-          lock.releaseLock();
-          return 0
-        }
-      } catch (e) {}
-
-      if (mode == "🚀 發送訊息" && Stext != "/exit") {
-        //以下準備接收telegram資訊並發到line
-
-        // 檢查是否誤傳
-        if (in_command(Stext) || Stext.substr(0, 2) == "/d") {
-          sendtext(chat_id, ct["plz_exit_and_resend"]);
-          // ^ "請先按下 /exit 離開後再下指令喔!"
-          lock.releaseLock();
-          return 0;
-        }
-
-        try {
-          // 下面這個是跟Line重(ㄔㄨㄥˊ )要Line的檔案
-          var rg = Stext.split("@")[0].split("_")
-          if (rg[0] == '/tryget') {
-            tryget_XXX(ALL, chat_id, ct, rg, download_folder_name, CHANNEL_ACCESS_TOKEN)
-            lock.releaseLock();
-            return 0
-          }
-        } catch (e) {}
-
-        if (estringa.message['entities']) {
-          //處理 text 格式化字串連結
-          var entities = estringa.message['entities']
-          Stext = entities_conversion(Stext, entities, ct)
-        }
-        if (estringa.message['caption_entities']) {
-          //處理 caption 格式化字串連結
-          var entities = estringa.message['caption_entities']
-          var caption = estringa.message.caption
-          estringa.message.caption = entities_conversion(caption, entities, ct)
-        }
-
-        try {
-          if (estringa.message.reply_to_message.text) {
-            var rt = estringa.message.reply_to_message.text
-            var index = rt.search(ct['reduce_seach_chat']['text'])
-            if (index) {
-              // 處理回覆的字數限制問題(需要跟著名子字數走)
-              var rt_max_chats = rt_max_chats + parseInt(index)
-            }
-            var rt_text = rt_text_reduce(rt, rt_max_chats)
-            var rt_date = estringa.message.reply_to_message.date
-            var date = get_time_txt(rt_date * 1000, GMT)
-            text = ct["For_this_reply"]["text"].format(rt_text, date, Stext);
-            // ^ "{0}\n{1}\n████針對回復████\n{2}"
-          } else {
-            text = Stext;
-          }
-        } catch (e) {
-          text = Stext;
-        }
-        TG_Send_text_To_Line(Line_id, text)
-        lock.releaseLock();
-        return 0;
-
-        //================================================================
-      } else if (mode == "🔖 重新命名" && Stext != "/main") {
-        if (in_name(ALL, (U + "✅")) || in_name(ALL, (U + "❎")) || in_name(ALL, (U + "⭐️"))) { //排除重名
-          sendtext(chat_id, ct["duplicate_name"]);
-          // ^ "名子不可重複，請重新輸入一個!"
-        } else if (in_command(Stext)) { //排除與指令重複
-          sendtext(chat_id, ct["duplicate_command"]);
-          // ^ "名子不可跟命令重複，請重新輸入一個!"
         } else {
-          // 找目標
-          var OName = ALL.opposite.Name
-          var FM = ALL.FastMatch[OName]
-          // 確認符號
-          if (ALL.data[FM]['status'] == '已升級房間2') {
-            var symbol = "⭐️"
-          } else if (ALL.data[FM]['Notice']) {
-            var symbol = "✅"
-          } else {
-            var symbol = "❎"
-          }
-          // 取代符號
-          ALL.data[FM].Name = Stext + symbol
-          var y = JSON.parse(
-            JSON.stringify(ALL.FastMatch).replace(OName, Stext + symbol)
-          ); //簡化一下當年的技術債... 當紀念吧...
-
-          ALL.FastMatch = y;
-          ALL.mode = 0
-          //以下處理RoomKeyboard==================================================
-          ALL = REST_keyboard(ALL)[1] //重新編排keyborad
-          write_ALL(ALL, doc) //寫入
-
-          //=====================================================================
-          //var text = "🔖 重新命名完成~\n" + OName + " \n->\n " + Stext + "\n🔮 開啟主選單"
-          ct["rename_success"]["text"] = ct["rename_success"]["text"].format(
-            ct["🔖 重新命名"]["text"], OName, (Stext + symbol), ct["🔮 開啟主選單"]["text"]);
-          text = ct["rename_success"]
-          keyboard_main(chat_id, text, ALL)
+          sendtext(chat_id, ct["incorrect_operation"]);
+          // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
         }
-        lock.releaseLock();
-        return 0;
-        //================================================================
-      } else if (mode == "🔥 刪除房間" && Stext == "/delete") {
-        var aims = ALL.opposite.RoomId
-        var number = ALL.FastMatch2[aims]
-
-        //doc處理
-        ALL.data.splice(number, 1) //刪除目標
-        ALL.mode = 0
-        //sheet處理
-        var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-        var Sheet = SpreadSheet.getSheetByName("Line訊息區");
-        Sheet.deleteColumn(number + 1);
-        try {
-          var a1 = Line_leave(aims); //從Line中離開
-        } catch (e) {
-          sendtext(chat_id, ct['can_not_leave_from_line'])
-          var a1 = false
-        }
-        var y1 = REST_keyboard(ALL); //重製快速鍵盤
-        var a2 = y1[0]
-        var y2 = REST_FastMatch1and2and3(y1[1]); //重製快速索引
-        var a3 = y2[0]
-        ALL = y2[1]
-
-        write_ALL(ALL, doc) //寫入
-
-        text = ct["delete_room_success"]['text'].format(a1, a2, a3)
-        // ^ "Line_leave：{0}\nREST_keyboard：{1}\nREST_FastMatch1and2and3：{2}\n已刪除此聊天室"
-        keyboard_main(chat_id, text, ALL)
-        lock.releaseLock();
-        return 0;
-      } else if (mode == "⭐ 升級房間" && Stext == "/uproom") {
-        ALL.mode = "/uproom"
-        var FastMatch2_number = ALL.FastMatch2[ALL.opposite.RoomId]
-        var Binding_number = String(Random_text(12))
-        ALL.data[FastMatch2_number]['Binding_number'] = Binding_number //有點多餘但可確保
-        ALL['wait_to_Bind'][Binding_number] = FastMatch2_number
-        write_ALL(ALL, doc) //寫入
-        sendtext(chat_id, Binding_number)
-        sendtext(chat_id, ct["plz_forward_verification_code"]);
-        // ^ "請確認我在要綁定的群組中後，再轉發上方的驗證碼到那以進行綁定! \
-        //   \n或按下 /unsetroom 取消升級"
-        lock.releaseLock();
-        return 0;
-      } else if (mode == "/uproom" && Stext != "/main" && Stext != "/debug") {
-        if (Stext == "/unsetroom") {
-          delete ALL.FastMatch2[ALL.opposite.RoomId].Binding_number
-          ALL.mode = 0
-          write_ALL(ALL, doc) //寫入
-
-          sendtext(chat_id, ct["unsetroom_ed"]);
-          // ^ "已取消設定bot"
-        } else {
-          sendtext(chat_id, ct['in_uproom_but'])
-        }
-        lock.releaseLock();
-        return 0;
-      } else if (mode == "💫 降級房間" && Stext == "/droproom") {
-        var aims = ALL.opposite.RoomId
-        var number = ALL.FastMatch2[aims]
-        var oppid = ALL.data[number]["Bind_groud_chat_id"]
-        var Name = ALL.data[number]["Name"]
-
-        if (ALL.data[number]["Notice"]) { //回復符號
-          ALL.data[number]["Name"] = Name.substr(0, Name.length - 1) + "✅"
-        } else {
-          ALL.data[number]["Name"] = Name.substr(0, Name.length - 1) + "❎"
-        }
-
-        delete ALL.data[number].botToken
-        delete ALL.data[number]["Bind_groud_chat_id"]
-        delete ALL.data[number]["Bind_groud_chat_title"]
-        delete ALL.data[number]["Bind_groud_chat_type"]
-        delete ALL.data[number]["Display_name"]
-        delete ALL.FastMatch3[oppid]
-        ALL.data[number].status = "normal"
-        ALL.mode = 0 //讓mode回復正常
-        var REST_result = REST_keyboard(REST_FastMatch1and2and3(ALL)[1])
-        write_ALL(REST_result[1], doc) //寫入
-
-        keyboard_main(chat_id, ct["droproom_success"]["text"].format(
-          JSON.stringify(ALL.data[number])), ALL)
-        // ^ "已降級成功(๑•̀ㅂ•́)و✧\n\n" + "房間狀態:\n" + JSON.stringify(ALL.data[number])
-        lock.releaseLock();
-        return 0;
-      } else if ((mode == "♻ 移除關鍵字" || mode == "📎 新增關鍵字") && Stext == "/lookkeyword") {
-        text = ct["lookkeyword_result"]['text'].format(get_all_keyword(ALL))
-        sendtext(chat_id, text);
-        lock.releaseLock();
-        return 0;
-      } else if (mode == "📎 新增關鍵字" && Stext != "/main") {
-        try {
-          var addwkey = String(Stext)
-          var tt = addwkey.replace(/，/g, ',')
-          var addwkey_array = tt.split(',')
-
-          if (addwkey.search(",") == -1 && addwkey.search("，") == -1) {
-            ALL.keyword.push(addwkey)
-          } else {
-            for (var i = 0; i < addwkey_array.length; i++) {
-              if (addwkey_array[i] == "") {
-                continue
-              }
-              ALL.keyword.push(addwkey_array[i])
-            } //新增關鍵字
-          }
-
-          write_ALL(ALL, doc)
-          var li = get_all_keyword(ALL)
-          sendtext(chat_id, ct["add_keyword_success"]["text"].format(li));
-          // ^ "已成功新增\n\n{0}\n\n如遇離開請按 /main\n或者繼續輸入新增",
-        } catch (e) {
-          ct["add_keyword_success"]["text"] = ct["add_keyword_success"]["text"].format(String(e))
-          sendtext(chat_id, ct["add_keyword_success"]);
-          // ^ "新增失敗，原因如下：\n" + String(e)
-        }
-        lock.releaseLock();
-        return 0;
-      } else if (mode == "♻ 移除關鍵字" && Stext != "/main") {
-        try { //移除關鍵字
-          var rmwkey = String(Stext)
-          var tt = rmwkey.replace(/，/g, ',')
-          var re = /\d+/g
-          var rmwkey_array = tt.match(re)
-          rmwkey_array.sort(function(a, b) {
-            return b - a;
-          })
-          for (var i = 0; i < rmwkey_array.length; i++) {
-            if (isNaN(parseInt(rmwkey_array[i]))) {
-              continue
-            }
-            var index = parseInt(rmwkey_array[i]) - 1
-            ALL.keyword.splice(index, 1)
-          }
-
-          write_ALL(ALL, doc)
-          var li = get_all_keyword(ALL)
-          sendtext(chat_id, ct["delete_keyword_success"]["text"].format(li));
-          // ^ "已成功移除\n\n{0}\n\n如遇離開請按 /main\n或者繼續輸入移除",
-        } catch (e) {
-          ct["delete_keyword_fail"]["text"] = ct["delete_keyword_fail"]["text"].format(String(e))
-          sendtext(chat_id, ct["delete_keyword_success"]);
-          // ^ "移除失敗，如遇重新移除請先再次看過關鍵字名單再操作\n
-          //    按下 /lookkeyword 可顯示名單\n
-          //    移除失敗原因如下：\n{0}"
-        }
-        lock.releaseLock();
-        return 0;
-      } else if (mode == "⏰ 訊息時間啟用?" && Stext != "/main") {
-        function mixT(chat_id) {
-          keyboard_main(chat_id, ct["change_message_time_func"]["text"].format(
-            String(Stext)), ALL)
-          // ^ "已成功 " + Stext + " 訊息時間!"
-        }
-        if (Stext == ct["開啟"]["text"]) {
-          ALL.massage_time = true
-          ALL.mode = 0
-          var e = write_ALL(ALL, doc)
-          if (e) {
-            mixT(chat_id)
-          } else {
-            sendtext(chat_id, ct["w_error_status"]);
-            // ^ 寫入失敗，詳情如下：
-          }
-
-        } else if (Stext == ct["關閉"]["text"]) {
-          ALL.massage_time = false
-          ALL.mode = 0
-          var e = write_ALL(ALL, doc)
-          if (e) {
-            mixT(chat_id)
-          } else {
-            sendtext(chat_id, ct["w_error_status"]);
-            // ^ 寫入失敗，詳情如下：
-          }
-        } else {
-          var text = ""
-          sendtext(chat_id, ct["not_eat_this"]);
-          // ^ 030...\n請不要給我吃怪怪的東西...
-        }
-        lock.releaseLock();
-        return 0;
-      } else if (mode == "✈️ 設定GMT" && Stext != "/main") {
-        ALL['GMT'] = 'GMT' + Stext
-        ALL.mode = 0
-        write_ALL(ALL, doc)
-        text = ct["set_GMT_ed"]['text'].format(Stext)
-        keyboard_main(chat_id, text, ALL)
-        lock.releaseLock();
-        return 0;
-      } else if (mode == "🌋 丟棄舊檔" && Stext != "/main" && Stext != ct["🔙 返回大廳"]["text"]) {
-        var send_ed = sendtext(chat_id, ct['get_command_ed'])
-        // ^ "已接收指令!\n處理中請稍後..."
-        var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
-        switch (Stext) {
-          case ct['Trashed_10day']["text"]:
-            var result = clear_files_by_mode(Folder, 'time', 10)
-            break;
-          case ct['Trashed_30day']["text"]:
-            var result = clear_files_by_mode(Folder, 'time', 30)
-            break;
-          case ct['Trashed_ALL']["text"]:
-            var result = clear_files_by_mode(Folder, 'All')
-            break;
-          default:
-            sendtext(chat_id, ct['not_eat_this'])
-            // ^ "030...\n請不要給我吃怪怪的東西..."
-            lock.releaseLock();
-            return 0;
-        }
-        deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
-        if (!result[0]) { //意外發生
-          var ey = '失敗\n' + result[1]
-        } else {
-          var ey = '成功'
-        }
-        ct['Trashed_result'] = ct['Trashed_result']['text'].format(ey)
-        ALL.mode = 0
-        write_ALL(ALL, doc)
-        keyboard_main(chat_id, ct['Trashed_result'], ALL)
-        lock.releaseLock();
-        return 0;
-      } else {
-        //以下指令分流
-        switch (Stext) {
-          case '/main':
-          case ct['🔃 重新整理']["text"]:
-            if (ALL.mode != 0) {
-              ALL.mode = 0
-              write_ALL(ALL, doc) //寫入
-            }
-            keyboard_main(chat_id, ct["🔮 開啟主選單"], ALL)
-            break;
-          case ct['🔙 返回大廳']["text"]:
-            if (ALL.mode != 0) {
-              ALL.mode = 0
-              write_ALL(ALL, doc) //寫入
-            }
-            var keyboard = ALL.RoomKeyboard;
-            var resize_keyboard = true
-            var one_time_keyboard = false
-            var text = ct["請選擇聊天室"]
-            ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
-
-            break;
-          case ct['🔭 訊息狀態']["text"]:
-            data_len = ALL.data.length;
-            text = ""
-            for (var i = 0; i < data_len; i++) {
-              if (ALL.data[i].Amount == 0) {
-                continue;
-              }
-              text = ct["unread_number"]["text"].format(text, ALL.data[i].Name, ALL.data[i].Amount)
-              // ^ text + ALL.data[i].Name + '\n' + '未讀：' + ALL.data[i].Amount + '\n' + '-------------\n'
-            }
-            ct["unread_number"]["text"] = text // 覆蓋回去
-            if (text == "") {
-              ct["unread_number"]["text"] = "沒有任何未讀。"
-            }
-            sendtext(chat_id, ct["unread_number"]);
-            break;
-          case ct['✔ 關閉鍵盤']["text"]:
-            var text = ct['colse_Keyboard_ed']
-            ReplyKeyboardRemove(chat_id, text)
-            // ^ "已關閉鍵盤，如欲再次開啟請按 /main"
-            break;
-          case ct['🚀 發送訊息']["text"]:
-            ALL.mode = "🚀 發送訊息"
-            write_ALL(ALL, doc) //寫入
-            ReplyKeyboardRemove(chat_id, ct["sendtext_to_XXX"]["text"].format(ALL.opposite.Name))
-            // ^  "將對 {0} 發送訊息\n如欲離開請輸入 /exit \n請輸入訊息："
-            break;
-          case '/exit':
-            ALL.mode = 0
-            write_ALL(ALL, doc) //寫入
-            keyboard_main(chat_id, ct["exit_room_ed"], ALL)
-            // ^ "======已停止對話!======"
-            break;
-          case ct['📬 讀取留言']["text"]:
-            if (ALL.data[ALL.FastMatch2[ALL.opposite.RoomId]].Amount == 0) {
-              sendtext(chat_id, ct["not_need_read"], notification);
-              // ^ "這個房間並沒有未讀的通知喔~ "
-            } else {
-              //獨立出來比較好
-              read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id)
-            }
-            break;
-          case ct['🔖 重新命名']["text"]:
-            var OName = ALL.opposite.Name
-            ALL.mode = "🔖 重新命名"
-            write_ALL(ALL, doc) //寫入
-            ReplyKeyboardRemove(chat_id, ct["rename_room_text"]['text'].format(OName))
-            // ^ "將對 {0} 重新命名!!!\n如要取消命名請按 /main 取消\n請輸入新名子："
-            break;
-          case ct['🔥 刪除房間']["text"]:
-            ALL.mode = "🔥 刪除房間"
-            write_ALL(ALL, doc) //寫入
-            sendtext(chat_id, ct["sure_delete_room?"]["text"].format(ALL.opposite.Name));
-            // ^ 你確定要刪除 {0} 嗎?\n若是請按一下 /delete\n若沒按下則不會刪除!!!"
-            break;
-          case ct['🐳 開啟通知']["text"]:
-            var OName = ALL.opposite.Name
-            var FM = ALL.FastMatch[OName]
-            ALL.data[FM].Notice = true;
-            var u = ALL.data[FM].Name.replace("❎", "✅");
-            ALL.data[FM].Name = u;
-            var y = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace(
-              OName, OName.slice(0, OName.length - 1) + "✅"));
-            ALL.FastMatch = y;
-            ALL.opposite.Name = u;
-            ALL = REST_keyboard(ALL)[1] //重新編排keyborad
-            write_ALL(ALL, doc) //寫入
-            sendtext(chat_id, ct["enabled_notification_ed"]["text"].format(OName));
-            // ^ "已開啟 {0} 的通知"
-            //以下處理RoomKeyboard==================================================
-
-            break;
-          case ct['🔰 暫停通知']["text"]:
-            var OName = ALL.opposite.Name
-            var FM = ALL.FastMatch[OName]
-            ALL.data[FM].Notice = false
-            var u = ALL.data[FM].Name.replace("✅", "❎");
-            ALL.data[FM].Name = u;
-            var y = JSON.parse(String(JSON.stringify(ALL.FastMatch)).replace(
-              OName, OName.slice(0, OName.length - 1) + "❎"));
-            ALL.FastMatch = y;
-            ALL.opposite.Name = u;
-            ALL = REST_keyboard(ALL)[1] //重新編排keyborad
-            write_ALL(ALL, doc) //寫入
-            sendtext(chat_id, ct["disabled_notification_ed"]["text"].format(OName));
-            // ^ "已暫停 {0} 的通知"
-            //以下處理RoomKeyboard==================================================
-
-            break;
-          case ct['⭐ 升級房間']["text"]:
-            if (!ALL.ctrl_bot_id) {
-              var t = ct["not_find_ctrl_id"]['text']
-              var payload = {
-                "method": "sendMessage",
-                'chat_id': chat_id,
-                'text': t,
-                'disable_notification': ct["not_find_ctrl_id"]['notification']
-              }
-              var data = {
-                "method": "post",
-                "payload": payload
-              }
-              var ans = UrlFetchApp.fetch(
-                "https://api.telegram.org/bot" + Telegram_bot_key + "/", data);
-              var ans_json = JSON.parse(ans)
-              var ctrl_bot_id = ans_json['result'].from.id
-              if (ctrl_bot_id == undefined) {
-                sendtext(chat_id, ct["get_ctrl_id_error"].format(ans))
-                return 0
-              }
-              ALL.ctrl_bot_id = ctrl_bot_id
-              write_ALL(ALL, doc) //寫入
-            }
-
-            ALL.mode = "⭐ 升級房間"
-            write_ALL(ALL, doc) //寫入
-
-            sendtext(chat_id, ct["uproom_Introduction"]);
-            // ^ "⭐ 升級房間功能介紹：\n升級房間後，以後來自該對象(Line)的訊息
-            //皆會及時傳到 **新的"群組"聊天室** ，而不會傳到這個"bot"聊天室中，
-            //這個功能是可以回來這裡取消的。
-            sendtext(chat_id, ct['uproom_sure?']["text"].format(ALL.opposite.Name));
-            // ^ "您確定要升級 {0} 嗎?\n若是請按一下 /uproom \n若沒按下則不會進入升級!!!"
-            break;
-          case ct['💫 降級房間']["text"]:
-            ALL.mode = "💫 降級房間"
-            write_ALL(ALL, doc) //寫入
-
-            sendtext(chat_id, ct["droproom_sure?"]["text"].format(ALL.opposite.Name));
-            // ^ "您確定要降級 {0} 嗎?\n若是請按一下 /droproom \n若沒按下則不會降級!!!"
-            break;
-          case ct['☀ 顯示發送者']["text"]:
-            var OName = ALL.opposite.Name
-            var FM = ALL.FastMatch[OName]
-            ALL.data[FM].Display_name = true;
-            ALL.mode = 0
-            write_ALL(ALL, doc) //寫入
-            var keyboard = [
-              [{
-                'text': ct['💫 降級房間']["text"]
-              }, {
-                'text': ct["☁ 不顯示發送者"]["text"]
-              }],
-              [{
-                'text': ct["🔙 返回大廳"]["text"]
-              }]
-            ]
-            text = ct['Display_name_ch_ed']['text'].format(OName, ct['☀ 顯示發送者']["text"])
-            // ^ {0} 已 {1}
-            var u = undefined
-            ReplyKeyboardMakeup(chat_id, keyboard, u, u, text)
-            break;
-          case ct['☁ 不顯示發送者']["text"]:
-            var OName = ALL.opposite.Name
-            var FM = ALL.FastMatch[OName]
-            ALL.data[FM].Display_name = false;
-            ALL.mode = 0
-            write_ALL(ALL, doc) //寫入
-            var keyboard = [
-              [{
-                'text': ct['💫 降級房間']["text"]
-              }, {
-                'text': ct["☀ 顯示發送者"]["text"]
-              }],
-              [{
-                'text': ct["🔙 返回大廳"]["text"]
-              }]
-            ]
-            text = ct['Display_name_ch_ed']['text'].format(OName, ct['☁ 不顯示發送者']["text"])
-            // ^ {0} 已 {1}
-            var u = undefined
-            ReplyKeyboardMakeup(chat_id, keyboard, u, u, text)
-            break;
-          case '/debug':
-            ALL.mode = 0
-            ALL.wait_to_Bind = {}
-            var xfjhxgfh = REST_FastMatch1and2and3(ALL); //強制等待，不知道為什麼有時候不會執行
-            var ydjdyf = REST_keyboard(xfjhxgfh[1]); //強制等待，不知道為什麼有時候不會執行
-            var r = JSON.stringify(ydjdyf[1]);
-            doc.setText(r); //寫入
-            sendtext(chat_id, ct["debug_ed"]["text"].format(xfjhxgfh[0], ydjdyf[0]));
-            // ^ "已debug\nREST_FastMatch1and2and3() : {0}\nREST_keyboard() : {1}",
-            break;
-          case '/AllRead':
-          case '/Allread':
-          case '/allRead':
-          case '/allread':
-            var send_ed = sendtext(chat_id, ct["get_command_ed"]["text"]);
-            // ^ "已接收指令!"
-            AllRead();
-            sendtext(chat_id, ct["allRead_ed"]["text"]);
-            // ^ "已全已讀"
-            deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
-            break;
-          case ct['🔧 更多設定']["text"]:
-            var more_keyboard = [
-              [{
-                'text': ct["🔑 設定關鍵字提醒"]["text"]
-              }, {
-                'text': ct['⏰ 訊息時間啟用?']["text"]
-              }],
-              [{
-                'text': ct["✈️ 設定GMT"]["text"]
-              }, {
-                'text': ct["🌋 丟棄舊檔"]["text"]
-              }],
-              [{
-                'text': ct["🔙 返回大廳"]["text"]
-              }]
-            ]
-            if (ALL.keyword_notice == undefined) {
-              ALL.keyword_notice = false
-              var istrue = true
-            }
-            if (ALL.massage_time == undefined) {
-              ALL.massage_time = false
-              var istrue = true
-            }
-            if (istrue) {
-              write_ALL(ALL, doc) //寫入
-            }
-            text = ct["more_setting_status"]['text'].format(
-              ALL['keyword_notice'], ALL['massage_time'], ALL['GMT'])
-            // ^ '設定狀態：\n● 關鍵字提醒：{0}\n● 訊息時間啟用： {1}\n'
-            var resize_keyboard = true
-            var one_time_keyboard = false
-            ReplyKeyboardMakeup(chat_id, more_keyboard, resize_keyboard, one_time_keyboard, text)
-            break;
-          case ct['⏰ 訊息時間啟用?']["text"]:
-            ALL.mode = "⏰ 訊息時間啟用?"
-            write_ALL(ALL, doc) //寫入
-
-            var massage_time_q_keyboard = [
-              [{
-                'text': ct["開啟"]["text"]
-              }, {
-                'text': ct["關閉"]["text"]
-              }]
-            ]
-            text = ct["plz_select_on_off"]
-            // ^  "請選擇開啟或關閉"
-            var resize_keyboard = true
-            var one_time_keyboard = false
-            ReplyKeyboardMakeup(
-              chat_id, massage_time_q_keyboard, resize_keyboard, one_time_keyboard, text)
-            break;
-          case ct["🔑 設定關鍵字提醒"]["text"]:
-            if (ALL.keyword_notice == undefined) { //這一次啟動時的重製
-              ALL.keyword_notice = false
-              write_ALL(ALL, doc) //寫入
-              sendtext(chat_id, ct["first_use_keyword_text"]);
-              // ^ 提醒您，如要啟用關鍵字提醒，請記得按下方按鈕開啟！\n預設為'關閉提醒'"
-            }
-
-            var keyword_keyboard1 = [
-              [{
-                'text': ct['📎 新增關鍵字']["text"]
-              }, {
-                'text': ct["♻ 移除關鍵字"]["text"]
-              }],
-              [{
-                'text': ct["暫停關鍵字提醒"]["text"]
-              }, {
-                'text': ct["🔙 返回大廳"]["text"]
-              }]
-            ]
-            var keyword_keyboard2 = [
-              [{
-                'text': ct['📎 新增關鍵字']["text"]
-              }, {
-                'text': ct["♻ 移除關鍵字"]["text"]
-              }],
-              [{
-                'text': ct["啟動關鍵字提醒"]["text"]
-              }, {
-                'text': ct["🔙 返回大廳"]["text"]
-              }]
-            ]
-            if (ALL.keyword_notice) {
-              var keyword_keyboard = keyword_keyboard1
-            } else {
-              var keyword_keyboard = keyword_keyboard2
-            }
-
-            var all_word = get_all_keyword(ALL)
-            var resize_keyboard = true
-            var one_time_keyboard = false
-            ReplyKeyboardMakeup(
-              chat_id, keyword_keyboard, resize_keyboard, one_time_keyboard, all_word)
-            break;
-          case ct['📎 新增關鍵字']["text"]:
-            ALL.mode = "📎 新增關鍵字"
-            ReplyKeyboardRemove(chat_id, ct["add_keyword_ing"])
-            // ^ "請輸入欲新增關鍵字\n新增多組關鍵字請用 ',' 或 '，' 號隔開
-            // \n如欲離開請按 /main"
-            write_ALL(ALL, doc)
-            break;
-          case ct['♻ 移除關鍵字']["text"]:
-            ALL.mode = "♻ 移除關鍵字"
-            AllRead();
-            ReplyKeyboardRemove(chat_id, ct["delete_keyword_ing"])
-            // ^ '請輸入欲移除關鍵字的**前方編號!!!**\n刪除多組關鍵字請用 "任意符號" 隔開(推薦用","或"，")\n如遇離開請按 /main'
-            write_ALL(ALL, doc) //寫入
-            break;
-          case ct['啟動關鍵字提醒']["text"]:
-            ALL.keyword_notice = true
-            write_ALL(ALL, doc) //寫入
-            text = ct["turn_on_keyword_ed"]
-            var keyboard = [
-              [{
-                'text': ct['📎 新增關鍵字']["text"]
-              }, {
-                'text': ct["♻ 移除關鍵字"]["text"]
-              }],
-              [{
-                'text': ct["暫停關鍵字提醒"]["text"]
-              }, {
-                'text': ct["🔙 返回大廳"]["text"]
-              }]
-            ]
-            var resize_keyboard = true
-            var one_time_keyboard = false
-            ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
-            break;
-          case ct['暫停關鍵字提醒']["text"]:
-            ALL.keyword_notice = false
-            write_ALL(ALL, doc) //寫入
-            text = ct["turn_off_keyword_ed"]
-            var keyboard = [
-              [{
-                'text': ct['📎 新增關鍵字']["text"]
-              }, {
-                'text': ct["♻ 移除關鍵字"]["text"]
-              }],
-              [{
-                'text': ct["啟動關鍵字提醒"]["text"]
-              }, {
-                'text': ct["🔙 返回大廳"]["text"]
-              }]
-            ]
-            var resize_keyboard = true
-            var one_time_keyboard = false
-            ReplyKeyboardMakeup(
-              chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
-            break;
-          case '/lookkeyword':
-            text = ct["lookkeyword_result"]['text'].format(get_all_keyword(ALL))
-            sendtext(chat_id, text);
-            break;
-          case ct["✈️ 設定GMT"]["text"]:
-            ALL.mode = "✈️ 設定GMT"
-            sendtext(chat_id, ct["set_GMT_ing_1"]);
-            ReplyKeyboardRemove(chat_id, ct["set_GMT_ing_2"]);
-            write_ALL(ALL, doc) //寫入
-            break;
-          case ct["🌋 丟棄舊檔"]["text"]:
-            ALL.mode = "🌋 丟棄舊檔"
-            text = ct["file_to_Trashed"]
-            var Trashed_keyboard = [
-              [{
-                'text': ct["Trashed_10day"]["text"]
-              }, {
-                'text': ct["Trashed_30day"]["text"]
-              }],
-              [{
-                'text': ct['Trashed_ALL']["text"]
-              }, {
-                'text': ct["🔙 返回大廳"]["text"]
-              }]
-            ]
-            var resize_keyboard = true
-            var one_time_keyboard = false
-            ReplyKeyboardMakeup(
-              chat_id, Trashed_keyboard, resize_keyboard, one_time_keyboard, text)
-            write_ALL(ALL, doc) //寫入
-            break;
-            //-------------------------------------------------------------------
-          default:
-            if (Stext == ct['/droproom']['text']) {
-              sendtext(chat_id, ct["incorrect_operation"]);
-              // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-            }
-
-            //下面處理房間選擇
-            var st = Stext.substr(0, 2)
-            if (ALL.FastMatch[Stext] != undefined || st == "/d") {
-
-              if (ALL.FastMatch[Stext] != undefined) { //一種間接抓，一種直接
-                var FM = ALL.FastMatch[Stext]
-              } else {
-                var s_len = Stext.length - 1;
-                var number = Stext.substr(2, s_len)
-                var FM = number;
-              }
-
-              var OAmount = ALL.data[FM].Amount
-              var OName = ALL.data[FM].Name
-              var ORoomId = ALL.data[FM].RoomId
-              var Ostatus = ALL.data[FM].status
-              if (ALL.data[FM].Display_name) {
-                var ODisplay_name = "顯示人名：" + ALL.data[FM].Display_name + '\n'
-              } else {
-                var ODisplay_name = ""
-              }
-              ALL.opposite.RoomId = ORoomId;
-              ALL.opposite.Name = OName;
-              write_ALL(ALL, doc) //寫入
-              var Notice = ALL.data[FM].Notice
-
-              text = ct["select_room_text"]["text"].format(
-                OName, OAmount, Notice, ODisplay_name, Ostatus)
-              // ^ "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?"
-              var keyboard = [
-                [{
-                  'text': ct['🚀 發送訊息']["text"]
-                }, {
-                  'text': ct['📬 讀取留言']["text"]
-                }, {
-                  'text': ct['🔖 重新命名']["text"]
-                }],
-                [{
-                  'text': ct['⭐ 升級房間']["text"]
-                }, {
-                  'text': ct['🐳 開啟通知']["text"]
-                }, {
-                  'text': ct['🔰 暫停通知']["text"]
-                }],
-                [{
-                  'text': ct["🔥 刪除房間"]["text"]
-                }, {
-                  'text': ct["🔙 返回大廳"]["text"]
-                }]
-              ]
-
-              if (ALL.data[FM]["Bind_groud_chat_id"]) { //如果遇到已升級的則改"降級"
-                var keyboard2 = [
-                  [{
-                    'text': ct['💫 降級房間']["text"]
-                  }, {
-                    'text': ct["☀ 顯示發送者"]["text"]
-                  }],
-                  [{
-                    'text': ct['🔖 重新命名']["text"]
-                  }, {
-                    'text': ct["🔙 返回大廳"]["text"]
-                  }]
-                ]
-                keyboard = keyboard2
-              }
-              if (ALL.data[FM]["Display_name"]) { //改鍵盤人名顯示與否
-                keyboard2[0][1]['text'] = '☁ 不顯示發送者'
-              }
-              var resize_keyboard = true
-              var one_time_keyboard = false
-              ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
-
-            } else {
-              sendtext(chat_id, ct["incorrect_operation"]);
-              // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-            }
-        }
-        lock.releaseLock();
-        return 0;
       }
-    } else if (estringa.message.photo) { //如果是照片
-      if (mode == "🚀 發送訊息") {
-        //以下選擇telegram照片並發到line
-        var p = estringa.message.photo
-        var max = p.length - 1;
-
-        var photo_id = p[max].file_id
-        var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
-        var gfid = downloadFromTG(Telegram_bot_key, photo_id, fileName, Folder)
-        var Durl = get_200_url(G_drive_Durl + gfid)
-        TG_Send_Photo_To_Line(Line_id, photo_id, Durl)
-
-        if (estringa.message.caption)
-          TG_Send_text_To_Line(Line_id, estringa.message.caption)
-        //如有簡介則一同發出
-        sendtext(chat_id, ct["sendPhoto_ed"]);
-        // ^ "(圖片已發送!)"
-      } else {
-        sendtext(chat_id, ct["incorrect_operation"]);
-        // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-      }
-    } else if (estringa.message.video) { //如果是影片
-      if (mode == "🚀 發送訊息") {
-        //以下選擇telegram video並發到line
-        var video_id = estringa.message.video.file_id
-        var thumb_id = estringa.message.video.thumb.file_id
-        TG_Send_video_To_Line(Line_id, video_id, thumb_id)
-        if (estringa.message.caption)
-          TG_Send_text_To_Line(Line_id, estringa.message.caption)
-        sendtext(chat_id, ct["sendVideo_ed"]);
-        // ^ "(影片已發送!)"
-      } else {
-        sendtext(chat_id, ct["incorrect_operation"]);
-        // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-      }
-    } else if (estringa.message.video_note) { //如果是影片
-      if (mode == "🚀 發送訊息") {
-        //以下選擇telegram video並發到line
-        var video_id = estringa.message.video_note.file_id
-        var thumb_id = estringa.message.video_note.thumb.file_id
-        TG_Send_video_To_Line(Line_id, video_id, thumb_id)
-        if (estringa.message.caption)
-          TG_Send_text_To_Line(Line_id, estringa.message.caption)
-        sendtext(chat_id, ct["sendVideo_ed"]);
-        // ^ "(影片已發送!)"
-      } else {
-        sendtext(chat_id, ct["incorrect_operation"]);
-        // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-      }
-    } else if (estringa.message.sticker) { //如果是貼圖
-      if (mode == "🚀 發送訊息") {
-        var file_id = estringa.message.sticker.file_id
-        TG_Send_Sticker_To_Line(Line_id, file_id)
-        sendtext(chat_id, ct["sendSticker_ed"]);
-        // ^ "(貼圖已發送!)"
-      } else {
-        sendtext(chat_id, ct["incorrect_operation"]);
-        // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-      }
-    } else if (estringa.message.audio) { //如果是聲音
-      if (mode == "🚀 發送訊息") {
-        var duration = estringa.message.audio.duration
-        var audio_id = estringa.message.audio.file_id
-        TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
-        if (estringa.message.caption)
-          TG_Send_text_To_Line(Line_id, estringa.message.caption)
-        sendtext(chat_id, ct["sendAudio_ed"]);
-        // ^ "(音檔已發送!)"
-      } else {
-        sendtext(chat_id, ct["incorrect_operation"]);
-        // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-      }
-    } else if (estringa.message.voice) { //如果是錄音
-      if (mode == "🚀 發送訊息") {
-        var duration = estringa.message.voice.duration
-        var audio_id = estringa.message.voice.file_id
-        TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
-        if (estringa.message.caption)
-          TG_Send_text_To_Line(Line_id, estringa.message.caption)
-        sendtext(chat_id, ct["sendVoice_ed"]);
-        //sendtext(chat_id, ct["not_support_audio"]);
-        // ^ "(暫時不支援audio傳送喔!)"
-      } else {
-        sendtext(chat_id, ct["incorrect_operation"]);
-        // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-      }
-    } else if (estringa.message.location) { //如果是位置
-      if (mode == "🚀 發送訊息") {
-        var latitude = estringa.message.location.latitude
-        var longitude = estringa.message.location.longitude
-        try {
-          var response = Maps.newGeocoder().setLanguage(
-            'zh-TW').reverseGeocode(latitude, longitude);
-          var formatted_address = response.results[0]['formatted_address']
-        } catch (e) {
-          var formatted_address = '未知地點'
-        }
-        //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
-        TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
-      } else {
-        sendtext(chat_id, ct["incorrect_operation"]);
-        // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-      }
-    } else if (estringa.message.animation) {
-      if (mode == "🚀 發送訊息") {
-        //var duration = estringa.message.animation.duration
-        var file_id = estringa.message.animation.file_id
-        var thumb_id = estringa.message.animation.thumb.file_id
-        TG_Send_video_To_Line(Line_id, file_id, thumb_id)
-        sendtext(chat_id, ct["sendGIF_ed"]);
-        // ^ "(GIF已發送!)"
-      } else {
-        sendtext(chat_id, ct["incorrect_operation"]);
-        // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-      }
-    } else if (estringa.message.document) {
-      if (mode == "🚀 發送訊息") {
-        var fileId = estringa.message.document.file_id
-        var fileName = estringa.message.document.file_name
-        var file_size = parseInt(estringa.message.document.file_size)
-        var file_size_MB = (file_size / 1024 / 1024).toFixed(3)
-
-        var Folder = DriveApp.getFolderById(ALL[download_folder_name]['FolderId']);
-        var gfid = downloadFromTG(Telegram_bot_key, fileId, fileName, Folder)
-        var Durl = G_drive_Durl + gfid
-        text = ct['sendFileToLine']['text'].format(Durl, fileName, file_size, file_size_MB)
-        if (estringa.message.caption) { //如有簡介則一同發出
-          text = text + '\n' + estringa.message.caption
-        }
-
-        TG_Send_text_To_Line(Line_id, text)
-        sendtext(chat_id, ct["sendFile_ed"]);
-        // ^ "(File連結已發送!)"
-      } else {
-        sendtext(chat_id, ct["incorrect_operation"]);
-        // ^ "錯誤的操作喔（ ・∀・），請檢查環境是否錯誤"
-      }
+      // throw new Error("強制停止!")
+    } catch (e) {
+      sendtext(Telegram_id, ct['bot_error']['text'].format(e))
+      //GmailApp.sendEmail(email, "telegram-line出事啦)", d + "\n" + e);
+      throw new Error(e)
     }
     lock.releaseLock();
     return 0;
@@ -1542,12 +2143,17 @@ function doPost(e) {
               //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNskkLZktW"}
             } else if (message_json.type == "sticker") {
-              var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" +
-                message_json.stickerId + "/android/sticker.png;compress=true"
+              var sticker_png_url = get_sticker(
+                ALL, sticker_need, 'Line', message_json.stickerId)
               var caption = ct["is_from"]["text"].format(message_json.userName)
               var send_ed = sendtext(chat_id, ct["sendSticker_ing"])
               // ^ (正在傳送貼圖，請稍後...)
-              sendPhoto(chat_id, sticker_png_url, notification, caption)
+
+              if (sticker_png_url[1] == 'image/gif') {
+                sendAnimation(chat_id, sticker_png_url[0], notification, caption)
+              } else {
+                sendPhoto(chat_id, sticker_png_url, notification, caption)
+              }
 
               //刪除"正在傳送XXX" 整潔舒爽!
               deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
@@ -1606,12 +2212,13 @@ function doPost(e) {
             } else if (message_json.type == "file") {
               //處理文件
               var file_id = message_json.ID
-              var blob = DriveApp.getFileById(file_id).getBlob();
+              var file_body = DriveApp.getFileById(file_id)
+              var fileName = String(file_body.getName())
+              var blob = file_body.getBlob();
               var send_ed = sendtext(chat_id, ct["sendFile_ing"])
               // ^ (正在傳送檔案，請稍後...)
-
               //處理caption
-              caption = message_json.userName + '\n'
+              caption = ct['file_info']['text'].format(message_json.userName, fileName)
               if (ALL.massage_time) {
                 caption += get_time_txt(message_json.timestamp, GMT)
               }
@@ -1645,6 +2252,7 @@ function doPost(e) {
               ct['unfollow']['text'] = ct['unfollow']['text'].format(message_json.userName)
               sendtext(chat_id, ct['unfollow']['text']);
             }
+            // throw new Error("強制停止!")
           } catch (e) {
             var aims_room_name = ALL.data[ALL.FastMatch2[line_roomID]].Name
             ct["send_to_TG_error"]['text'] = ct["send_to_TG_error"]['text'].format(
@@ -1652,6 +2260,7 @@ function doPost(e) {
             sendtext(Telegram_id, ct["send_to_TG_error"]);
             // ^ '傳送失敗...，原因如下\n\n{0}'
             // NU$ 例外狀況未加
+            throw new Error(e)
           }
         } else { //以下有登記，未"🚀 發送訊息"
           //以下處理sheet========================================================
@@ -2066,18 +2675,18 @@ function TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_addres
   //--------------------------------------------------
   UrlFetchApp.fetch(url, options);
 }
-//=================================================================================
-function TG_Send_Sticker_To_Line(Line_id, sticker_id) { //舊款function 先留著
+//================================================================
+function TG_Send_Sticker_To_Line(Line_id, Sticker_url) { //舊款function 先留著
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
-  var G = TGdownloadURL(getpath(sticker_id))
+
 
   var url = 'https://api.line.me/v2/bot/message/push';
   //--------------------------------------------------
   var retMsg = [{
     "type": "image",
-    "originalContentUrl": G,
-    "previewImageUrl": G
+    "originalContentUrl": Sticker_url,
+    "previewImageUrl": Sticker_url
   }];
   var header = {
     'Content-Type': 'application/json; charset=UTF-8',
@@ -2803,9 +3412,9 @@ String.prototype.format = function() {
   var txt = this.toString();
   for (var i = 0; i < arguments.length; i++) {
     var exp = getStringFormatPlaceHolderRegEx(i);
-    arguments[i] = String(arguments[i]).replace(/\$/gm,'♒☯◈∭')
+    arguments[i] = String(arguments[i]).replace(/\$/gm, '♒☯◈∭')
     txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
-    txt = txt.replace(/♒☯◈∭/gm,'$')
+    txt = txt.replace(/♒☯◈∭/gm, '$')
   }
   return cleanStringFormatResult(txt);
 }
@@ -2821,7 +3430,44 @@ function cleanStringFormatResult(txt) {
   if (txt == null) return "";
   return txt.replace(getStringFormatPlaceHolderRegEx("\\d+"), "");
 }
-//=================================================================================
+
+// 為了讓 ct 的 [] 物件也可以用特化的
+//ㄜ... 居然會影響其他的物件，改成 function 好了。
+/*
+Object.prototype.format = function() {
+  var text = ''
+  this.forEach(function(element) {
+    text += element
+  });
+  var txt = text
+
+  for (var i = 0; i < arguments.length; i++) {
+    var exp = getStringFormatPlaceHolderRegEx(i);
+
+    arguments[i] = String(arguments[i]).replace(/\$/gm, '♒☯◈∭')
+    txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
+    txt = txt.replace(/♒☯◈∭/gm, '$')
+  }
+  return cleanStringFormatResult(txt);
+}
+//*/
+function O_format() {
+  var text = ''
+  arguments[0].forEach(function(element) {
+    text += element
+  });
+  var txt = text
+
+  for (var i = 1; i < arguments.length; i++) {
+    var exp = getStringFormatPlaceHolderRegEx(i - 1);
+
+    arguments[i] = String(arguments[i]).replace(/\$/gm, '♒☯◈∭')
+    txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
+    txt = txt.replace(/♒☯◈∭/gm, '$')
+  }
+  return cleanStringFormatResult(txt);
+}
+//================================================================
 // 我印象中有找到一種方式來分割字串的，但不知道是哪個指令...
 // 用法是 text.xxxx(10) -> 回傳 [字串前10個字 , 後10個到底的字]
 String.prototype.nslice = function() {
@@ -3137,11 +3783,13 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
       } else if (message_json.type == "file") {
         //處理文件
         var file_id = message_json.ID
-        var blob = DriveApp.getFileById(file_id).getBlob();
+        var file_body = DriveApp.getFileById(file_id)
+        var fileName = String(file_body.getName())
+        var blob = file_body.getBlob();
         var send_ed = sendtext(chat_id, ct["sendFile_ing"])
         // ^ (正在傳送檔案，請稍後...)
         //處理caption
-        caption = message_json.userName + '\n'
+        caption = ct['file_info']['text'].format(message_json.userName, fileName)
         if (ALL.massage_time) {
           caption += get_time_txt(message_json.timestamp, GMT)
         }
@@ -3191,12 +3839,204 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
       aims_room_name, JSON.stringify(message_json), e)
     sendtext(Telegram_id, ct["send_to_TG_error"]);
     // ^ '傳送失敗...，原因如下\n\n{0}'
+    throw new Error(e)
   }
-
 
   return true
 }
-//=================================================================================
+//================================================================
+function conservion_media(media_id, media_blob, new_format, conservion_server, layer) {
+
+  if (media_id === void 0)
+    throw new Error("media_id未給")
+  if (media_blob === void 0)
+    throw new Error("media_blob未給")
+  if (new_format === void 0)
+    throw new Error("new_format未給")
+  if (conservion_server === void 0)
+    throw new Error("conservion_server未給")
+  layer = layer || 0
+
+  if (layer >= 1) {
+    return false
+  }
+
+  var payload = {
+    "media_id": String(media_id),
+    "media_blob": media_blob,
+    "new_format": String(new_format),
+    "agree_server_save": conservion_server['agree_server_save'],
+  }
+
+  var data = {
+    "method": "post",
+    "payload": payload
+  }
+
+  var conservion_server_url = "https://{0}/{1}".format(
+    conservion_server["domain_name"], conservion_server["conservion_api"])
+
+  try {
+    var conservion_blob = UrlFetchApp.fetch(conservion_server_url, data);
+    return conservion_blob
+  } catch (e) {
+    console.log('conservion_blob error')
+    console.log(e)
+    if (conservion_blob.getResponseCode() == 500) {
+      layer += 1
+      conservion_server['domain_name'] = UrlFetchApp.fetch(conservion_server['spare_require'])["domain_name"]
+      return conservion_media(media_id, media_blob, new_format, conservion_server, layer)
+    }
+    return e
+  }
+
+}
+//================================================================
+function get_sticker(ALL, sticker_need, from, file_id, keep_time) {
+  if (ALL === void 0)
+    throw new Error("ALL 未給")
+
+  if (sticker_need === void 0)
+    throw new Error("sticker_need 未給")
+
+  var DLineSFN = sticker_need['DLineSFN']
+  if (DLineSFN === void 0)
+    throw new Error("DLineSFN 未給")
+
+  var DTGSFN = sticker_need['DTGSFN']
+  if (DTGSFN === void 0)
+    throw new Error("DTGSFN 未給")
+
+  var sticker_doc_name = sticker_need['sticker_doc_name']
+  if (sticker_doc_name === void 0)
+    throw new Error("sticker_doc_name 未給")
+
+  var G_drive_Durl = sticker_need['G_drive_Durl']
+  if (G_drive_Durl === void 0)
+    throw new Error("G_drive_Durl 未給")
+
+  if (from === void 0)
+    throw new Error("from 未給")
+
+  if (file_id === void 0)
+    throw new Error("file_id 未給")
+  keep_time = keep_time || 21600
+  //-----------------------------------------------------------
+
+  var cache = CacheService.getScriptCache();
+  var Stickers = cache.get(sticker_doc_name);
+
+  if (Stickers == null) { //看cached還在不在，不在就拉回來
+    var Stickers_doc_id = ALL[sticker_doc_name]['FileId']
+    var Stickers_doc = DocumentApp.openById(Stickers_doc_id)
+    var Stickers_doc_txt = Stickers_doc.getText()
+
+    cache.put(sticker_doc_name, Stickers_doc_txt, keep_time)
+    var Stickers = Stickers_doc_txt
+  }
+
+  var sticker_json = JSON.parse(Stickers);
+
+  if (from == 'Line') {
+    var Line_sk_id = file_id
+    var file_id = 'Line' + file_id
+  }
+
+  if (!sticker_json[file_id]) { //第二階段，抓圖存放
+    if (from == 'TG') {
+      var TG_sticker = UrlFetchApp.fetch(TGdownloadURL(getpath(file_id))).getBlob()
+      var TG_sticker_png = conservion_media(file_id, TG_sticker, 'png', ALL["conservion_server"])
+
+      var TG_sticker_Folder = DriveApp.getFolderById(ALL[DTGSFN]['FolderId']);
+      var TG_sticker_png_file = TG_sticker_Folder.createFile(TG_sticker_png).setName(file_id)
+      var TG_sticker_png_file_id = TG_sticker_png_file.getId()
+
+      var TG_sticker_url = G_drive_Durl + TG_sticker_png_file_id
+      sticker_json[file_id] = {
+        "url": TG_sticker_url,
+        "extension": TG_sticker_png_file.getMimeType()
+      }
+      var sticker_url = TG_sticker_url
+
+    } else if (from == 'Line') {
+      var png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" +
+        Line_sk_id + "/android/sticker.png;compress=true"
+      var Apng_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" +
+        Line_sk_id + "/iPhone/sticker_animation@2x.png;compress=true"
+
+      try {
+        var Apng_blob = UrlFetchApp.fetch(Apng_url).getBlob().setName(file_id + '.apng')
+        var Line_sticker_gif = conservion_media(
+          file_id, Apng_blob, 'gif', ALL["conservion_server"])
+
+        var Line_sticker_Folder = DriveApp.getFolderById(ALL[DLineSFN]['FolderId']);
+        var Line_sticker_png_file = Line_sticker_Folder.createFile(Line_sticker_gif)
+        Line_sticker_png_file = Line_sticker_png_file.setName(Line_sk_id + '.gif')
+        var Line_sticker_png_file_id = Line_sticker_png_file.getId()
+
+        var Line_sticker_url = G_drive_Durl + Line_sticker_png_file_id
+        sticker_json[file_id] = {
+          "url": Line_sticker_url,
+          "extension": Line_sticker_png_file.getMimeType()
+        }
+
+        var sticker_url = Line_sticker_url
+        var extension = sticker_json[file_id]['extension']
+      } catch (e) {
+        return png_url //靜態的就算了，動態再來載。
+      }
+    } else {
+      throw new Error("from 來源未知處理方式")
+    }
+
+    if (!Stickers_doc) {
+      var Stickers_doc_id = ALL[sticker_doc_name]['FileId']
+      var Stickers_doc = DocumentApp.openById(Stickers_doc_id)
+      var Stickers_doc_txt = Stickers_doc.getText()
+    }
+    Stickers_doc.setText(JSON.stringify(sticker_json))
+    cache.remove(sticker_doc_name)
+    cache.put(sticker_doc_name, JSON.stringify(sticker_json), keep_time)
+  } else {
+    var sticker_url = sticker_json[file_id]['url']
+    var extension = sticker_json[file_id]['extension']
+  }
+
+  if (ALL['image_link_mode'] == '🏀 來源連結') {
+    sticker_url = get_200_url(sticker_url)
+  }
+
+  return [sticker_url, extension]
+}
+//================================================================
+function ed_notification_tidy(chat_id, ct, ALL, lock) {
+  if (ALL['ed_notification']['need']) {
+    var send_ed = sendtext(chat_id, ct);
+    // ^ "(XX已發送!)"
+    if (ALL['ed_notification']['delete_notification']) {
+      if (ALL['ed_notification']['delay']) {
+        lock.releaseLock();
+        Utilities.sleep(ALL['ed_notification']['delay_time'])
+        deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
+      } else {
+        deleteMessage(chat_id, JSON.parse(send_ed)["result"]['message_id'])
+      }
+    }
+  }
+}
+//================================================================
+function rm_cache() {
+  try {
+    var sticker_doc_name = '貼圖對照表'
+    var cache = CacheService.getScriptCache();
+    var Stickers = cache.remove(sticker_doc_name);
+    Logger.log(Stickers)
+  } catch (e) {
+    return false
+  }
+  return true
+}
+//================================================================
 function start(payload) {
   var base_json = base()
   var Telegram_bot_key = base_json.Telegram_bot_key
