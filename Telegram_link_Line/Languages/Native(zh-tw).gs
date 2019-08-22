@@ -8,7 +8,7 @@ function language() {
     "correspond_text": {
       "backed_up_ing": {
         "type": "to_Telegram",
-        "text": "已備份舊資料，更新doc資料庫中...\n#doc #TG_Line_bot備份",
+        "text": "已備份舊資料，更新doc資料庫中...\n#doc",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -185,7 +185,7 @@ function language() {
       },
       "add_keyword_success": {
         "type": "to_Telegram",
-        "text": "已成功新增\n\n{0}\n\n如遇離開請按 /main\n或者繼續輸入新增",
+        "text": "已成功新增\n\n{0}\n\n如欲離開請按 /main\n或者繼續輸入新增",
         // {0} = 全部的keyword列表
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
@@ -198,7 +198,7 @@ function language() {
       },
       "delete_keyword_success": {
         "type": "to_Telegram",
-        "text": "已成功移除\n\n{0}\n\n如遇離開請按 /main\n或者繼續輸入移除",
+        "text": "已成功移除\n\n{0}\n\n如欲離開請按 /main\n或者繼續輸入移除",
         // {0} = 全部的keyword列表
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
@@ -335,12 +335,6 @@ function language() {
         "type": "to_Telegram(only_text)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "{1}{0}"
         // {0} = first_name {1} = last_name
-      },
-      "assemble_caption": {
-        "type": "to_Telegram(only_text)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-        "text": "{0}\n{1}"
-        // {0} = 來源文字(is_from) {1} = 媒體的說明文字(caption)
-        // 跟 "is_from" 有關連。
       },
       "read_massage_ed": {
         "type": "to_Telegram",
@@ -550,7 +544,7 @@ function language() {
       },
       "delete_keyword_ing": {
         "type": "to_Telegram",
-        "text": '請輸入欲移除關鍵字的 **前方編號!!!** \n刪除多組關鍵字請用 "任意符號" 隔開(推薦用","或"，")\n如遇離開請按 /main',
+        "text": '請輸入欲移除關鍵字的 **前方編號!!!** \n刪除多組關鍵字請用 "任意符號" 隔開(推薦用","或"，")\n如欲離開請按 /main',
         "notification": false, //不通知? true or false
         "parse_mode": "Markdown" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -652,15 +646,6 @@ function language() {
       "plz_forward_verification_code": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
         "text": "請確認我在要綁定的群組中後，再轉發上方的驗證碼到那以進行綁定!\n或按下 /unsetroom 取消升級",
-        "notification": false, //不通知? true or false
-        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
-      },
-      "not_owner": {
-        "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-        "text": ["您好!這是私人用的bot，不對他人開放\n",
-          "若您想要一個自己的 Telegram_link_Line 機器人，請至 \n",
-          "https://github.com/we684123/Telegram_link_Line"
-        ], // {0} = line的某人
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -883,7 +868,7 @@ function language() {
       },
       "first_conversion": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-        "text": "啊對了，在之後傳新貼圖時第一次會傳比較慢，第二次後就會回覆正常速度了\n_(¦3」∠)_",
+        "text": "啊對了，在之後傳新貼圖時第一次會傳比較慢，第二次後就會回復正常速度了\n_(¦3」∠)_",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
