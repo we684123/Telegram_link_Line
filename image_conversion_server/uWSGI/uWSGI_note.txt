@@ -1,0 +1,3 @@
+uwsgi image_conversion.ini
+
+這只是記不住所以做個指令筆記
