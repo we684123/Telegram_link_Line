@@ -445,11 +445,11 @@ code_version =
   如果要自架 "轉圖server" 的請至 "image_conversion_server" 資料夾查看！**    
 
   更新方式：    
-  0. 在 gs 上執行 [CP()](https://t.me/TG_link_Line/23) 函示備份後再繼續！！！     
-  1. Telegram_link_Line.gs 修改    
-  2. Languages.gs 修改    
-  3. **重部署版本** (版本是 "新增" )
-  4. 對 bot 下 /up_version 指令，或是在 gs 上直接執行 up_version() 函式
+  1. 在 gs 上 [執行CP()函示備份](https://t.me/TG_link_Line/23) 後再繼續！！！     
+  2. Telegram_link_Line.gs 修改    
+  3. Languages.gs 修改    
+  4. **重部署版本** (版本是 "新增" )
+  5. 對 bot 下 /up_version 指令，或是在 gs 上直接執行 up_version() 函式
 
 
 > 已知Bug：
