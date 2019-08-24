@@ -2846,6 +2846,26 @@ function list_folder(Description_Folder) {
   }
   return Folders_list
 }
+//================================================================
+
+/**
+ * list_files - 得到目標資料夾下所有檔案的詳細資料
+ *
+ * @param  {Folder} Description_Folder  目標資料夾
+ * @return {Array}           詳細資料陣列
+ */
+function list_files(Description_Folder) {
+  if (Description_Folder === void 0)
+    throw new Error("Description_Folder未給")
+
+  var Files = Description_Folder.getFiles();
+  var Files_list = []
+  while (Files.hasNext()) {
+    var file = Files.next();
+    Files_list.push(get_file_info(file))
+  }
+  return Files_list
+}
 //=================================================================================
 
 /**
