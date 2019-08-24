@@ -10,6 +10,8 @@ function up_version() {
   var ALL = JSON.parse(doc.getText());
   var ct = language()["correspond_text"]
 
+  var lock = LockService.getScriptLock();
+  var success = lock.tryLock(30 * 1000);
 
   sendtext(Telegram_id, '升級中請稍後...');
 
@@ -33,7 +35,7 @@ function up_version() {
   }
   if (ALL['code_version'] < 3.2) {
     var ctv = language()["match_version"]
-    if (ctv != 3.2) {
+    if (ctv < 3.2) {
       throw new Error("請更新 language 文件再重來!")
     }
     var Folder = DriveApp.getFolderById(FolderId);
@@ -53,13 +55,13 @@ function up_version() {
     // /debug
     ALL.mode = 0
     ALL.wait_to_Bind = {}
-    var xfjhxgfh = REST_FastMatch1and2and3(ALL);
-    var ydjdyf = REST_keyboard(xfjhxgfh[1]);
-    var r = JSON.stringify(ydjdyf[1]);
+    var REST_F = REST_FastMatch1and2and3(ALL);
+    var REST_k = REST_keyboard(REST_F[1]);
+    var r = JSON.stringify(REST_k[1]);
     doc.setText(r); //寫入
-    sendtext(Telegram_id, ct["debug_ed"]["text"].format(xfjhxgfh[0], ydjdyf[0]));
+    sendtext(Telegram_id, ct["debug_ed"]["text"].format(REST_F[0], REST_k[0]));
     // 🔮 開啟主選單
-    keyboard_main(Telegram_id, ct["🔮 開啟主選單"], ydjdyf[1])
+    keyboard_main(Telegram_id, ct["🔮 開啟主選單"], REST_k[1])
   }
 
   // 下面是 V3.3 所需 ( 終於解決貼圖問題啦~ 撒花ヽ(✿ﾟ▽ﾟ)ノ
@@ -2845,6 +2847,47 @@ function list_folder(Description_Folder) {
     Folders_list.push(get_folder_info(Folder))
   }
   return Folders_list
+}
+//================================================================
+
+/**
+ * get_file_info - 得到目標資料夾的詳細資料
+ *
+ * @param  {type} file   欲查看的目標檔案
+ * @return {type}        目標檔案的詳細資料
+ */
+function get_file_info(file) {
+  if (file === void 0)
+    throw new Error("file未給")
+
+  var file_info = {
+    "FileName": file.getName(),
+    "FileId": file.getId(),
+    "FolderUrl": file.getUrl(),
+    "FileDescription": file.getDescription(),
+    "FileMimeType": file.getMimeType()
+  }
+  return file_info
+}
+//================================================================
+
+/**
+ * list_files - 得到目標資料夾下所有檔案的詳細資料
+ *
+ * @param  {Folder} Description_Folder  目標資料夾
+ * @return {Array}           詳細資料陣列
+ */
+function list_files(Description_Folder) {
+  if (Description_Folder === void 0)
+    throw new Error("Description_Folder未給")
+
+  var Files = Description_Folder.getFiles();
+  var Files_list = []
+  while (Files.hasNext()) {
+    var file = Files.next();
+    Files_list.push(get_file_info(file))
+  }
+  return Files_list
 }
 //=================================================================================
 
