@@ -2849,6 +2849,27 @@ function list_folder(Description_Folder) {
 //================================================================
 
 /**
+ * get_file_info - 得到目標資料夾的詳細資料
+ *
+ * @param  {type} file   欲查看的目標檔案
+ * @return {type}        目標檔案的詳細資料
+ */
+function get_file_info(file) {
+  if (file === void 0)
+    throw new Error("file未給")
+
+  var file_info = {
+    "FileName": file.getName(),
+    "FileId": file.getId(),
+    "FolderUrl": file.getUrl(),
+    "FileDescription": file.getDescription(),
+    "FileMimeType": file.getMimeType()
+  }
+  return file_info
+}
+//================================================================
+
+/**
  * list_files - 得到目標資料夾下所有檔案的詳細資料
  *
  * @param  {Folder} Description_Folder  目標資料夾
