@@ -677,6 +677,10 @@ code_version =
 
   但就算沒超過 50 MB，Line server也會處理N久     
   我遇過等她處理 32MB 處理整整2小時半的案例過...。
+  
+  ### 10. 只有貼圖傳送錯誤    
+  如果錯誤訊息是 "bot發生錯誤，訊息如下:TypeError: 無法呼叫 undefined 的「getResponseCode」方法。" 可能是你的 "🌀 轉圖設定"，設定錯誤，請設好後再繼續。    
+  (預設是 目標伺服器域名:we684123.hopto.org 目標api:media_conservion)     
 
 # 贊助(Donate)
 hmmm........     
