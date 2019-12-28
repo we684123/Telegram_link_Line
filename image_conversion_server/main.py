@@ -40,7 +40,7 @@ class Hello_World(Resource):
         return {"about": "hello world!"}
 
 
-class media_conservion(Resource):
+class media_conversion(Resource):
     # print('111111111')
     def get(self):
         return 'is working', 200
@@ -164,7 +164,7 @@ class media_conservion(Resource):
 
 
 #Api.add_resource(Hello_World, '/')
-Api.add_resource(media_conservion, '/media_conservion')
+Api.add_resource(media_conversion, '/media_conversion')
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0',

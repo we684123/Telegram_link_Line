@@ -426,6 +426,28 @@ code_version =
 
 ---
 # 版本資訊
+  ##### 2019/12/28 - (V3.3.2)     
+  * 修正 新創的 bot 傳送 "照片+文字" 時文字會不見的問題     
+    (對... 舊的沒影響，我不知道為什麼( ˘•ω•˘ ) )    
+  * 因應 Line 修改 api 網址做出一點改變     
+    (若不做此次更新，2020/4/30 後便無法下載 line 的照片、貼圖...等媒體)    
+  * 修正 因為我英文渣把轉圖api名稱 "conversion" 拼成 "conservion" 的問題(ﾟ皿ﾟﾒ)    
+    (現在是2個名稱都開了api，有在考慮要不要跟line一樣，舊的只支援到2020/4/30)    
+
+  更新方式：    
+  1. Telegram_link_Line.gs 修改    
+  2. Languages.gs 修改    
+  3. **重部署版本** (版本是 "新增")    
+  4. (可選)去你的TGbot修改api名稱      
+    "🔧 更多設定" ->      
+    "🌀 轉圖設定" ->      
+    "🚲 設定目標請求" ->      
+    "media_conversion" ->      
+    完成!      
+    [操作圖1](https://raw.githubusercontent.com/we684123/Telegram_link_Line/dev/%E5%9C%96%E5%BA%8A/2019-12-28%2021_29_50-Telegram.png)      
+    [操作圖2](https://raw.githubusercontent.com/we684123/Telegram_link_Line/dev/%E5%9C%96%E5%BA%8A/2019-12-28%2021_29_37-Telegram.png)      
+
+
   ##### 2019/08/24 - (hotfix)(V3.3.1)     
   * 修正 up_version出錯      
 
@@ -656,10 +678,12 @@ code_version =
   原則上應該是不會出現這種狀況(都用全局鎖了qwq)，如果不是網路或TG的問題的話，請 /main + /debug 再繼續操作，要是依舊無解請在 Telegram 上找 [@we684123](https://t.me/we684123) 來協助處理。
 
   ### 5. 為什麼我的 line bot 無法加入 line 的群組中?
-  這是因為 line 限制一個群組只能加入一個 bot，如果你目前群組內的 bot 是 Telegram_link_Line bot 的話可以請擁有者邀你進入他的TG群，本bot支援 TG 群對 line 群的對話方式。
+  這是因為 line 限制一個群組只能加入一個 bot，如果你目前群組內的 bot 是 Telegram_link_Line bot 的話可以請擁有者邀你進入他的TG群，本bot支援 TG 群對 line 群的對話方式。      
+  或著還有個狀況是你沒有把"自動同意加入群組"打開(參考問題6的圖)      
 
   ### 6. Line bot 在對方傳訊息後自動回說「感謝您傳送訊息給我！很抱歉...」，這段訊息怎麼關掉?
-  這個要去 line bot 的後臺關掉($NU 後台網址或圖片)
+  這個要去 line bot 的後臺關掉
+  ![line新版後臺圖](https://raw.githubusercontent.com/we684123/Telegram_link_Line/dev/%E5%9C%96%E5%BA%8A/2019-12-28%2019_59_13-LINE%20Developers.png)
 
   ### 7. 怎麼確定這個 bot 的資料不會外傳?
   基本上這 bot 是架在你的 Google Apps Script 上的(其實也算是在GCP上)，我完全沒存取權，如果你沒有主動將設定檔 (baseANDtest.gs & doc.gs & gs的對外網址) 的內容洩漏出去的話是不會有這樣的問題的。
@@ -677,7 +701,7 @@ code_version =
 
   但就算沒超過 50 MB，Line server也會處理N久     
   我遇過等她處理 32MB 處理整整2小時半的案例過...。
-  
+
   ### 10. 只有貼圖傳送錯誤    
   如果錯誤訊息是 "bot發生錯誤，訊息如下:TypeError: 無法呼叫 undefined 的「getResponseCode」方法。" 可能是你的 "🌀 轉圖設定"，設定錯誤，請設好後再繼續。    
   (預設是 目標伺服器域名:we684123.hopto.org 目標api:media_conservion)     

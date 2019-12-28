@@ -336,6 +336,12 @@ function language() {
         "text": "{1}{0}"
         // {0} = first_name {1} = last_name
       },
+      "assemble_caption": {
+        "type": "to_Telegram(only_text)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": "{0}\n{1}"
+        // {0} = 來源文字(is_from) {1} = 媒體的說明文字(caption)
+        // 跟 "is_from" 有關連。
+      },
       "read_massage_ed": {
         "type": "to_Telegram",
         "text": "=======讀取完畢=======",

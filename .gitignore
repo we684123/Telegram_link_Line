@@ -2,3 +2,5 @@ test
 google-apps-script
 node_modules
 Auto_test
+
+image_conversion_server/media_conversion.py

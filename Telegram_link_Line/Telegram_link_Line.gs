@@ -105,7 +105,7 @@ function up_version() {
     // 希望能相信一次人性。
     ALL["conservion_server"] = {
       "domain_name": 'we684123.hopto.org',
-      "conservion_api": 'media_conservion',
+      "conservion_api": 'media_conversion',
       "agree_server_save": false,
       "spare_require": 'https://xxx.xxx' //暫時無用
     }
@@ -3021,7 +3021,7 @@ function copy_file(file, destination_folder) {
 function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
   //讓我們感謝河馬大大!m(_ _)m
   //https://riverhippo.blogspot.tw/2016/02/google-drive-direct-link.html
-  var url = 'https://api.line.me/v2/bot/message/' + Id + '/content';
+  var url = 'https://api-data.line.me/v2/bot/message/' + Id + '/content';
   //--------------------------------------------------
   var header = {
     'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN
