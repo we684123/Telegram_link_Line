@@ -659,7 +659,8 @@ code_version =
   這是因為 line 限制一個群組只能加入一個 bot，如果你目前群組內的 bot 是 Telegram_link_Line bot 的話可以請擁有者邀你進入他的TG群，本bot支援 TG 群對 line 群的對話方式。
 
   ### 6. Line bot 在對方傳訊息後自動回說「感謝您傳送訊息給我！很抱歉...」，這段訊息怎麼關掉?
-  這個要去 line bot 的後臺關掉($NU 後台網址或圖片)
+  這個要去 line bot 的後臺關掉
+  ![line新版後臺圖](https://raw.githubusercontent.com/we684123/Telegram_link_Line/dev/%E5%9C%96%E5%BA%8A/2019-12-28%2019_59_13-LINE%20Developers.png)
 
   ### 7. 怎麼確定這個 bot 的資料不會外傳?
   基本上這 bot 是架在你的 Google Apps Script 上的(其實也算是在GCP上)，我完全沒存取權，如果你沒有主動將設定檔 (baseANDtest.gs & doc.gs & gs的對外網址) 的內容洩漏出去的話是不會有這樣的問題的。
@@ -677,7 +678,7 @@ code_version =
 
   但就算沒超過 50 MB，Line server也會處理N久     
   我遇過等她處理 32MB 處理整整2小時半的案例過...。
-  
+
   ### 10. 只有貼圖傳送錯誤    
   如果錯誤訊息是 "bot發生錯誤，訊息如下:TypeError: 無法呼叫 undefined 的「getResponseCode」方法。" 可能是你的 "🌀 轉圖設定"，設定錯誤，請設好後再繼續。    
   (預設是 目標伺服器域名:we684123.hopto.org 目標api:media_conservion)     
