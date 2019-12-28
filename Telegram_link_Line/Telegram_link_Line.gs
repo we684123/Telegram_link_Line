@@ -105,7 +105,7 @@ function up_version() {
     // 希望能相信一次人性。
     ALL["conservion_server"] = {
       "domain_name": 'we684123.hopto.org',
-      "conservion_api": 'media_conservion',
+      "conservion_api": 'media_conversion',
       "agree_server_save": false,
       "spare_require": 'https://xxx.xxx' //暫時無用
     }
