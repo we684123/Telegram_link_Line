@@ -3021,7 +3021,7 @@ function copy_file(file, destination_folder) {
 function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
   //讓我們感謝河馬大大!m(_ _)m
   //https://riverhippo.blogspot.tw/2016/02/google-drive-direct-link.html
-  var url = 'https://api.line.me/v2/bot/message/' + Id + '/content';
+  var url = 'https://api-data.line.me/v2/bot/message/' + Id + '/content';
   //--------------------------------------------------
   var header = {
     'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN
