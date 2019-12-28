@@ -656,8 +656,9 @@ code_version =
   原則上應該是不會出現這種狀況(都用全局鎖了qwq)，如果不是網路或TG的問題的話，請 /main + /debug 再繼續操作，要是依舊無解請在 Telegram 上找 [@we684123](https://t.me/we684123) 來協助處理。
 
   ### 5. 為什麼我的 line bot 無法加入 line 的群組中?
-  這是因為 line 限制一個群組只能加入一個 bot，如果你目前群組內的 bot 是 Telegram_link_Line bot 的話可以請擁有者邀你進入他的TG群，本bot支援 TG 群對 line 群的對話方式。
-
+  這是因為 line 限制一個群組只能加入一個 bot，如果你目前群組內的 bot 是 Telegram_link_Line bot 的話可以請擁有者邀你進入他的TG群，本bot支援 TG 群對 line 群的對話方式。      
+  或著還有個狀況是你沒有把"自動同意加入群組"打開(參考問題6的圖)      
+      
   ### 6. Line bot 在對方傳訊息後自動回說「感謝您傳送訊息給我！很抱歉...」，這段訊息怎麼關掉?
   這個要去 line bot 的後臺關掉
   ![line新版後臺圖](https://raw.githubusercontent.com/we684123/Telegram_link_Line/dev/%E5%9C%96%E5%BA%8A/2019-12-28%2019_59_13-LINE%20Developers.png)
