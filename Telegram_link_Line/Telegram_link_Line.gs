@@ -3696,7 +3696,7 @@ function get_200_url(url) {
   // 明明手機的就會自己轉，電腦版的就不行，X
   //console.log("----------------------")
   var options = {
-    'followRedirects': false,
+    'followRedirects': true,
     'method': 'get'
   }
   var ruse = UrlFetchApp.fetch(url, options);
@@ -4068,7 +4068,7 @@ function get_sticker(ALL, sticker_need, from, file_id, keep_time) {
     var extension = sticker_json[file_id]['extension']
   }
 
-  if (ALL['image_link_mode'] == '🏀 來源連結') {
+  if (ALL['image_link_mode'] == '🏀 來源連結' && from == 'TG') {
     sticker_url = get_200_url(sticker_url)
   }
 
