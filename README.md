@@ -71,6 +71,7 @@
 ![Imgur](https://i.imgur.com/FDVa131.png)
 ----
 **獨立房間(升級房間) + ☀️ 顯示發送者：**    
+[影片連結點這裡(mp4 version)](https://youtu.be/uBkdUtEWEp8)    
 ![Imgur](https://github.com/we684123/Telegram_link_Line/blob/master/%E5%9C%96%E5%BA%8A/s3.gif?raw=true)    
 
 **關鍵字提及：**    
@@ -421,7 +422,7 @@ GMT =
 code_version =     
 該程式的版本，用來驗證配對語言包正確性。
 
-**在這之後其實還有一些沒說明的屬性當可以在 up_version 函式中找到。**    
+**在這之後其實還有一些沒說明的屬性可以在 up_version 函式中找到。**    
 
 
 ---
