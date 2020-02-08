@@ -165,6 +165,9 @@ $NU錄影片阿
   ![Imgur](https://i.imgur.com/MvEDdfk.png)
   ----    
   ![Imgur](https://i.imgur.com/WgT109q.png)
+  ----    
+  **上面填的資訊正常來說最後應該跟這張圖呈現得差不多**
+  ![Imgur](https://imgur.com/VFjyAiz.png)
 
   再一次
   按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱(推薦叫"Languages") -> 將"[Native(zh-tw).gs](https://github.com/we684123/Telegram_link_Line/blob/master/Telegram_link_Line/Languages/Native(zh-tw).gs)"內容複製上去__    
@@ -216,6 +219,7 @@ $NU錄影片阿
 
   此時上面的文字應該是會改成向類似這樣
   "Privacy mode  is disabled for (bot 名稱) (bot的username)."    
+
 
 ----
 - 註一
@@ -717,6 +721,8 @@ code_version =
   如果錯誤訊息是 "bot發生錯誤，訊息如下:TypeError: 無法呼叫 undefined 的「getResponseCode」方法。" 可能是你的 "🌀 轉圖設定"，設定錯誤，請設好後再繼續。    
   (預設是 目標伺服器域名:we684123.hopto.org 目標api:media_conservion)     
 
+  ### 11. 收的到LINE群組訊息但顯示發送者的功能無效，或無法透過TG發訊息到LINE    
+  你的 CHANNEL_ACCESS_TOKEN 設定有問題，正常的 CHANNEL_ACCESS_TOKEN [長這樣](https://imgur.com/VFjyAiz.png)
 # 贊助(Donate)
 hmmm........     
 如果你覺得這對你有幫助的話，........    
