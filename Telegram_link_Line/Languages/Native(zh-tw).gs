@@ -516,7 +516,7 @@ function language() {
       },
       "plz_select_on_off": {
         "type": "to_Telegram",
-        "text": "請選擇開啟或關閉",
+        "text": "請選擇開啟或關閉\nps' 這個功能不會在已升級的房間啟用",
         "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },

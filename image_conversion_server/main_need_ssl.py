@@ -17,6 +17,9 @@ del_download = False
 
 ALLOWED_EXTENSIONS = set(['png','apng', 'jpg', 'jpeg', 'webp', 'gif', 'mp4', 'ogg'])
 
+SSL_fullchain = '/etc/letsencrypt/live/we684123.hopto.org/fullchain.pem'
+SSL_privkey = '/etc/letsencrypt/live/we684123.hopto.org/privkey.pem'
+
 UPLOAD_FOLDER = '/conversion用'
 save_path = os.getcwd() + UPLOAD_FOLDER
 app = Flask(__name__)
@@ -164,6 +167,7 @@ class media_conversion(Resource):
 Api.add_resource(media_conversion, '/media_conversion')
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0')
+    app.run(debug=False, host='0.0.0.0',
+            ssl_context=(SSL_fullchain, SSL_privkey))
 
 # -----------------------------------
