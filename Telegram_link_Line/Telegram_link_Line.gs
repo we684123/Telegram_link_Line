@@ -630,6 +630,10 @@ function doPost(e) {
             TG_Send_text_To_Line(Line_id, text)
             ed_notification_tidy(chat_id, ct["sendFile_ed"], ALL, lock)
             // ^ "(File連結已發送!)"
+          } else if (estringa.message.editMessageText) {)
+            ed_notification_tidy(chat_id, ct["not_support_editMessageText"], ALL, lock)
+          } else if (estringa.message.editMessageCaption) {
+            ed_notification_tidy(chat_id, ct["not_support_editMessageCaption"], ALL, lock)
           }
         }
         lock.releaseLock();

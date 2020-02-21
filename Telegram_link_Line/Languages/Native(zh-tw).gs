@@ -90,6 +90,18 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
+      "not_support_editMessageText": {
+        "type": "to_Telegram",
+        "text": "(目前不支援編輯文字喔!)",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "not_support_editMessageCaption": {
+        "type": "to_Telegram",
+        "text": "(目前不支援編輯文字喔!)",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
       "plz_exit_and_resend": {
         "type": "to_Telegram",
         "text": "請先按下 /exit 離開後再下指令喔!",
