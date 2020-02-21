@@ -1,9 +1,9 @@
 function language() {
   var language = { //多包一層看以後有沒有打算擴充...............
     "language_name": "Native(zh-tw)",
-    "language_version": 1.1,
-    "match_version": 3.3,
-    "update_time": 1564987373086,
+    "language_version": 2,
+    "match_version": 3.4,
+    "update_time": 1582263815675,
     "author": "永格天",
     "correspond_text": {
       "backed_up_ing": {

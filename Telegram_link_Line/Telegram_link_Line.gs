@@ -127,6 +127,21 @@ function up_version() {
     sendtext(Telegram_id, 'V3.3 已升級完成\n終於解決貼圖問題啦~~~\nヽ(✿ﾟ▽ﾟ)ノ (撒花');
   }
 
+  // 下面是 V3.4 所需
+  if (ALL['code_version'] < 3.4) {
+    var ctv = language()["match_version"]
+    if (ctv < 3.4) {
+      throw new Error("請更新 language 文件再來執行此函式!")
+    }
+
+    ALL['line_user_data'] = {} // 用來存放 line user data
+
+    ALL['code_version'] = 3.4
+    ALL.mode = 0
+    ALL.wait_to_Bind = {}
+    sendtext(Telegram_id, 'V3.4 已升級完成\n解決了群組中 "離開的人名稱無法顯示" 的問題\n');
+  }
+
   // 寫入ALL
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
@@ -2043,13 +2058,21 @@ function doPost(e) {
       } else {
         var room_id = cutSource.roomId
       }
-      if (userId) { //嘗試取得發話人名稱
+      if (userId) { //處理 line user 相關 data
+        //嘗試取得發話人名稱
         if (cutSource.type == "user") {
-          var userName = Get_profile(userId)['displayName']; //如果有則用
+          var line_user = Get_profile(userId, ALL)
+          var userName = line_user['displayName']; //如果有則用
         } else if (cutSource.type == "room") {
-          var userName = new_Get_profile(userId, 'room', room_id)['displayName'];
+          var line_user = new_Get_profile(userId, 'room', room_id, ALL)
+          var userName = line_user['displayName'];
         } else {
-          var userName = new_Get_profile(userId, 'group', room_id)['displayName'];
+          var line_user = new_Get_profile(userId, 'group', room_id, ALL)
+          var userName = line_user['displayName'];
+        }
+        if (ALL['line_user_data'][userId] != line_user) {
+          ALL['line_user_data'][userId] = line_user
+          write_ALL(ALL, doc)
         }
       }
 
@@ -2443,7 +2466,7 @@ function mv_all_uproom() {
 
 }
 //=================================================================================
-function Get_profile(userId) {
+function Get_profile(userId, ALL) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
   var header = {
@@ -2458,12 +2481,18 @@ function Get_profile(userId) {
     var profile = JSON.parse(
       UrlFetchApp.fetch("https://api.line.me/v2/bot/profile/" + userId, options))
   } catch (r) {
-    var profile = "未知姓名"
+    if (ALL['line_user_data'][userId]) {
+      profile["displayName"] = ALL['line_user_data'][userId]["displayName"]
+    } else {
+      var profile = {
+        "displayName": "未知姓名"
+      }
+    }
   }
   return profile
 }
 //=================================================================================
-function new_Get_profile(userId, rq_mode, groupId) {
+function new_Get_profile(userId, rq_mode, groupId, ALL) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
   var header = {
@@ -2479,7 +2508,13 @@ function new_Get_profile(userId, rq_mode, groupId) {
     var profile = UrlFetchApp.fetch(url, options)
     profile = JSON.parse(profile)
   } catch (r) {
-    var profile = "未知姓名"
+    if (ALL['line_user_data'][userId]) {
+      profile["displayName"] = ALL['line_user_data'][userId]["displayName"]
+    } else {
+      var profile = {
+        "displayName": "未知姓名"
+      }
+    }
   }
   return profile
 }
