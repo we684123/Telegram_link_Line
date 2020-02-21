@@ -630,7 +630,7 @@ function doPost(e) {
             TG_Send_text_To_Line(Line_id, text)
             ed_notification_tidy(chat_id, ct["sendFile_ed"], ALL, lock)
             // ^ "(File連結已發送!)"
-          } else if (estringa.message.editMessageText) {)
+          } else if (estringa.message.editMessageText) {
             ed_notification_tidy(chat_id, ct["not_support_editMessageText"], ALL, lock)
           } else if (estringa.message.editMessageCaption) {
             ed_notification_tidy(chat_id, ct["not_support_editMessageCaption"], ALL, lock)
@@ -3683,6 +3683,7 @@ function up_room_start(ALL) {
 }
 //=================================================================================
 function entities_conversion(text, entities, ct) { //用來處理格式化的網址
+  // 幾本上就是先從後面處理到前面，然後再組合
   var EC_text = []
   var text_link = []
   var URL_Quantity = 0
@@ -3695,7 +3696,7 @@ function entities_conversion(text, entities, ct) { //用來處理格式化的網
     var y = text.nslice(ed_capture)
     text = y[0]
     EC_text.unshift(y[1])
-    if (entities[i]["type"] == 'text_link') {
+    if (entities[i]["type"] == 'text_link') { //連結
       var y = text.nslice(st_capture)
       text = y[0]
       var u = ct['entities_conversion_text']['text'].format(y[1], URL_Quantity)
@@ -3710,6 +3711,14 @@ function entities_conversion(text, entities, ct) { //用來處理格式化的網
       var y = text.nslice(st_capture)
       text = y[0]
       EC_text.unshift(' _{0}_ '.format(y[1]))
+    } else if (entities[i]["type"] == 'strikethrough') { //刪除線
+      var y = text.nslice(st_capture)
+      text = y[0]
+      EC_text.unshift(' ~{0}~ '.format(y[1]))
+    } else if (entities[i]["type"] == 'code') { //程式碼
+      var y = text.nslice(st_capture)
+      text = y[0]
+      EC_text.unshift(' `{0}` '.format(y[1]))
     }
   }
   //Logger.log('EC_text = ', EC_text)
