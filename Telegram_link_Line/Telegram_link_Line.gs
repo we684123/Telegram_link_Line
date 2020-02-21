@@ -3735,7 +3735,7 @@ function get_200_url(url) {
   // 明明手機的就會自己轉，電腦版的就不行，X
   //console.log("----------------------")
   var options = {
-    'followRedirects': true,
+    'followRedirects': false,
     'method': 'get'
   }
   var ruse = UrlFetchApp.fetch(url, options);
