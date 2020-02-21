@@ -135,6 +135,8 @@ function up_version() {
     }
 
     ALL['line_user_data'] = {} // 用來存放 line user data
+    ALL['TG_nickname_list'] = {} // 用來存放 TG_to_line 的暱稱
+    ALL['Line_nickname_list'] = {} // 用來存放 line_to_TG 的暱稱
 
     ALL['code_version'] = 3.4
     ALL.mode = 0
@@ -414,6 +416,15 @@ function doPost(e) {
             }
             var by_name = ct['by_name']['text'].format(first_name, last_name)
             var TG_name = ct['TG_name']['text'].format(first_name, last_name)
+
+            // 如果 ALL['TG_nickname_list'] 中有 estringa.message.from.id 則執行。
+            if (ALL['TG_nickname_list'][estringa.message.from.id]) {
+              // 替換成暱稱
+              // 先說這裡是 TG_to_line 的暱稱
+              var nickname = ALL['TG_nickname_list'][estringa.message.from.id]
+              var by_name = ct['by_name']['text'].format(nickname)
+              var TG_name = ct['TG_name']['text'].format(nickname)
+            }
           } else {
             var by_name = ''
           }
