@@ -523,11 +523,13 @@ function doPost(e) {
             // ^ "(影片已發送!)"
           } else if (estringa.message.sticker) {
             var file_id = estringa.message.sticker.file_id
+            var file_unique_id = estringa.message.sticker.file_unique_id
             if (estringa.message.sticker['is_animated']) {
               ed_notification_tidy(chat_id, ct["not_support_animated_sticker"], ALL, lock)
               return 0
             }
-            var TG_sticker_url = get_sticker(ALL, sticker_need, 'TG', file_id)[0]
+            var TG_sticker_url = get_sticker(
+              ALL, sticker_need, 'TG', file_id, 21600, file_unique_id)[0]
             TG_Send_Sticker_To_Line(Line_id, TG_sticker_url)
             if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
               TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
@@ -1939,7 +1941,7 @@ function doPost(e) {
           }
           var file_id = estringa.message.sticker.file_id
           var TG_sticker_url = get_sticker(ALL, sticker_need, 'TG', file_id)[0]
-          TG_Send_Sticker_To_Line(Line_id, TG_sticker_url)
+          TG_Send_Sticker_To_Line(Line_id, TG_sticker_url)[0]
           ed_notification_tidy(chat_id, ct["sendSticker_ed"], ALL, lock)
           // ^ "(貼圖已發送!)"
         } else {
@@ -4007,7 +4009,7 @@ function conservion_media(media_id, media_blob, new_format, conservion_server, l
 
 }
 //================================================================
-function get_sticker(ALL, sticker_need, from, file_id, keep_time) {
+function get_sticker(ALL, sticker_need, from, file_id, keep_time, file_unique_id) {
   if (ALL === void 0)
     throw new Error("ALL 未給")
 
@@ -4036,6 +4038,12 @@ function get_sticker(ALL, sticker_need, from, file_id, keep_time) {
   if (file_id === void 0)
     throw new Error("file_id 未給")
   keep_time = keep_time || 21600
+
+  if (from == 'TG') {
+    if (file_unique_id === void 0) {
+      throw new Error("file_unique_id 未給")
+    }
+  }
   //-----------------------------------------------------------
 
   var cache = CacheService.getScriptCache();
@@ -4049,31 +4057,13 @@ function get_sticker(ALL, sticker_need, from, file_id, keep_time) {
     cache.put(sticker_doc_name, Stickers_doc_txt, keep_time)
     var Stickers = Stickers_doc_txt
   }
-
   var sticker_json = JSON.parse(Stickers);
 
   if (from == 'Line') {
     var Line_sk_id = file_id
     var file_id = 'Line' + file_id
-  }
 
-  if (!sticker_json[file_id]) { //第二階段，抓圖存放
-    if (from == 'TG') {
-      var TG_sticker = UrlFetchApp.fetch(TGdownloadURL(getpath(file_id))).getBlob()
-      var TG_sticker_png = conservion_media(file_id, TG_sticker, 'png', ALL["conservion_server"])
-
-      var TG_sticker_Folder = DriveApp.getFolderById(ALL[DTGSFN]['FolderId']);
-      var TG_sticker_png_file = TG_sticker_Folder.createFile(TG_sticker_png).setName(file_id)
-      var TG_sticker_png_file_id = TG_sticker_png_file.getId()
-
-      var TG_sticker_url = G_drive_Durl + TG_sticker_png_file_id
-      sticker_json[file_id] = {
-        "url": TG_sticker_url,
-        "extension": TG_sticker_png_file.getMimeType()
-      }
-      var sticker_url = TG_sticker_url
-
-    } else if (from == 'Line') {
+    if (!sticker_json[file_id]) { //如果不是舊的就開工
       var png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" +
         Line_sk_id + "/android/sticker.png;compress=true"
       var Apng_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" +
@@ -4085,36 +4075,67 @@ function get_sticker(ALL, sticker_need, from, file_id, keep_time) {
           file_id, Apng_blob, 'gif', ALL["conservion_server"])
 
         var Line_sticker_Folder = DriveApp.getFolderById(ALL[DLineSFN]['FolderId']);
-        var Line_sticker_png_file = Line_sticker_Folder.createFile(Line_sticker_gif)
-        Line_sticker_png_file = Line_sticker_png_file.setName(Line_sk_id + '.gif')
-        var Line_sticker_png_file_id = Line_sticker_png_file.getId()
+        var Line_sticker_file = Line_sticker_Folder.createFile(Line_sticker_gif)
+        Line_sticker_file = Line_sticker_file.setName(Line_sk_id + '.gif')
+        var Line_sticker_file_id = Line_sticker_file.getId()
 
-        var Line_sticker_url = G_drive_Durl + Line_sticker_png_file_id
+        var Line_sticker_url = G_drive_Durl + Line_sticker_file_id
         sticker_json[file_id] = {
           "url": Line_sticker_url,
-          "extension": Line_sticker_png_file.getMimeType()
+          "extension": Line_sticker_file.getMimeType()
         }
-
         var sticker_url = Line_sticker_url
         var extension = sticker_json[file_id]['extension']
-      } catch (e) {
-        return png_url //靜態的就算了，動態再來載。
-      }
-    } else {
-      throw new Error("from 來源未知處理方式")
-    }
 
-    if (!Stickers_doc) {
-      var Stickers_doc_id = ALL[sticker_doc_name]['FileId']
-      var Stickers_doc = DocumentApp.openById(Stickers_doc_id)
-      var Stickers_doc_txt = Stickers_doc.getText()
+        // 下面處理TG或Line新增過貼圖後更新doc跟cache
+        if (!Stickers_doc) {
+          var Stickers_doc_id = ALL[sticker_doc_name]['FileId']
+          var Stickers_doc = DocumentApp.openById(Stickers_doc_id)
+          var Stickers_doc_txt = Stickers_doc.getText()
+        }
+        Stickers_doc.setText(JSON.stringify(sticker_json))
+        cache.remove(sticker_doc_name)
+        cache.put(sticker_doc_name, JSON.stringify(sticker_json), keep_time)
+      } catch (e) {
+        return [png_url, 'image/png'] //靜態的就算了，動態再來載。
+      }
+
+    } else {
+      var sticker_url = sticker_json[file_id]['url']
+      var extension = sticker_json[file_id]['extension']
     }
-    Stickers_doc.setText(JSON.stringify(sticker_json))
-    cache.remove(sticker_doc_name)
-    cache.put(sticker_doc_name, JSON.stringify(sticker_json), keep_time)
+  } else if (from == 'TG') {
+    if (!sticker_json[file_unique_id]) {
+      var TG_sticker = UrlFetchApp.fetch(TGdownloadURL(getpath(file_id))).getBlob()
+      var TG_sticker_png = conservion_media(file_unique_id, TG_sticker, 'png', ALL["conservion_server"])
+
+      var TG_sticker_Folder = DriveApp.getFolderById(ALL[DTGSFN]['FolderId']);
+      var TG_sticker_png_file = TG_sticker_Folder.createFile(TG_sticker_png).setName(file_unique_id)
+      var TG_sticker_png_file_id = TG_sticker_png_file.getId()
+
+      var TG_sticker_url = G_drive_Durl + TG_sticker_png_file_id
+      sticker_json[file_unique_id] = {
+        "url": TG_sticker_url,
+        "extension": TG_sticker_png_file.getMimeType()
+      }
+      var sticker_url = TG_sticker_url
+      var extension = TG_sticker_png_file.getMimeType()
+
+      // 下面處理TG或Line新增過貼圖後更新doc跟cache
+      if (!Stickers_doc) {
+        var Stickers_doc_id = ALL[sticker_doc_name]['FileId']
+        var Stickers_doc = DocumentApp.openById(Stickers_doc_id)
+        var Stickers_doc_txt = Stickers_doc.getText()
+      }
+      Stickers_doc.setText(JSON.stringify(sticker_json))
+      cache.remove(sticker_doc_name)
+      cache.put(sticker_doc_name, JSON.stringify(sticker_json), keep_time)
+    } else {
+      var sticker_url = sticker_json[file_unique_id]['url']
+      var extension = sticker_json[file_unique_id]['extension']
+    }
   } else {
-    var sticker_url = sticker_json[file_id]['url']
-    var extension = sticker_json[file_id]['extension']
+    throw new Error("from 來源未知處理方式")
   }
 
   if (ALL['image_link_mode'] == '🏀 來源連結' && from == 'TG') {
