@@ -305,7 +305,7 @@ function doPost(e) {
 
             if (ALL.data[n]['Amount']) { //如果還有訊息直接傾倒
               sendtext(chat_id, ct["not_read_all_ed"])
-              var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id)
+              var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id, sticker_need)
               if (j) {
                 ALL.data[n]['Amount'] = 0
               }
@@ -343,7 +343,7 @@ function doPost(e) {
         } else { //已綁定群組中發話
           if (ALL.data[number]['Amount']) { //如果還有訊息直接傾倒
             sendtext(chat_id, ct["not_read_all_ed"])
-            var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id)
+            var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id, sticker_need)
             if (j) {
               ALL.data[number]['Amount'] = 0
             }
@@ -1304,7 +1304,7 @@ function doPost(e) {
                 // ^ "這個房間並沒有未讀的通知喔~ "
               } else {
                 //獨立出來比較好
-                read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id)
+                read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id, sticker_need)
               }
               break;
             case ct['🔖 重新命名']["text"]:
@@ -1947,7 +1947,7 @@ function doPost(e) {
           }
           var file_id = estringa.message.sticker.file_id
           var TG_sticker_url = get_sticker(ALL, sticker_need, 'TG', file_id)[0]
-          TG_Send_Sticker_To_Line(Line_id, TG_sticker_url)[0]
+          TG_Send_Sticker_To_Line(Line_id, TG_sticker_url)
           ed_notification_tidy(chat_id, ct["sendSticker_ed"], ALL, lock)
           // ^ "(貼圖已發送!)"
         } else {
@@ -2181,16 +2181,18 @@ function doPost(e) {
               //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNskkLZktW"}
             } else if (message_json.type == "sticker") {
-              var sticker_png_url = get_sticker(
+              var sticker_data = get_sticker(
                 ALL, sticker_need, 'Line', message_json.stickerId)
+              var sticker_url = sticker_data[0]
+              var sticker_type = sticker_data[1]
               var caption = ct["is_from"]["text"].format(message_json.userName)
               var send_ed = sendtext(chat_id, ct["sendSticker_ing"])
               // ^ (正在傳送貼圖，請稍後...)
 
-              if (sticker_png_url[1] == 'image/gif') {
-                sendAnimation(chat_id, sticker_png_url[0], notification, caption)
+              if (sticker_type == 'image/gif') {
+                sendAnimation(chat_id, sticker_url, notification, caption)
               } else {
-                sendPhoto(chat_id, sticker_png_url, notification, caption)
+                sendPhoto(chat_id, sticker_url, notification, caption)
               }
 
               //刪除"正在傳送XXX" 整潔舒爽!
@@ -3780,7 +3782,7 @@ function rt_text_reduce(text, rt_max_chats) {
   return text.replace('\n', '%0A').replace(/\n/g, ' ').replace('%0A', '\n')
 }
 //=================================================================================
-function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id) {
+function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id, sticker_need) {
 
   try {
     var SpreadSheet = SpreadsheetApp.openById(sheet_key);
@@ -3838,14 +3840,22 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
         //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
         //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNsk9kLZktWQ1U"}
       } else if (message_json.type == "sticker") {
-        var sticker_png_url = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" +
-          message_json.stickerId + "/android/sticker.png;compress=true"
+        var sticker_data = get_sticker(
+          ALL, sticker_need, 'Line', message_json.stickerId)
+        var sticker_url = sticker_data[0]
+        var sticker_type = sticker_data[1]
         var caption = ct["is_from"]["text"].format(message_json.userName)
+
         if (ALL.massage_time) {
           t = get_time_txt(message_json.timestamp, GMT)
           caption += "\n" + t
         }
-        sendPhoto(chat_id, sticker_png_url, notification, caption)
+
+        if (sticker_type == 'image/gif') {
+          sendAnimation(chat_id, sticker_url, notification, caption)
+        } else {
+          sendPhoto(chat_id, sticker_url, notification, caption)
+        }
         //https://stickershop.line-scdn.net/stickershop/v1/sticker/
         // 3214753/android/sticker.png;compress=true
         //{"type":"sticker","message_id":"6548799151539","userName":"永格天@李孟哲",
