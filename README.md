@@ -747,7 +747,9 @@ code_version =
   如果錯誤訊息是 "bot發生錯誤，訊息如下:TypeError: 無法呼叫 undefined 的「getResponseCode」方法。" 可能是你的 "🌀 轉圖設定"，設定錯誤，請設好後再繼續。    
   (預設是 目標伺服器域名:we684123.hopto.org 目標api:media_conservion)     
   ![Imgur](https://imgur.com/cDzqkNY.png)    
-  還有一個可能是你的資料夾忘記設成 "知道的人均可檢視"
+       
+  **還有一個可能是你的 download_from_line 資料夾忘記設成 "知道的人均可檢視"**
+  (不過v3.4開始會自己設定好權限，應該較少發生這個問題，但還是可以檢查一下)
 
   ### 11. 收的到LINE群組訊息但顯示發送者的功能無效，或無法透過TG發訊息到LINE    
   你的 CHANNEL_ACCESS_TOKEN 設定有問題，正常的 CHANNEL_ACCESS_TOKEN [長這樣](https://imgur.com/VFjyAiz.png)    

@@ -45,7 +45,8 @@ function up_version() {
     // 下面2個註解提醒一下自己之後要完美支援貼圖，希望之後改版能成啦!
     //create_Folder(Folder, 'Telegram_貼圖', Description)
     //create_Folder(Folder, 'Line_貼圖', Description)
-    create_Folder(Folder, '檔案放置區', Description)
+    create_Folder(Folder, '檔案放置區', Description).setSharing(
+      DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
     var list = list_folder(Folder)
     for (var i = 0; i < list.length; i++) {
       ALL[list[i]['FolderName']] = list[i]
@@ -72,8 +73,10 @@ function up_version() {
     }
     var Folder = DriveApp.getFolderById(FolderId);
     var Description = "{'version': 3.3}"
-    create_Folder(Folder, 'Line貼圖放置區', Description)
-    create_Folder(Folder, 'Telegram貼圖放置區', Description)
+    create_Folder(Folder, 'Line貼圖放置區', Description).setSharing(
+      DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    create_Folder(Folder, 'Telegram貼圖放置區', Description).setSharing(
+      DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
     var sticker_doc_name = '貼圖對照表'
     var sticker_doc_1 = DocumentApp.create(sticker_doc_name);
