@@ -146,6 +146,7 @@ function up_version() {
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
   lock.releaseLock();
+  sendtext(Telegram_id, '升級程式已執行完畢！');
   return ALL['code_version']
 }
 //==============================================================================
