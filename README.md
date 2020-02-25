@@ -437,8 +437,12 @@ code_version =
 # 版本資訊
   ##### 2020/02/25 - (V3.4)     
   * 支援 TG → Line 的格式化文字(刪除線、code)    
+  * 改變 在新創 bot 時，up_version會自己設定資料夾權限，降低創造難度。
+  > (此改變不會對已升級用戶造成影響)
+
   * 改變 現在開始如果bot在TG群遇到編輯過的文字會主動提醒 "不支援"    
   > 關於這個，如果你有什麼較好處理方法，歡迎私我提供    
+  
   * 修正 TG貼圖的快取方式，現在會更省 diver 空間。    
   * 修正 line群有人離開時，名子顯示失敗的問題    
   * 修正 TG → Line 貼圖在 "🏀來源連結" 模式下傳送失敗       
@@ -747,7 +751,7 @@ code_version =
   如果錯誤訊息是 "bot發生錯誤，訊息如下:TypeError: 無法呼叫 undefined 的「getResponseCode」方法。" 可能是你的 "🌀 轉圖設定"，設定錯誤，請設好後再繼續。    
   (預設是 目標伺服器域名:we684123.hopto.org 目標api:media_conservion)     
   ![Imgur](https://imgur.com/cDzqkNY.png)    
-       
+
   **還有一個可能是你的 download_from_line 資料夾忘記設成 "知道的人均可檢視"**
   (不過v3.4開始會自己設定好權限，應該較少發生這個問題，但還是可以檢查一下)
 
