@@ -36,6 +36,7 @@ function up_version() {
   if (ALL['code_version'] < 3.2) {
     var ctv = language()["match_version"]
     if (ctv < 3.2) {
+      sendtext(Telegram_id, '請更新 language 文件再來執行此函式!');
       throw new Error("請更新 language 文件再重來!")
     }
     var Folder = DriveApp.getFolderById(FolderId);
@@ -69,6 +70,7 @@ function up_version() {
   if (ALL['code_version'] < 3.3) {
     var ctv = language()["match_version"]
     if (ctv < 3.3) {
+      sendtext(Telegram_id, '請更新 language 文件再來執行此函式!');
       throw new Error("請更新 language 文件再來執行此函式!")
     }
     var Folder = DriveApp.getFolderById(FolderId);
@@ -134,6 +136,7 @@ function up_version() {
   if (ALL['code_version'] < 3.4) {
     var ctv = language()["match_version"]
     if (ctv < 3.4) {
+      sendtext(Telegram_id, '請更新 language 文件再來執行此函式!');
       throw new Error("請更新 language 文件再來執行此函式!")
     }
 
