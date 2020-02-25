@@ -1,14 +1,14 @@
 # Telegram_link_Line
->用Telegram來收發Line的訊息。    
+>用 Telegram 來收發 Line 的訊息。    
 >use telegram to Send and receive messages(from Line).    
 
->或者把它當作Line的訊息備份也是可啦 😛    
+>或者把它當作 Line 的訊息備份也是可啦 😛    
 
 >支援 Telegram、Line 個人及群組    
 >1對1、多對1、1對多、多對多 的訊息傳遞。    
 
 
-此為針對 v3.3 的README。    
+此為針對 v3.3 的 README。    
 如果是 Telegram_Bot 新手推薦看完 [這個影片](https://youtu.be/On9yeMtG2Wg)後在來使用。    
 
 如果想要獲取更新資訊，可以加入這個頻道  https://t.me/TG_link_Line
@@ -59,7 +59,7 @@
 * V2、V3有時會不知道是誰發言是因為對方[版本](https://goo.gl/noYa7L)不夠新。
 * 註1：目前確定 "安卓的line版本8.5.3" 可以正常看貼圖，"Windows的line版本 5.10.0.1789" 則無法，其他未知。
 * 註2：僅TG發給Line，LINE發送到TG僅會收到GIF的第一格的畫面。
-* 註3：目前不支援TG的動圖。 支援Line動圖傳至TG。 TG傳送貼圖至Line會先去我的伺服器轉檔，若覺不妥可自架。
+* 註3：目前不支援 TG 的動圖。 支援Line動圖傳至 TG。 TG 傳送貼圖至Line會先去我的伺服器轉檔，若覺不妥可自架。
 * 註4：支援 TG → Line 傳送文字格式(粗體、斜體、刪除線、程式碼、連結) 。
 
 
@@ -123,14 +123,13 @@
 
 ## 其他人的教學
 
- #### [企鵝](https://t.me/penguinF)做了一個非常詳細的[圖文教學](https://hackmd.io/s/Bkc6LwAP7#)(萬分感謝 m(_ \_)m )，可以去看看。    
-
- #### 但是此教學目前過期，不過創建LINEbot的部分是能用的
- #### 另外就是這個版本升級房間時不再使用新的bot，轉成用"新群組"替代！
+  **此教學目前過期，不過創建LINEbot的部分是能用的**
+  **另外就是這個版本升級房間時不再使用新的bot，轉成用"新群組"替代！**
+  #### [企鵝](https://t.me/penguinF)做了一個非常詳細的[圖文教學](https://hackmd.io/s/Bkc6LwAP7#)(萬分感謝 m(_ \_)m )，可以去看看。    
 
 ----
 
-## 部屬教學影片(Install teach video)(還沒空錄 先擺著之後補)(undone ,after supplement)
+## 部屬教學影片(Install teach video)
 [![Telegram_link_Line部屬教學影片](http://img.youtube.com/vi/tOkCOcP-nmY/0.jpg)](http://bit.ly/2yjI91k)     
 $NU錄影片阿     
 
@@ -156,10 +155,11 @@ $NU錄影片阿
 
 3.  一個資料夾(用來放來自Line的媒體)，推薦名稱叫 "download_from_line"(如果Google空間爆了bot會罷工喔，一般帳號有15G應該還好，如果是這個bot的東西占滿空間可以去"自己的TGbot"->"更多設定"->"丟棄舊檔"來丟到垃圾桶)
 
-<!--4.  如下圖，點選 "執行"->"啟用由 Chorme V8 技術..." 來啟用V8引擎 **(如果沒有的話請用[V3.3版本的程式](https://github.com/we684123/Telegram_link_Line/releases/tag/V3.3.3))**    
-    ![Imgur](https://imgur.com/kFzrmN6.png)
--->
-4.  三個gs檔(google apps script)，並將v3其中的"Telegram_link_Line.gs"的內容複製在一開始給你的"程式碼"區內。    
+4.  如下圖，點選 "執行" -> **"停用由 Chorme V8 技術..."** 來停用V8引擎
+<!--**(如果沒有的話請用[V3.3版本的程式](https://github.com/we684123/Telegram_link_Line/releases/tag/V3.3.3))**-->    
+  ![Imgur](https://imgur.com/kFzrmN6.png)
+
+5.  三個gs檔(google apps script)，並將v3其中的"Telegram_link_Line.gs"的內容複製在一開始給你的"程式碼"區內。    
   ![Imgur](https://i.imgur.com/V3KF0rh.png)
   複製完後按下左上角的 __"檔案" -> "新增" -> "指令碼檔案" -> 輸入你要的名稱(推薦叫"baseANDtest") -> 將"baseANDtest.gs"內容複製上去並填上資訊(註一)__    
   ![Imgur](https://i.imgur.com/tt2F4cj.png)
@@ -179,20 +179,20 @@ $NU錄影片阿
   ![Imgur](https://i.imgur.com/KCwcCEz.png)
 
 
-  然成後請如下操作：    
+  然後請如下操作：    
   * 接下來按下左上角的     
   * "發佈" ->     
   * "部屬為網路應用程式" ->     
-  * 專案版本 選"新增"**(一定要記得!!!)** ->     
+  * 專案版本選 "新增" **(一定要記得!!!)** ->     
   * 將應用程式執行為 改成"我" ->     
   * 具有應用程式存取的使用者 改成"任何人甚至匿名使用者" ->     
   * 確定(or更新)(註二) ->     
   * 將他給你的網址複製起來，並設定Telegram和Line的bot Post到該網址。(註三)     
-  * 將 [CP()](https://t.me/TG_link_Line/23)，[設定計時器](https://t.me/TG_link_Line/24) 每6小時一次 (<-非必要，以防萬一用。)(用來備份整個doc)    
+  * 將 [CP()](https://t.me/TG_link_Line/23)，[設定計時器](https://t.me/TG_link_Line/24) 每24小時一次 (<-非必要，以防萬一用。)(用來備份整個doc)    
     [說明圖1](http://i.imgur.com/KGXuqhT.png)、[說明圖2](http://i.imgur.com/GWpqmYH.png)、[說明圖3](http://i.imgur.com/tP8HUgR.png)、[說明圖4](http://i.imgur.com/HHs9qOH.png)
   * **執行 up_version()，如[說明圖](https://imgur.com/ghcR90c)，很重要!(考試不會考:p**    
 
-##### Telegram bot 需要新增四個指令：
+### Telegram bot 需要新增四個指令：
 
       main - 開啟主選單
       exit - 離開對話
@@ -209,7 +209,7 @@ $NU錄影片阿
   ps' /allread、/debug這兩個指令也可以移到bot的About裡面     
   ![bot的About](https://imgur.com/ypwUAtg.png)    
 
-##### Telegram bot 需要關閉隱私模式：
+### Telegram bot 需要關閉隱私模式：
   **不然升級房間後會有沒接收到訊息的問題。**
 
   找[@BotFather](https://t.me/BotFather)關閉掉隱私模式。    
