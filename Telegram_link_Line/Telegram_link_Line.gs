@@ -1802,6 +1802,10 @@ function doPost(e) {
               write_ALL(ALL, doc) //寫入
               sendtext(chat_id, ct['choose_room_1'])
               break;
+            case '/help':
+              var text = O_format(ct['help']['text'],ct['🚀 發送訊息']['text'])
+              sendtext(chat_id, text)
+              break;
               //-------------------------------------------------------------------
             default:
               if (Stext == ct['/droproom']['text']) {
@@ -1946,7 +1950,13 @@ function doPost(e) {
             return 0
           }
           var file_id = estringa.message.sticker.file_id
-          var TG_sticker_url = get_sticker(ALL, sticker_need, 'TG', file_id)[0]
+          var file_unique_id = estringa.message.sticker.file_unique_id
+          if (estringa.message.sticker['is_animated']) {
+            ed_notification_tidy(chat_id, ct["not_support_animated_sticker"], ALL, lock)
+            return 0
+          }
+          var TG_sticker_url = get_sticker(
+            ALL, sticker_need, 'TG', file_id, 21600, file_unique_id)[0]
           TG_Send_Sticker_To_Line(Line_id, TG_sticker_url)
           ed_notification_tidy(chat_id, ct["sendSticker_ed"], ALL, lock)
           // ^ "(貼圖已發送!)"
