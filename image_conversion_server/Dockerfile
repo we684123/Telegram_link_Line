@@ -5,7 +5,8 @@ MAINTAINER we684123
 WORKDIR /conversion
 COPY . .
 RUN python -m pip install --upgrade pip \
-    && pip install -r requirements.txt
+    && pip install -r requirements.txt \
+    && mkdir conversion用
 
 FROM builder
 WORKDIR /conversion
