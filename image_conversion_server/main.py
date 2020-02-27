@@ -38,7 +38,6 @@ class Hello_World(Resource):
 
 
 class media_conversion(Resource):
-    # print('111111111')
     def get(self):
         return 'is working', 200
 
@@ -167,3 +166,5 @@ if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0')
 
 # -----------------------------------
+# 之後看看怎麼改成連檔案都不留，先來填其他坑
+# https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/118496/
