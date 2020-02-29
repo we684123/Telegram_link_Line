@@ -130,8 +130,7 @@
 ----
 
 ## 部屬教學影片(Install teach video)
-[![Telegram_link_Line部屬教學影片](http://img.youtube.com/vi/tOkCOcP-nmY/0.jpg)](http://bit.ly/2yjI91k)     
-$NU錄影片阿     
+[![Telegram_link_Line部屬教學影片](http://img.youtube.com/vi/E-ofS-MiVzs/0.jpg)](http://bit.ly/3agGXdu)     
 
 ----
 
@@ -435,7 +434,8 @@ code_version =
 
 ---
 # 版本資訊
-  ##### 2020/02/25 - (V3.4)     
+  ##### 2020/02/29 - (V3.4)     
+  * 部屬教學影片在1年半後終於生出來啦！！！ 完全值得紀念⸜(* ॑꒳ ॑* )⸝
   * 新增 /help 指令(列出所有指令用)
   * 支援 TG → Line 的格式化文字(刪除線、code)    
   * 改變 在新創 bot 時，up_version會自己設定資料夾權限，降低創造難度。
