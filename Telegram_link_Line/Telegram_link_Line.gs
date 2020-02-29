@@ -1803,7 +1803,7 @@ function doPost(e) {
               sendtext(chat_id, ct['choose_room_1'])
               break;
             case '/help':
-              var text = O_format(ct['help']['text'],ct['🚀 發送訊息']['text'])
+              var text = O_format(ct['help']['text'], ct['🚀 發送訊息']['text'])
               sendtext(chat_id, text)
               break;
               //-------------------------------------------------------------------
