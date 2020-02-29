@@ -131,8 +131,8 @@
 
 ## 部屬教學影片(Install teach video)
 [![Telegram_link_Line部屬教學影片](http://img.youtube.com/vi/E-ofS-MiVzs/0.jpg)](http://bit.ly/3agGXdu)     
-1年半後終於生出來ㄌ~
-請先看影片資訊欄來了解食用方式。
+1年半後終於生出來ㄌ~    
+請先看影片資訊欄來了解食用方式。    
 
 ----
 
