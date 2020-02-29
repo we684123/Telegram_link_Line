@@ -1,9 +1,9 @@
 function language() {
   var language = { //多包一層看以後有沒有打算擴充...............
     "language_name": "Native(zh-tw)",
-    "language_version": 1.1,
-    "match_version": 3.3,
-    "update_time": 1564987373086,
+    "language_version": 2,
+    "match_version": 3.4,
+    "update_time": 1582263815675,
     "author": "永格天",
     "correspond_text": {
       "backed_up_ing": {
@@ -87,6 +87,18 @@ function language() {
       "not_support_animated_sticker": {
         "type": "to_Telegram",
         "text": "(暫時不支援動態貼圖傳送喔!)",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "not_support_editMessageText": {
+        "type": "to_Telegram",
+        "text": "(目前不支援編輯文字喔!)",
+        "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "not_support_editMessageCaption": {
+        "type": "to_Telegram",
+        "text": "(目前不支援編輯文字喔!)",
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
@@ -1143,6 +1155,20 @@ function language() {
         "type": "to_Telegram",
         "text": '對調完成！',
         "notification": false, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "help": {
+        "type": "to_Telegram",
+        "text": [
+          '/help 會列出所有指令\n\n',
+          '/main 消除所有暫存狀態，並回到主選單(任何情況下都可以用)\n\n',
+          '/debug 修復bot用\n\n',
+          '/AllRead /Allread /allRead /allread\n如果太多訊息不想看可以全部已讀\n\n',
+          '/exit 取消 "{0}" 狀態，並回到主選單\n\n',
+          '/up_version 升級bot用(需先手動更新gs程式碼才有作用)\n\n',
+          '/version /v /V /info 顯示bot當前版本\n\n',
+         ],
+        "notification": true, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
     }

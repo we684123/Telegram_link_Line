@@ -1,14 +1,13 @@
-FROM python:3.6
+FROM python:3.6 as builder
 MAINTAINER we684123
 # for image_conversion
 
+WORKDIR /conversion
+COPY . .
 RUN python -m pip install --upgrade pip \
-    && pip install filetype==1.0.5 \
-    flask==1.1.1 \
-    flask-restful==0.3.8 \
-    Pillow==7.0.0
+    && pip install -r requirements.txt \
+    && mkdir conversion用
 
-COPY ./main.py /conversion/main.py
-COPY ./mylib /conversion/mylib
-
+FROM builder
+WORKDIR /conversion
 CMD ["python","/conversion/main.py"]
