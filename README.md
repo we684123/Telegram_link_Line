@@ -131,11 +131,13 @@
 
 ## 部屬教學影片(Install teach video)
 [![Telegram_link_Line部屬教學影片](http://img.youtube.com/vi/E-ofS-MiVzs/0.jpg)](http://bit.ly/3agGXdu)     
+1年半後終於生出來ㄌ~
+請先看影片資訊欄來了解食用方式。
 
 ----
 
 ## 準備
- **需要使用者申請 Telegram_bot跟Line_bot(Developer Trial)**
+ **需要使用者申請 Telegram_bot 跟 Line_bot(Messaging API)**
 
  **需有一google帳號並在其中創建：**
 
@@ -154,7 +156,7 @@
 
 3.  一個資料夾(用來放來自Line的媒體)，推薦名稱叫 "download_from_line"(如果Google空間爆了bot會罷工喔，一般帳號有15G應該還好，如果是這個bot的東西占滿空間可以去"自己的TGbot"->"更多設定"->"丟棄舊檔"來丟到垃圾桶)
 
-4.  如下圖，點選 "執行" -> **"停用由 Chorme V8 技術..."** 來停用V8引擎
+4.  如下圖，點選 "執行" -> **"停用由 Chrome V8 技術..."** 來停用V8引擎
 <!--**(如果沒有的話請用[V3.3版本的程式](https://github.com/we684123/Telegram_link_Line/releases/tag/V3.3.3))**-->    
   ![Imgur](https://imgur.com/kFzrmN6.png)
 
