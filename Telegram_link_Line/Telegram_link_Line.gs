@@ -2559,6 +2559,84 @@ function get_line_members(message_json, cutL) {
   return members_data_text
 }
 //=================================================================================
+function get_group_summary(groupId) {
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var options = {
+    'headers': header,
+    'method': 'get'
+  }
+  try {
+    var group_summary = JSON.parse(
+      UrlFetchApp.fetch(
+        "https://api.line.me/v2/bot/group/{0}/summary".format(groupId),
+        options
+      )
+    )
+  } catch (e) {
+    console.log('get_group_summary(groupId) error');
+    console.log(e);
+    throw new Error("get_group_summary(groupId) error")
+  }
+  return group_summary
+}
+//=================================================================================
+function get_members_in_group_count(groupId) {
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var options = {
+    'headers': header,
+    'method': 'get'
+  }
+  try {
+    var members_in_group_count = JSON.parse(
+      UrlFetchApp.fetch(
+        "https://api.line.me/v2/bot/group/{0}/members/count".format(groupId),
+        options
+      )
+    )
+  } catch (e) {
+    console.log('get_members_in_group_count(groupId) error');
+    console.log(e);
+    throw new Error("get_members_in_group_count(groupId) error")
+  }
+  return members_in_group_count
+}
+//=================================================================================
+function get_members_in_room_count(roomId) {
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var options = {
+    'headers': header,
+    'method': 'get'
+  }
+  try {
+    var members_in_room_count = JSON.parse(
+      UrlFetchApp.fetch(
+        "https://api.line.me/v2/bot/room/{0}/members/count".format(roomId),
+        options
+      )
+    )
+  } catch (e) {
+    console.log('get_members_in_room_count(roomId) error');
+    console.log(e);
+    throw new Error("get_members_in_room_count(roomId) error")
+  }
+  return members_in_room_count
+}
+//=================================================================================
 function TG_Send_text_To_Line(Line_id, text) {
   var base_json = base()
   var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN;
