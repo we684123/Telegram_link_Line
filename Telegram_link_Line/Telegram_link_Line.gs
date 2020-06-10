@@ -2362,21 +2362,25 @@ function doPost(e) {
         if (userName) { // 初步選出房間名
           var U = userName
         } else {
-          var U = line_roomID
+          try {
+            var U= get_group_summary(groupId)['groupName']
+          } catch (e) { //如果到這裡那應該就是room了
+            var U = line_roomID//真的沒幹嘛
+          }
         }
 
         for (;;) { // 打死都不要重名
           if (in_command(U)) {
-            U = U + String(Random_text(6))
+            U += String(Random_text(6))
             continue;
           } else if (in_name(ALL, (U + "✅"))) {
-            U = U + String(Random_text(6))
+            U += String(Random_text(6))
             continue;
           } else if (in_name(ALL, (U + "❎"))) {
-            U = U + "_" + String(Random_text(6))
+            U += "_" + String(Random_text(6))
             continue;
           } else if (in_name(ALL, (U + "⭐️"))) {
-            U = U + "_" + String(Random_text(6))
+            U += "_" + String(Random_text(6))
           } else {
             break;
           }
