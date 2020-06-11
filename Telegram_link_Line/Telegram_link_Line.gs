@@ -1842,7 +1842,7 @@ function doPost(e) {
                 if (ALL.data[FM].line_room_type) {
                   if (ALL.data[FM].line_room_type == "group") {
                     try {
-                      var summary = get_group_summary(ORoomId)
+                      var summary = get_group_summary(ORoomId)['groupName']
                     } catch (e) {
                       console.log(
                         'from 選擇房間 {0} get_group_summary()失敗'.format(ORoomId)
@@ -2380,7 +2380,7 @@ function doPost(e) {
           var U = userName
         } else {
           try {
-            var U = get_group_summary(groupId)['groupName']
+            var U = get_group_summary(line_roomID)['groupName']
           } catch (e) { //如果到這裡那應該就是room了
             var U = line_roomID //真的沒幹嘛
           }
