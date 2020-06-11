@@ -1829,6 +1829,7 @@ function doPost(e) {
                 var OName = ALL.data[FM].Name
                 var ORoomId = ALL.data[FM].RoomId
                 var Ostatus = ALL.data[FM].status
+                var Notice = ALL.data[FM].Notice
                 if (ALL.data[FM].Display_name) {
                   var ODisplay_name = "顯示人名：" + ALL.data[FM].Display_name + '\n'
                 } else {
@@ -1837,11 +1838,27 @@ function doPost(e) {
                 ALL.opposite.RoomId = ORoomId;
                 ALL.opposite.Name = OName;
                 write_ALL(ALL, doc) //寫入
-                var Notice = ALL.data[FM].Notice
 
-                text = ct["select_room_text"]["text"].format(
-                  OName, OAmount, Notice, ODisplay_name, Ostatus)
-                // ^ "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?"
+                if (ALL.data[FM].line_room_type) {
+                  if (ALL.data[FM].line_room_type == "group") {
+                    try {
+                      var summary = get_group_summary(ORoomId)
+                    } catch (e) {
+                      console.log(
+                        'from 選擇房間 {0} get_group_summary()失敗'.format(ORoomId)
+                      )
+                    }
+                  }
+                  text = ct["select_room_text_2"]["text"].format(
+                    OName, OAmount, Notice, ODisplay_name, Ostatus, summary)
+                  // ^ "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?"
+                } else {
+                  text = ct["select_room_text"]["text"].format(
+                    OName, OAmount, Notice, ODisplay_name, Ostatus)
+                  // ^ "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?"
+                }
+
+
                 var keyboard = [
                   [{
                     'text': ct['🚀 發送訊息']["text"]
@@ -2363,9 +2380,9 @@ function doPost(e) {
           var U = userName
         } else {
           try {
-            var U= get_group_summary(groupId)['groupName']
+            var U = get_group_summary(groupId)['groupName']
           } catch (e) { //如果到這裡那應該就是room了
-            var U = line_roomID//真的沒幹嘛
+            var U = line_roomID //真的沒幹嘛
           }
         }
 
