@@ -1829,6 +1829,7 @@ function doPost(e) {
                 var OName = ALL.data[FM].Name
                 var ORoomId = ALL.data[FM].RoomId
                 var Ostatus = ALL.data[FM].status
+                var Notice = ALL.data[FM].Notice
                 if (ALL.data[FM].Display_name) {
                   var ODisplay_name = "顯示人名：" + ALL.data[FM].Display_name + '\n'
                 } else {
@@ -1837,11 +1838,27 @@ function doPost(e) {
                 ALL.opposite.RoomId = ORoomId;
                 ALL.opposite.Name = OName;
                 write_ALL(ALL, doc) //寫入
-                var Notice = ALL.data[FM].Notice
 
-                text = ct["select_room_text"]["text"].format(
-                  OName, OAmount, Notice, ODisplay_name, Ostatus)
-                // ^ "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?"
+                if (ALL.data[FM].line_room_type) {
+                  if (ALL.data[FM].line_room_type == "group") {
+                    try {
+                      var summary = get_group_summary(ORoomId)['groupName']
+                    } catch (e) {
+                      console.log(
+                        'from 選擇房間 {0} get_group_summary()失敗'.format(ORoomId)
+                      )
+                    }
+                  }
+                  text = ct["select_room_text_2"]["text"].format(
+                    OName, OAmount, Notice, ODisplay_name, Ostatus, summary)
+                  // ^ "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?"
+                } else {
+                  text = ct["select_room_text"]["text"].format(
+                    OName, OAmount, Notice, ODisplay_name, Ostatus)
+                  // ^ "您選擇了 {0} 聊天室\n未讀數量：{1}\n聊天室通知：{2}\n請問你要?"
+                }
+
+
                 var keyboard = [
                   [{
                     'text': ct['🚀 發送訊息']["text"]
@@ -2362,21 +2379,25 @@ function doPost(e) {
         if (userName) { // 初步選出房間名
           var U = userName
         } else {
-          var U = line_roomID
+          try {
+            var U = get_group_summary(line_roomID)['groupName']
+          } catch (e) { //如果到這裡那應該就是room了
+            var U = line_roomID //真的沒幹嘛
+          }
         }
 
         for (;;) { // 打死都不要重名
           if (in_command(U)) {
-            U = U + String(Random_text(6))
+            U += String(Random_text(6))
             continue;
           } else if (in_name(ALL, (U + "✅"))) {
-            U = U + String(Random_text(6))
+            U += String(Random_text(6))
             continue;
           } else if (in_name(ALL, (U + "❎"))) {
-            U = U + "_" + String(Random_text(6))
+            U += "_" + String(Random_text(6))
             continue;
           } else if (in_name(ALL, (U + "⭐️"))) {
-            U = U + "_" + String(Random_text(6))
+            U += "_" + String(Random_text(6))
           } else {
             break;
           }
@@ -2557,6 +2578,84 @@ function get_line_members(message_json, cutL) {
       String('[{0}]({1})\n').format(j['displayName'], j['pictureUrl'])
   }
   return members_data_text
+}
+//=================================================================================
+function get_group_summary(groupId) {
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var options = {
+    'headers': header,
+    'method': 'get'
+  }
+  try {
+    var group_summary = JSON.parse(
+      UrlFetchApp.fetch(
+        "https://api.line.me/v2/bot/group/{0}/summary".format(groupId),
+        options
+      )
+    )
+  } catch (e) {
+    console.log('get_group_summary(groupId) error');
+    console.log(e);
+    throw new Error("get_group_summary(groupId) error")
+  }
+  return group_summary
+}
+//=================================================================================
+function get_members_in_group_count(groupId) {
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var options = {
+    'headers': header,
+    'method': 'get'
+  }
+  try {
+    var members_in_group_count = JSON.parse(
+      UrlFetchApp.fetch(
+        "https://api.line.me/v2/bot/group/{0}/members/count".format(groupId),
+        options
+      )
+    )
+  } catch (e) {
+    console.log('get_members_in_group_count(groupId) error');
+    console.log(e);
+    throw new Error("get_members_in_group_count(groupId) error")
+  }
+  return members_in_group_count
+}
+//=================================================================================
+function get_members_in_room_count(roomId) {
+  var base_json = base()
+  var CHANNEL_ACCESS_TOKEN = base_json.CHANNEL_ACCESS_TOKEN
+  var header = {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+  }
+  var options = {
+    'headers': header,
+    'method': 'get'
+  }
+  try {
+    var members_in_room_count = JSON.parse(
+      UrlFetchApp.fetch(
+        "https://api.line.me/v2/bot/room/{0}/members/count".format(roomId),
+        options
+      )
+    )
+  } catch (e) {
+    console.log('get_members_in_room_count(roomId) error');
+    console.log(e);
+    throw new Error("get_members_in_room_count(roomId) error")
+  }
+  return members_in_room_count
 }
 //=================================================================================
 function TG_Send_text_To_Line(Line_id, text) {
