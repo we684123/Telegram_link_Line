@@ -123,16 +123,15 @@
 
 ## 其他人的教學
 
-  **此教學目前過期，不過創建LINEbot的部分是能用的**
-  **另外就是這個版本升級房間時不再使用新的bot，轉成用"新群組"替代！**
-  #### [企鵝](https://t.me/penguinF)做了一個非常詳細的[圖文教學](https://hackmd.io/s/Bkc6LwAP7#)(萬分感謝 m(_ \_)m )，可以去看看。    
+
+  #### [企鵝](https://t.me/penguinF)做了一個非常詳細的[圖文教學](https://hackmd.io/s/Bkc6LwAP7#)(萬分感謝 m(_ \_)m )，但是此教學目前過期，不過創建LINEbot的部分是能用的，另外就是這個版本升級房間時不再使用新的bot，轉成用"新群組"替代！    
 
 ----
 
 ## 部屬教學影片(Install teach video)
 [![Telegram_link_Line部屬教學影片](http://img.youtube.com/vi/E-ofS-MiVzs/0.jpg)](http://bit.ly/3agGXdu)     
 1年半後終於生出來ㄌ~    
-請先看影片資訊欄來了解食用方式。    
+**請先看影片資訊欄來了解食用方式。**    
 
 ----
 
