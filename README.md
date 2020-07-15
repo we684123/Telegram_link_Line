@@ -436,8 +436,8 @@ code_version =
 ---
 # 版本資訊
   ##### 2020/07/15 - (V3.5)     
-  * 變更 在 "選擇房間" 後會嘗試獲取Line房間名稱，並顯示。
-  ![Imgur](https://imgur.com/dgi5NmW.png)
+  * 變更 在 "選擇房間" 後會嘗試獲取Line房間名稱，並顯示。    
+  ![Imgur](https://imgur.com/dgi5NmW.png)    
 
 
   更新方式：    
