@@ -442,6 +442,8 @@ code_version =
   1. Telegram_link_Line.gs 修改    
   2. **重部署版本** (版本是 "新增" )
 
+  ****
+
   ##### 2020/07/15 - (V3.5)     
   * 變更 在 "選擇房間" 後會嘗試獲取Line房間名稱，並顯示。    
   ![Imgur](https://imgur.com/dgi5NmW.png)    
@@ -452,6 +454,8 @@ code_version =
   2. Languages.gs 修改    
   3. **重部署版本** (版本是 "新增" )
 
+
+  ****
 
   ##### 2020/02/29 - (V3.4)     
   * 部屬教學影片在1年半後終於生出來啦！！！ 完全值得紀念⸜(* ॑꒳ ॑* )⸝
@@ -479,6 +483,7 @@ code_version =
   4. **重部署版本** (版本是 "新增" )
   5. 對 bot 下 /up_version 指令，或是在 gs 上直接執行 up_version() 函式
 
+  ****
 
   ##### 2020/02/06 - (V3.3.3)     
   * 修正 TG→Line 貼圖在 "🏀來源連結" 模式下傳送失敗       
@@ -489,6 +494,7 @@ code_version =
   1. Telegram_link_Line.gs 修改     
   2. **重部署版本** (版本是 "新增")    
 
+  ****
 
   ##### 2019/12/28 - ([V3.3.2](https://github.com/we684123/Telegram_link_Line/releases/tag/V3.3.2))     
   * 修正 新創的 bot 傳送 "照片+文字" 時文字會不見的問題     
@@ -511,6 +517,8 @@ code_version =
     [操作圖1](https://raw.githubusercontent.com/we684123/Telegram_link_Line/dev/%E5%9C%96%E5%BA%8A/2019-12-28%2021_29_50-Telegram.png)      
     [操作圖2](https://raw.githubusercontent.com/we684123/Telegram_link_Line/dev/%E5%9C%96%E5%BA%8A/2019-12-28%2021_29_37-Telegram.png)      
 
+
+  ****
 
   ##### 2019/08/24 - (hotfix)([V3.3.1](https://github.com/we684123/Telegram_link_Line/releases/tag/V3.3.1(hotfix)))     
   * 修正 up_version出錯      
@@ -583,7 +591,9 @@ code_version =
 
   更新方式：
   1. Telegram_link_Line.gs 修改    
-  2. **重部署版本** (版本是 "新增" )
+  2. **重部署版本** (版本是 "新增" )    
+
+  ****
 
   ##### 2019/07/26 - (hotfix)([V3.2.5](https://github.com/we684123/Telegram_link_Line/releases/tag/V3.2.5(hotfix)))     
   * 修正 Line 傳到 TG 時無法處理 "$" 號問題
@@ -592,6 +602,7 @@ code_version =
   1. Telegram_link_Line.gs 修改    
   2. **重部署版本** (版本是 "新增" )
 
+  ****
 
   ##### 2019/04/07 - (hotfix)([V3.2.4](https://github.com/we684123/Telegram_link_Line/releases/tag/V3.2.4(hotfix)))     
   * 修正 TG、Line 端傳送字串太長導致失敗的問題
