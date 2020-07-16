@@ -437,7 +437,7 @@ code_version =
 ---
 # 版本資訊
   ##### 2020/07/16 - (V3.5.1)     
-  * 修正 CP() doc超過5w字元會失敗的問題
+  * 修正 CP() doc超過5w字元會失敗的問題    
 
   更新方式：    
   1. Telegram_link_Line.gs 修改    
