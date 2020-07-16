@@ -2471,15 +2471,25 @@ function CP() {
   var base_json = base()
   var sheet_key = base_json.sheet_key
   var doc_key = base_json.doc_key
-  var SpreadSheet = SpreadsheetApp.openById(sheet_key);
-  var Sheet = SpreadSheet.getSheetByName("JSON備份");
-  var LastRow = Sheet.getLastRow();
+  var SpreadSheet = SpreadsheetApp.openById(sheet_key)
+  var Sheet = SpreadSheet.getSheetByName("JSON備份")
+  var LastRow = Sheet.getLastRow()
 
   var doc = DocumentApp.openById(doc_key)
-  var f = doc.getText();
-  var d = new Date();
-  Sheet.getRange(LastRow + 1, 1).setValue(d);
-  Sheet.getRange(LastRow + 1, 2).setValue(f);
+  var f = doc.getText()
+  var d = new Date()
+  
+  Sheet.getRange(LastRow + 1, 1).setValue(d)
+  var chat_max = 48000
+  for (var i = 2;; i++) {
+    if (f.length > chat_max) {
+      Sheet.getRange(LastRow + 1, i).setValue(f.substring(0, chat_max))
+      f = f.substring(chat_max, f.length)
+    } else {
+      Sheet.getRange(LastRow + 1, i).setValue(f)
+      break
+    }
+  }
 }
 //==============================================================================
 function mv_all_uproom() {
