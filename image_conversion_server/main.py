@@ -15,9 +15,10 @@ get_fn = fn.get_filename
 
 del_download = False
 
-ALLOWED_EXTENSIONS = set(['png','apng', 'jpg', 'jpeg', 'webp', 'gif', 'mp4', 'ogg'])
+ALLOWED_EXTENSIONS = set(
+    ['png', 'apng', 'jpg', 'jpeg', 'webp', 'gif', 'mp4', 'ogg'])
 
-UPLOAD_FOLDER = '/conversion用'
+UPLOAD_FOLDER = '/conversion_need'
 save_path = os.getcwd() + UPLOAD_FOLDER
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = '.' + UPLOAD_FOLDER
