@@ -26,3 +26,9 @@ python main.py
 # 額外補充包 (nginx、uWSGI)
 
 附上這兩個的設定檔，可自行取用，當然請記得改成適合自身狀況的方式    
+
+----
+
+# heroku
+直接拿 heroku_version 的東西去部屬就可以了     
+試過能用     
