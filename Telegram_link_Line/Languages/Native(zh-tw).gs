@@ -1175,8 +1175,15 @@ function language() {
           '/exit 取消 "{0}" 狀態，並回到主選單\n\n',
           '/up_version 升級bot用(需先手動更新gs程式碼才有作用)\n\n',
           '/version /v /V /info 顯示bot當前版本\n\n',
-         ],
+          '/reset_all_sticker 如果貼圖一直錯誤的話，可以用這個清掉所有貼圖的快取及檔案'
+        ],
         "notification": true, //不通知? true or false
+        "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
+      },
+      "reset_all_sticker_rt": {
+        "type": "to_Telegram",
+        "text": '結果：\nre_cache_result：{0}\n刪除line貼圖：{1}\n刪除tg貼圖：{2}',
+        "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
     }
