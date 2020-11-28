@@ -2227,18 +2227,36 @@ function doPost(e) {
               //{"type":"image","message_id":"6548749837597","userName":"永格天@李孟哲",
               //"DURL":"https://drive.google.com/uc?export=download&id=0B-0JNskkLZktW"}
             } else if (message_json.type == "sticker") {
+              var send_ed = sendtext(chat_id, ct["sendSticker_ing"])
+              // ^ (正在傳送貼圖，請稍後...)
+
               var sticker_data = get_sticker(
                 ALL, sticker_need, 'Line', message_json.stickerId)
               var sticker_url = sticker_data[0]
               var sticker_type = sticker_data[1]
+              var file_id = sticker_data[2]
               var caption = ct["is_from"]["text"].format(message_json.userName)
-              var send_ed = sendtext(chat_id, ct["sendSticker_ing"])
-              // ^ (正在傳送貼圖，請稍後...)
 
-              if (sticker_type == 'image/gif') {
-                sendAnimation(chat_id, sticker_url, notification, caption)
-              } else {
-                sendPhoto(chat_id, sticker_url, notification, caption)
+              try {
+                if (sticker_type == 'image/gif') {
+                  sendAnimation(chat_id, sticker_url, notification, caption)
+                } else {
+                  sendPhoto(chat_id, sticker_url, notification, caption)
+                }
+              } catch (e) {
+                // 處理壞掉的東東
+                rm_error_sticker(ALL, file_id)
+                // 這裡跟上面一樣，我知道很醜，但之後會重構啦QQ
+                var sticker_data = get_sticker(
+                  ALL, sticker_need, 'Line', message_json.stickerId)
+                var sticker_url = sticker_data[0]
+                var sticker_type = sticker_data[1]
+                var file_id = sticker_data[2]
+                if (sticker_type == 'image/gif') {
+                  sendAnimation(chat_id, sticker_url, notification, caption)
+                } else {
+                  sendPhoto(chat_id, sticker_url, notification, caption)
+                }
               }
 
               //刪除"正在傳送XXX" 整潔舒爽!
@@ -4296,7 +4314,7 @@ function get_sticker(ALL, sticker_need, from, file_id, keep_time, file_unique_id
     sticker_url = get_200_url(sticker_url)
   }
 
-  return [sticker_url, extension]
+  return [sticker_url, extension, file_id]
 }
 //================================================================
 function ed_notification_tidy(chat_id, ct, ALL, lock) {
@@ -4325,6 +4343,23 @@ function rm_cache() {
     return false
   }
   return true
+}
+//================================================================
+function rm_error_sticker(ALL, file_id) {
+  // 刪除 sticker_doc 中的貼圖
+  var sticker_doc_id = ALL['貼圖對照表']['FileId']
+  var sticker_doc = DocumentApp.openById(sticker_doc_id)
+  var sticker_doc_text = sticker_doc.getText()
+  var sticker_doc_json = JSON.parse(sticker_doc_text)
+  delete sticker_doc_json[file_id]
+  sticker_doc.setText(JSON.stringify(sticker_doc_json))
+
+  // 刪除 檔案中的貼圖
+  var sticker_url = sticker_doc_json[file_id]['url']
+  var sticker_file_id = sticker_url.replace(/(.+)&id=/, '')
+  DriveApp.getFileById(sticker_file_id).setTrashed(true)
+
+  rm_cache()
 }
 //================================================================
 function start(payload) {
