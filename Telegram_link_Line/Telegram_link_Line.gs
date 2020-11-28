@@ -1450,6 +1450,25 @@ function doPost(e) {
               sendtext(chat_id, ct["debug_ed"]["text"].format(
                 REST_F[0], REST_k[0], re_cache_result));
               break;
+            case '/reset_all_sticker':
+            sendtext(chat_id, "/reset_all_sticker ing...")
+              var re_cache_result = rm_cache()
+              var sticker_doc_id = ALL['貼圖對照表']['FileId']
+              var sticker_doc = DocumentApp.openById(sticker_doc_id)
+              sticker_doc.setText("{}")
+              var clear_files_line_rt = false
+              var clear_files_tg_rt = false
+              try {
+                var Line_sticker_Folder = DriveApp.getFolderById(ALL['Line貼圖放置區']['FolderId']);
+                var TG_sticker_Folder = DriveApp.getFolderById(ALL['Telegram貼圖放置區']['FolderId']);
+                var clear_files_line_rt = clear_files(Line_sticker_Folder)
+                var clear_files_tg_rt = clear_files(TG_sticker_Folder)
+              } catch (e) {}
+              var text_ = ("結果：\nre_cache_result：" + re_cache_result +
+                "\n刪除line貼圖：" + clear_files_line_rt[1] +
+                "\n刪除tg貼圖：" + clear_files_tg_rt[1])
+              sendtext(chat_id, text_)
+              break;
             case '/AllRead':
             case '/Allread':
             case '/allRead':
@@ -2478,7 +2497,7 @@ function CP() {
   var doc = DocumentApp.openById(doc_key)
   var f = doc.getText()
   var d = new Date()
-  
+
   Sheet.getRange(LastRow + 1, 1).setValue(d)
   var chat_max = 48000
   for (var i = 2;; i++) {
