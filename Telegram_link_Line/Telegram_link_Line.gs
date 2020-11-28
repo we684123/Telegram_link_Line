@@ -4346,18 +4346,20 @@ function rm_cache() {
 }
 //================================================================
 function rm_error_sticker(ALL, file_id) {
-  // 刪除 sticker_doc 中的貼圖
+  // 獲取 貼圖基本資料
   var sticker_doc_id = ALL['貼圖對照表']['FileId']
   var sticker_doc = DocumentApp.openById(sticker_doc_id)
   var sticker_doc_text = sticker_doc.getText()
   var sticker_doc_json = JSON.parse(sticker_doc_text)
-  delete sticker_doc_json[file_id]
-  sticker_doc.setText(JSON.stringify(sticker_doc_json))
 
   // 刪除 檔案中的貼圖
   var sticker_url = sticker_doc_json[file_id]['url']
   var sticker_file_id = sticker_url.replace(/(.+)&id=/, '')
   DriveApp.getFileById(sticker_file_id).setTrashed(true)
+
+  // 刪除 sticker_doc 中的貼圖
+  delete sticker_doc_json[file_id]
+  sticker_doc.setText(JSON.stringify(sticker_doc_json))
 
   rm_cache()
 }
