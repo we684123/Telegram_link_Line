@@ -1465,8 +1465,8 @@ function doPost(e) {
                 var clear_files_tg_rt = clear_files(TG_sticker_Folder)
               } catch (e) {}
               var text_ = ("結果：\nre_cache_result：" + re_cache_result +
-                "\n刪除line貼圖：" + clear_files_line_rt[1] +
-                "\n刪除tg貼圖：" + clear_files_tg_rt[1])
+                "\n刪除line貼圖：" + clear_files_line_rt[0] +
+                "\n刪除tg貼圖：" + clear_files_tg_rt[0])
               sendtext(chat_id, text_)
               break;
             case '/AllRead':
