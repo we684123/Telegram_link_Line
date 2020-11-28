@@ -1451,7 +1451,7 @@ function doPost(e) {
                 REST_F[0], REST_k[0], re_cache_result));
               break;
             case '/reset_all_sticker':
-            sendtext(chat_id, "/reset_all_sticker ing...")
+              sendtext(chat_id, "/reset_all_sticker ing...")
               var re_cache_result = rm_cache()
               var sticker_doc_id = ALL['貼圖對照表']['FileId']
               var sticker_doc = DocumentApp.openById(sticker_doc_id)
