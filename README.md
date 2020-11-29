@@ -199,6 +199,7 @@
       exit - 離開對話
       debug - 重生資料(bot壞掉時用)(不會讓房間不見)
       allread - 全部已讀
+      help - 獲取所有指令說明
 
   * 跟 [@BotFather](https://t.me/BotFather) 對話  ->    
   * 然後 /mybots  ->    
@@ -447,7 +448,11 @@ code_version =
 
   待做:
   - /reset_all_sticker 加速
-  
+
+  提醒一下各位，如果是用我的server轉圖的，用了這版還有問題的話，麻煩請    
+  1. [轉換一下目標 api](https://t.me/TG_link_Line/42) 成 **media_conversion** 試試。    
+  2. 使用 /reset_all_sticker 清空貼圖快取
+
   ****
 
   ##### 2020/07/16 - (V3.5.1)     
