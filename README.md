@@ -16,16 +16,16 @@
 ----
 
 # 目錄(Index)
-  1. [功能 (Features)](https://github.com/we684123/Telegram_link_Line/tree/master#%E5%8A%9F%E8%83%BDfeatures)
-  2. [實際情況截圖 (Screenshot)](https://github.com/we684123/Telegram_link_Line/tree/master#screenshot)
-  3. [自定義語言包說明 (Custom language pack description)](https://github.com/we684123/Telegram_link_Line/tree/master#%E8%87%AA%E5%AE%9A%E7%BE%A9%E8%AA%9E%E8%A8%80%E5%8C%85%E8%AA%AA%E6%98%8Ecustom-language-pack-description)
-  4. [部署教學 (Installing)](https://github.com/we684123/Telegram_link_Line/tree/master#%E9%83%A8%E7%BD%B2%E6%95%99%E5%AD%B8-installing)
-  5. [注意事項 (Precautions)](https://github.com/we684123/Telegram_link_Line/tree/master#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A0%85-precautions)
-  6. [程式說明 (Code Introduction)](https://github.com/we684123/Telegram_link_Line/tree/master#%E7%A8%8B%E5%BC%8F%E8%AA%AA%E6%98%8E-code-introduction)
-  7. [版本資訊 (Version)](https://github.com/we684123/Telegram_link_Line/tree/master#%E7%89%88%E6%9C%AC%E8%B3%87%E8%A8%8A)
-  8. [常見問答 (Q&A)](https://github.com/we684123/Telegram_link_Line/tree/master#%E5%B8%B8%E8%A6%8B%E5%95%8F%E7%AD%94-qa)
-  9. [贊助(Donate)](https://github.com/we684123/Telegram_link_Line/tree/master#%E8%B4%8A%E5%8A%A9donate)
-  10. [作者 (Author)](https://github.com/we684123/Telegram_link_Line/tree/master#author)
+  1. [功能 (Features)](#%E5%8A%9F%E8%83%BDfeatures)
+  2. [實際情況截圖 (Screenshot)](#screenshot)
+  3. [自定義語言包說明 (Custom language pack description)](#%E8%87%AA%E5%AE%9A%E7%BE%A9%E8%AA%9E%E8%A8%80%E5%8C%85%E8%AA%AA%E6%98%8Ecustom-language-pack-description)
+  4. [部署教學 (Installing)](#%E9%83%A8%E7%BD%B2%E6%95%99%E5%AD%B8-installing)
+  5. [注意事項 (Precautions)](#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A0%85-precautions)
+  6. [程式說明 (Code Introduction)](#%E7%A8%8B%E5%BC%8F%E8%AA%AA%E6%98%8E-code-introduction)
+  7. [版本資訊 (Version)](#%E7%89%88%E6%9C%AC%E8%B3%87%E8%A8%8A)
+  8. [常見問答 (Q&A)](#%E5%B8%B8%E8%A6%8B%E5%95%8F%E7%AD%94-qa)
+  9. [贊助(Donate)](#%E8%B4%8A%E5%8A%A9donate)
+  10. [作者 (Author)](#author)
 
 ----
 
