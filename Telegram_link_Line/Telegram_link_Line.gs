@@ -1464,6 +1464,7 @@ function doPost(e) {
                 var clear_files_line_rt = clear_files(Line_sticker_Folder)
                 var clear_files_tg_rt = clear_files(TG_sticker_Folder)
               } catch (e) {}
+
               sendtext(chat_id, ct["reset_all_sticker_rt"]["text"].format(
                 re_cache_result, clear_files_line_rt[0], clear_files_tg_rt[0]))
               break;
