@@ -438,7 +438,7 @@ code_version =
 ---
 # 版本資訊
   ##### 2020/11/30 - (V3.5.2)     
-  * 新增 /reset_all_sticker 指令，當貼圖一直出錯直可用它清除貼圖快取
+  * 新增 /reset_all_sticker 指令，當貼圖一直出錯時可用它清除貼圖快取
   * 改變 現在開始如果從Line傳送貼圖有問題，程式會嘗試自動修復1次
   ![Imgur](https://imgur.com/XsVsZtg.png)
 
