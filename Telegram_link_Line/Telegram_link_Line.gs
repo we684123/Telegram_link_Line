@@ -244,7 +244,6 @@ function doPost(e) {
     //var f = doc.getText();
     //var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
     var mode = ALL.mode;
-    var GMT = ALL.GMT
     var Stext = estringa.message.text;
     var chat_id = estringa.message.chat.id
     var chat_type = estringa.message.chat.type
@@ -305,7 +304,7 @@ function doPost(e) {
 
             if (ALL.data[n]['Amount']) { //如果還有訊息直接傾倒
               sendtext(chat_id, ct["not_read_all_ed"])
-              var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id, sticker_need)
+              var j = read_massage(sheet_key, doc, ALL, ct, ALL.GMT, chat_id, notification, Telegram_id, sticker_need)
               if (j) {
                 ALL.data[n]['Amount'] = 0
               }
@@ -343,7 +342,7 @@ function doPost(e) {
         } else { //已綁定群組中發話
           if (ALL.data[number]['Amount']) { //如果還有訊息直接傾倒
             sendtext(chat_id, ct["not_read_all_ed"])
-            var j = read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id, sticker_need)
+            var j = read_massage(sheet_key, doc, ALL, ct, ALL.GMT, chat_id, notification, Telegram_id, sticker_need)
             if (j) {
               ALL.data[number]['Amount'] = 0
             }
@@ -450,7 +449,7 @@ function doPost(e) {
                 }
                 var rt_text = rt_text_reduce(rt, rt_max_chats)
                 var rt_date = estringa.message.reply_to_message.date
-                var date = get_time_txt(rt_date * 1000, GMT)
+                var date = get_time_txt(rt_date * 1000, ALL.GMT)
                 text = ct["For_this_reply"]["text"].format(rt_text, date, Stext);
                 // ^ "{0}\n{1}\n████針對回復████\n{2}"
               } else {
@@ -708,7 +707,7 @@ function doPost(e) {
               }
               var rt_text = rt_text_reduce(rt, rt_max_chats)
               var rt_date = estringa.message.reply_to_message.date
-              var date = get_time_txt(rt_date * 1000, GMT)
+              var date = get_time_txt(rt_date * 1000, ALL.GMT)
               text = ct["For_this_reply"]["text"].format(rt_text, date, Stext);
               // ^ "{0}\n{1}\n████針對回復████\n{2}"
             } else {
@@ -1304,7 +1303,7 @@ function doPost(e) {
                 // ^ "這個房間並沒有未讀的通知喔~ "
               } else {
                 //獨立出來比較好
-                read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Telegram_id, sticker_need)
+                read_massage(sheet_key, doc, ALL, ct, ALL.GMT, chat_id, notification, Telegram_id, sticker_need)
               }
               break;
             case ct['🔖 重新命名']["text"]:
@@ -2274,7 +2273,7 @@ function doPost(e) {
               //處理caption
               caption = message_json.userName + '\n'
               if (ALL.massage_time) {
-                caption += get_time_txt(message_json.timestamp, GMT)
+                caption += get_time_txt(message_json.timestamp, ALL.GMT)
               }
 
               sendAudio(chat_id, blob, notification, caption)
@@ -2323,7 +2322,7 @@ function doPost(e) {
               //處理caption
               caption = ct['file_info']['text'].format(message_json.userName, fileName)
               if (ALL.massage_time) {
-                caption += get_time_txt(message_json.timestamp, GMT)
+                caption += get_time_txt(message_json.timestamp, ALL.GMT)
               }
 
               sendDocument(chat_id, blob, notification, caption)
@@ -3249,7 +3248,9 @@ function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
     var k = "ResponseCode:\n{0}\nContentText:\n{1}".format(i, j)
     return [false, k]
   }
-
+  if(!fileName){
+    var fileName = "undefined"
+  }
   var f = Folder.createFile(blob).setName(fileName)
   if (fileName == 'wait_Line' || fileName == undefined) {
     f.setName(f.getMimeType())
@@ -3271,6 +3272,9 @@ function downloadFromTG(Telegram_bot_key, tg_file_id, fileName, Folder) {
   var K = Telegram_bot_key
   var url = TGdownloadURL(getpath(tg_file_id, K), K)
   var blob = UrlFetchApp.fetch(url);
+  if(!fileName){
+    var fileName = "undefined"
+  }
   var f = Folder.createFile(blob).setName(fileName)
   return f.getId()
 }
@@ -3973,7 +3977,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
       if (message_json.type == "text") {
         var p = message_json.userName + "：\n" + message_json.text
         if (ALL.massage_time) {
-          t = get_time_txt(message_json.timestamp, GMT)
+          t = get_time_txt(message_json.timestamp, ALL.GMT)
           p += "\n" + t
         }
         sendtext(chat_id, p);
@@ -3983,7 +3987,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
         var url = message_json.DURL
         var caption = ct["is_from"]["text"].format(message_json.userName)
         if (ALL.massage_time) {
-          t = get_time_txt(message_json.timestamp, GMT)
+          t = get_time_txt(message_json.timestamp, ALL.GMT)
           caption += "\n" + t
         }
         var send_ed = sendtext(chat_id, ct["sendPhoto_ing"]);
@@ -4002,7 +4006,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
         var caption = ct["is_from"]["text"].format(message_json.userName)
 
         if (ALL.massage_time) {
-          t = get_time_txt(message_json.timestamp, GMT)
+          t = get_time_txt(message_json.timestamp, ALL.GMT)
           caption += "\n" + t
         }
 
@@ -4024,7 +4028,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
         //處理caption
         caption = message_json.userName + '\n'
         if (ALL.massage_time) {
-          caption += get_time_txt(message_json.timestamp, GMT)
+          caption += get_time_txt(message_json.timestamp, ALL.GMT)
         }
 
         sendAudio(chat_id, blob, notification, caption)
@@ -4038,7 +4042,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
         sendLocation(chat_id, latitude, longitude, notification)
         var text = ct["is_from"]["text"].format(message_json.userName)
         if (ALL.massage_time) {
-          t = get_time_txt(message_json.timestamp, GMT)
+          t = get_time_txt(message_json.timestamp, ALL.GMT)
           text += "\n" + t
         }
         if (message_json.address) {
@@ -4052,7 +4056,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
         var url = message_json.DURL
         var caption = ct["is_from"]["text"].format(message_json.userName)
         if (ALL.massage_time) {
-          t = get_time_txt(message_json.timestamp, GMT)
+          t = get_time_txt(message_json.timestamp, ALL.GMT)
           caption += "\n" + t
         }
         var send_ed = sendtext(chat_id, ct["sendVideo_ing"])
@@ -4079,7 +4083,7 @@ function read_massage(sheet_key, doc, ALL, ct, GMT, chat_id, notification, Teleg
         //處理caption
         caption = ct['file_info']['text'].format(message_json.userName, fileName)
         if (ALL.massage_time) {
-          caption += get_time_txt(message_json.timestamp, GMT)
+          caption += get_time_txt(message_json.timestamp, ALL.GMT)
         }
         //發送
         sendDocument(chat_id, blob, notification, caption)
