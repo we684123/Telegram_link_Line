@@ -444,7 +444,9 @@ code_version =
 
   更新方式：    
   1. Telegram_link_Line.gs 修改    
-  2. **重部署版本** (版本是 "新增" )
+  2. 在 Google apps script IDE頁面中開啟V8引擎    
+  (詳細請參考[準備](#準備)中的第4步驟)    
+  3. **重部署版本** (版本是 "新增" )
 
   ****
 
