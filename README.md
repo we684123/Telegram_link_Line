@@ -157,8 +157,8 @@
 
 3.  一個資料夾(用來放來自Line的媒體)，推薦名稱叫 "download_from_line"(如果Google空間爆了bot會罷工喔，一般帳號有15G應該還好，如果是這個bot的東西占滿空間可以去"自己的TGbot"->"更多設定"->"丟棄舊檔"來丟到垃圾桶)
 
-4.  如下圖，確保V8是啟動狀態，要有 **"停用由 Chrome V8 技術..."** 在上面
-  (如果是新版的IDE，在左邊齒輪中勾選 "啟用 Chrome V8 執行階段")
+4.  如下圖，確保V8是啟動狀態，要有 **"停用由 Chrome V8 技術..."** 在上面    
+  (如果是新版的IDE，在左邊齒輪中勾選 "啟用 Chrome V8 執行階段")    
   ![Imgur](https://imgur.com/kFzrmN6.png)
 
 5.  三個gs檔(google apps script)，並將v3其中的"Telegram_link_Line.gs"的內容複製在一開始給你的"程式碼"區內。    
@@ -439,8 +439,8 @@ code_version =
 ---
 # 版本資訊
   ##### 2020/12/18 - (V3.6)     
-  * 改變 支援V8引擎！
-  因為 Google Rhino 崩掉，不得已直接轉V8，如果有bug請直接私我回報。
+  * 改變 支援V8引擎！    
+  因為 Google Rhino 崩掉，不得已直接轉V8，如果有bug請直接私我回報。    
 
   更新方式：    
   1. Telegram_link_Line.gs 修改    
