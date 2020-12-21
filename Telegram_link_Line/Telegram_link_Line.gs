@@ -1354,11 +1354,11 @@ function doPost(e) {
 
               break;
             case ct['⭐ 升級房間']["text"]:
-              if (!ALL.ctrl_bot_id) {
+              if (!ALL.ctrl_bot_id) { // 這三小爛code... 黑歷史RRRR
                 var t = ct["not_find_ctrl_id"]['text']
                 var payload = {
                   "method": "sendMessage",
-                  'chat_id': chat_id,
+                  'chat_id': String(chat_id),
                   'text': t,
                   'disable_notification': ct["not_find_ctrl_id"]['notification']
                 }
