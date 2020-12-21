@@ -1674,7 +1674,7 @@ function doPost(e) {
             case '/v':
             case '/V':
             case '/version':
-              var bot_version = ALL['code_version']
+              var bot_version = get_code_version()
               var language_version = language()["language_version"]
               var ctv = language()["match_version"]
               text = ct["version"]['text'].format(bot_version, language_version, ctv)
@@ -4365,6 +4365,10 @@ function rm_error_sticker(ALL, file_id) {
   sticker_doc.setText(JSON.stringify(sticker_doc_json))
 
   rm_cache()
+}
+//================================================================
+function get_code_version(){
+  return "3.6"
 }
 //================================================================
 function start(payload) {
