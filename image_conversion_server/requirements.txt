@@ -1,4 +1,4 @@
 filetype==1.0.5
 flask==1.1.1
 flask-restful==0.3.8
-Pillow==7.1.0
+Pillow==8.1.1
