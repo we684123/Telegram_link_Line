@@ -244,9 +244,16 @@ function doPost(e) {
     //var f = doc.getText();
     //var ALL = JSON.parse(f); //獲取資料//轉成JSON物件
     var mode = ALL.mode;
-    var Stext = estringa.message.text;
-    var chat_id = estringa.message.chat.id
-    var chat_type = estringa.message.chat.type
+    if (estringa.channel_post) {
+      var Stext = estringa.channel_post.text
+      var chat_id = estringa.channel_post.chat.id
+      var chat_type = estringa.channel_post.chat.type
+    } else {
+      var Stext = estringa.message?.text;
+      var chat_id = estringa.message.chat.id
+      var chat_type = estringa.message.chat.type
+    }
+
     //前期準備完成
 
 
@@ -266,7 +273,7 @@ function doPost(e) {
 
 
       //來源檢查===================================================
-      if (chat_type == "supergroup" || chat_type == "group") { //現在只剩 群組、超級群組 的可能
+      if (chat_type == "supergroup" || chat_type == "group" || chat_type == "channel") { //現在只剩 群組、超級群組 的可能
         var number = ALL.FastMatch3[chat_id]
         if (number == undefined) { //在不認識的群組時
           //如果出現綁定隨機碼，備份並綁定。
@@ -276,7 +283,10 @@ function doPost(e) {
             // ^ "已備份舊資料，更新doc資料庫中..."
             var n = ALL['wait_to_Bind'][Stext] //這邊的Stext是驗證碼
             //下面"升級房間2"用的資料新入
-            var chat_title = estringa.message.chat.chat_title
+            var chat_title = estringa?.message?.chat?.chat_title
+            if (chat_title == undefined) {
+              var chat_title = estringa?.channel_post?.chat?.chat_title
+            }
             var Name = ALL.data[n]["Name"]
             ALL.data[n]["Name"] = Name.substr(0, Name.length - 1) + "⭐"
             ALL.data[n]["Bind_groud_chat_id"] = chat_id
@@ -3248,7 +3258,7 @@ function downloadFromLine(CHANNEL_ACCESS_TOKEN, Id, fileName, Folder) {
     var k = "ResponseCode:\n{0}\nContentText:\n{1}".format(i, j)
     return [false, k]
   }
-  if(!fileName){
+  if (!fileName) {
     var fileName = "undefined"
   }
   var f = Folder.createFile(blob).setName(fileName)
@@ -3272,7 +3282,7 @@ function downloadFromTG(Telegram_bot_key, tg_file_id, fileName, Folder) {
   var K = Telegram_bot_key
   var url = TGdownloadURL(getpath(tg_file_id, K), K)
   var blob = UrlFetchApp.fetch(url);
-  if(!fileName){
+  if (!fileName) {
     var fileName = "undefined"
   }
   var f = Folder.createFile(blob).setName(fileName)
@@ -4367,7 +4377,7 @@ function rm_error_sticker(ALL, file_id) {
   rm_cache()
 }
 //================================================================
-function get_code_version(){
+function get_code_version() {
   return "3.6"
 }
 //================================================================
