@@ -148,6 +148,36 @@ function up_version() {
     sendtext(Telegram_id, 'V3.4 已升級完成\n解決了群組中 "離開的人名稱無法顯示" 的問題\n');
   }
 
+  // 下面是 V3.5 所需
+  let need_version = 3.5
+  if (ALL['code_version'] < need_version) {
+    let ctv = language()["match_version"]
+    if (ctv < need_version) {
+      sendtext(Telegram_id, '請更新 language 文件再來執行此函式!');
+      throw new Error("請更新 language 文件再來執行此函式!")
+    }
+
+    for (let i = 0; i < ALL['data'].length; i++) {
+      let room = ALL['data'][i]
+      console.log(room['Display_name'])
+      if (room['Display_name'] != undefined) {
+        room['TG_to_Line_DisplayName'] = room['Display_name']
+        room['Line_to_TG_DisplayName'] = true
+        delete room['Display_name']
+      }
+    }
+
+    ALL['code_version'] = need_version
+    ALL.mode = 0
+    ALL.wait_to_Bind = {}
+
+    let up_version_ed_text = [
+      `V${need_version} 已升級完成\n`,
+      `現在開始可以切換 "來自Line的訊息"是否要顯示人名\n`
+    ].join('')
+    sendtext(Telegram_id, up_version_ed_text);
+  }
+
   // 寫入ALL
   var r = JSON.stringify(ALL);
   doc.setText(r); //寫入
@@ -279,8 +309,9 @@ function doPost(e) {
           //如果出現綁定隨機碼，備份並綁定。
           if (ALL['wait_to_Bind'][Stext] != undefined) {
             CP();
+            // ↓ "已備份舊資料，更新doc資料庫中..."
             sendtext(Telegram_id, ct["backed_up_ing"])
-            // ^ "已備份舊資料，更新doc資料庫中..."
+
             var n = ALL['wait_to_Bind'][Stext] //這邊的Stext是驗證碼
             //下面"升級房間2"用的資料新入
             var chat_title = estringa?.message?.chat?.chat_title
@@ -293,7 +324,8 @@ function doPost(e) {
             ALL.data[n]["Bind_groud_chat_title"] = chat_title
             ALL.data[n]["Bind_groud_chat_type"] = chat_type
             ALL.data[n].status = "已升級房間2"
-            ALL.data[n]["Display_name"] = false
+            ALL.data[n]["TG_to_Line_DisplayName"] = false
+            ALL.data[n]["Line_to_TG_DisplayName"] = true
             ALL.FastMatch3[chat_id] = n //快速存取3寫入
 
             //下面收拾善後
@@ -309,7 +341,7 @@ function doPost(e) {
             text = ct["bing_success"]['text'].format(ALL.data[n]["Name"])
             keyboard_main(Telegram_id, text, ALL)
             // ^ {0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n
-            //   請記得去主控bot選擇這個房間並開啟"☀ 顯示發送者"，
+            //   請記得去主控bot選擇這個房間並開啟 "☀ 顯示TG發送者"，
             //   以免Line端眾不知何人發送。
 
             if (ALL.data[n]['Amount']) { //如果還有訊息直接傾倒
@@ -404,7 +436,8 @@ function doPost(e) {
               delete ALL.data[number]["Bind_groud_chat_id"]
               delete ALL.data[number]["Bind_groud_chat_title"]
               delete ALL.data[number]["Bind_groud_chat_type"]
-              delete ALL.data[number]["Display_name"]
+              delete ALL.data[number]["TG_to_Line_DisplayName"]
+              delete ALL.data[number]["Line_to_TG_DisplayName"]
               delete ALL.FastMatch3[oppid]
               ALL.data[number].status = "normal"
               ALL.mode = 0 //讓mode回復正常
@@ -422,7 +455,7 @@ function doPost(e) {
           // 下面才是正常的流程
           var n = number
           var Line_id = ALL.data[n]['RoomId'] //目標LINE房間ID
-          if (ALL.data[n]["Display_name"]) { //預先處理名稱問題
+          if (ALL.data[n]["TG_to_Line_DisplayName"]) { //預先處理名稱問題
             var last_name = ''
             var first_name = estringa.message.from.first_name
             if (estringa.message.from.last_name) {
@@ -468,7 +501,7 @@ function doPost(e) {
             } catch (e) {
               text = Stext;
             }
-            if (ALL.data[n]["Display_name"]) {
+            if (ALL.data[n]["TG_to_Line_DisplayName"]) {
               text = by_name + text
             }
             TG_Send_text_To_Line(Line_id, text)
@@ -482,12 +515,12 @@ function doPost(e) {
             var Durl = get_200_url(G_drive_Durl + gfid)
             TG_Send_Photo_To_Line(Line_id, photo_id, Durl)
 
-            if (ALL.data[n]["Display_name"] && estringa.message.caption) {
+            if (ALL.data[n]["TG_to_Line_DisplayName"] && estringa.message.caption) {
               var t1 = ct["is_from"]['text'].format(TG_name)
               var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
               TG_Send_text_To_Line(Line_id, t2)
             } else { //如只有 簡介 或 來源 則一同發出
-              if (ALL.data[n]["Display_name"]) {
+              if (ALL.data[n]["TG_to_Line_DisplayName"]) {
                 TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
               }
               if (estringa.message.caption) { //如有簡介則一同發出
@@ -501,12 +534,12 @@ function doPost(e) {
             var file_id = estringa.message.video.file_id
             var thumb_id = estringa.message.video.thumb.file_id
             TG_Send_video_To_Line(Line_id, file_id, thumb_id)
-            if (ALL.data[n]["Display_name"] && estringa.message.caption) {
+            if (ALL.data[n]["TG_to_Line_DisplayName"] && estringa.message.caption) {
               var t1 = ct["is_from"]['text'].format(TG_name)
               var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
               TG_Send_text_To_Line(Line_id, t2)
             } else { //如只有 簡介 或 來源 則一同發出
-              if (ALL.data[n]["Display_name"]) {
+              if (ALL.data[n]["TG_to_Line_DisplayName"]) {
                 TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
               }
               if (estringa.message.caption) { //如有簡介則一同發出
@@ -521,12 +554,12 @@ function doPost(e) {
             var file_id = estringa.message.video_note.file_id
             var thumb_id = estringa.message.video_note.thumb.file_id
             TG_Send_video_To_Line(Line_id, file_id, thumb_id)
-            if (ALL.data[n]["Display_name"] && estringa.message.caption) {
+            if (ALL.data[n]["TG_to_Line_DisplayName"] && estringa.message.caption) {
               var t1 = ct["is_from"]['text'].format(TG_name)
               var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
               TG_Send_text_To_Line(Line_id, t2)
             } else { //如只有 簡介 或 來源 則一同發出
-              if (ALL.data[n]["Display_name"]) {
+              if (ALL.data[n]["TG_to_Line_DisplayName"]) {
                 TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
               }
               if (estringa.message.caption) { //如有簡介則一同發出
@@ -546,7 +579,7 @@ function doPost(e) {
             var TG_sticker_url = get_sticker(
               ALL, sticker_need, 'TG', file_id, 21600, file_unique_id)[0]
             TG_Send_Sticker_To_Line(Line_id, TG_sticker_url)
-            if (ALL.data[n]["Display_name"]) { //如果開啟人名顯示
+            if (ALL.data[n]["TG_to_Line_DisplayName"]) { //如果開啟人名顯示
               TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
               // ^ "來自: {0}"
             }
@@ -556,12 +589,12 @@ function doPost(e) {
             var duration = estringa.message.audio.duration
             var audio_id = estringa.message.audio.file_id
             TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
-            if (ALL.data[n]["Display_name"] && estringa.message.caption) {
+            if (ALL.data[n]["TG_to_Line_DisplayName"] && estringa.message.caption) {
               var t1 = ct["is_from"]['text'].format(TG_name)
               var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
               TG_Send_text_To_Line(Line_id, t2)
             } else { //如只有 簡介 或 來源 則一同發出
-              if (ALL.data[n]["Display_name"]) {
+              if (ALL.data[n]["TG_to_Line_DisplayName"]) {
                 TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
               }
               if (estringa.message.caption) { //如有簡介則一同發出
@@ -575,12 +608,12 @@ function doPost(e) {
             var duration = estringa.message.voice.duration
             var audio_id = estringa.message.voice.file_id
             TG_Send_audio_To_Line(Line_id, audio_id, duration, Telegram_bot_key)
-            if (ALL.data[n]["Display_name"] && estringa.message.caption) {
+            if (ALL.data[n]["TG_to_Line_DisplayName"] && estringa.message.caption) {
               var t1 = ct["is_from"]['text'].format(TG_name)
               var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
               TG_Send_text_To_Line(Line_id, t2)
             } else { //如只有 簡介 或 來源 則一同發出
-              if (ALL.data[n]["Display_name"]) {
+              if (ALL.data[n]["TG_to_Line_DisplayName"]) {
                 TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
               }
               if (estringa.message.caption) { //如有簡介則一同發出
@@ -604,7 +637,7 @@ function doPost(e) {
 
             //感謝 思考要在空白頁 http://blog.yslin.tw/2013/02/google-map-api.html
             TG_Send_location_To_Line(Line_id, latitude, longitude, formatted_address)
-            if (ALL.data[n]["Display_name"]) {
+            if (ALL.data[n]["TG_to_Line_DisplayName"]) {
               TG_Send_text_To_Line(Line_id, (ct["caption_der_form"]['text'].format(TG_name)))
             }
             ed_notification_tidy(chat_id, ct["sendLocation_ed"], ALL, lock)
@@ -613,12 +646,12 @@ function doPost(e) {
             var file_id = estringa.message.animation.file_id
             var thumb_id = estringa.message.animation.thumb.file_id
             TG_Send_video_To_Line(Line_id, file_id, thumb_id)
-            if (ALL.data[n]["Display_name"] && estringa.message.caption) {
+            if (ALL.data[n]["TG_to_Line_DisplayName"] && estringa.message.caption) {
               var t1 = ct["is_from"]['text'].format(TG_name)
               var t2 = ct["assemble_caption"]['text'].format(t1, estringa.message.caption)
               TG_Send_text_To_Line(Line_id, t2)
             } else { //如只有 簡介 或 來源 則一同發出
-              if (ALL.data[n]["Display_name"]) {
+              if (ALL.data[n]["TG_to_Line_DisplayName"]) {
                 TG_Send_text_To_Line(Line_id, (ct["is_from"]['text'].format(TG_name)))
               }
               if (estringa.message.caption) { //如有簡介則一同發出
@@ -642,7 +675,7 @@ function doPost(e) {
             if (estringa.message.caption) { //如有簡介則一同發出
               text = text + '\n' + estringa.message.caption
             }
-            if (ALL.data[n]["Display_name"]) {
+            if (ALL.data[n]["TG_to_Line_DisplayName"]) {
               text = by_name + text
             }
             TG_Send_text_To_Line(Line_id, text)
@@ -844,7 +877,8 @@ function doPost(e) {
           delete ALL.data[number]["Bind_groud_chat_id"]
           delete ALL.data[number]["Bind_groud_chat_title"]
           delete ALL.data[number]["Bind_groud_chat_type"]
-          delete ALL.data[number]["Display_name"]
+          delete ALL.data[number]["TG_to_Line_DisplayName"]
+          delete ALL.data[number]["Line_to_TG_DisplayName"]
           delete ALL.FastMatch3[oppid]
           ALL.data[number].status = "normal"
           ALL.mode = 0 //讓mode回復正常
@@ -1405,44 +1439,118 @@ function doPost(e) {
               sendtext(chat_id, ct["droproom_sure?"]["text"].format(ALL.opposite.Name));
               // ^ "您確定要降級 {0} 嗎?\n若是請按一下 /droproom \n若沒按下則不會降級!!!"
               break;
-            case ct['☀ 顯示發送者']["text"]:
+            case ct["☀ 顯示TG發送者"]["text"]:
               var OName = ALL.opposite.Name
               var FM = ALL.FastMatch[OName]
-              ALL.data[FM].Display_name = true;
+              ALL.data[FM]['TG_to_Line_DisplayName'] = true;
               ALL.mode = 0
               write_ALL(ALL, doc) //寫入
               var keyboard = [
                 [{
                   'text': ct['💫 降級房間']["text"]
                 }, {
-                  'text': ct["☁ 不顯示發送者"]["text"]
+                  'text': ct['🔖 重新命名']["text"]
+                }],
+                [{
+                  'text': ct["☁ 不顯示TG發送者"]["text"]
+                }, {
+                  'text': ct["☁ 不顯示Line發送者"]["text"]
                 }],
                 [{
                   'text': ct["🔙 返回大廳"]["text"]
                 }]
               ]
-              text = ct['Display_name_ch_ed']['text'].format(OName, ct['☀ 顯示發送者']["text"])
+              if (!ALL.data[FM]["Line_to_TG_DisplayName"]) { //改鍵盤人名顯示與否
+                keyboard[1][1]['text'] = ct["☀ 顯示Line發送者"]["text"]
+              }
+              text = ct['Display_name_ch_ed']['text'].format(OName, ct["☀ 顯示TG發送者"]["text"])
               // ^ {0} 已 {1}
               var u = undefined
               ReplyKeyboardMakeup(chat_id, keyboard, u, u, text)
               break;
-            case ct['☁ 不顯示發送者']["text"]:
+            case ct['☁ 不顯示TG發送者']["text"]:
               var OName = ALL.opposite.Name
               var FM = ALL.FastMatch[OName]
-              ALL.data[FM].Display_name = false;
+              ALL.data[FM]['TG_to_Line_DisplayName'] = false;
               ALL.mode = 0
               write_ALL(ALL, doc) //寫入
               var keyboard = [
                 [{
                   'text': ct['💫 降級房間']["text"]
                 }, {
-                  'text': ct["☀ 顯示發送者"]["text"]
+                  'text': ct['🔖 重新命名']["text"]
+                }],
+                [{
+                  'text': ct["☀ 顯示TG發送者"]["text"]
+                }, {
+                  'text': ct["☁ 不顯示Line發送者"]["text"]
                 }],
                 [{
                   'text': ct["🔙 返回大廳"]["text"]
                 }]
               ]
-              text = ct['Display_name_ch_ed']['text'].format(OName, ct['☁ 不顯示發送者']["text"])
+              if (!ALL.data[FM]["Line_to_TG_DisplayName"]) { //改鍵盤人名顯示與否
+                keyboard[1][1]['text'] = ct["☀ 顯示Line發送者"]["text"]
+              }
+              text = ct['Display_name_ch_ed']['text'].format(OName, ct['☁ 不顯示TG發送者']["text"])
+              // ^ {0} 已 {1}
+              var u = undefined
+              ReplyKeyboardMakeup(chat_id, keyboard, u, u, text)
+              break;
+            case ct["☀ 顯示Line發送者"]["text"]:
+              var OName = ALL.opposite.Name
+              var FM = ALL.FastMatch[OName]
+              ALL.data[FM]['Line_to_TG_DisplayName'] = true;
+              ALL.mode = 0
+              write_ALL(ALL, doc) //寫入
+              var keyboard = [
+                [{
+                  'text': ct['💫 降級房間']["text"]
+                }, {
+                  'text': ct['🔖 重新命名']["text"]
+                }],
+                [{
+                  'text': ct["☁ 不顯示TG發送者"]["text"]
+                }, {
+                  'text': ct["☁ 不顯示Line發送者"]["text"]
+                }],
+                [{
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              if (!ALL.data[FM]["TG_to_Line_DisplayName"]) { //改鍵盤人名顯示與否
+                keyboard[1][0]['text'] = ct["☀ 顯示TG發送者"]["text"]
+              }
+              text = ct['Display_name_ch_ed']['text'].format(OName, ct["☀ 顯示Line發送者"]["text"])
+              // ^ {0} 已 {1}
+              var u = undefined
+              ReplyKeyboardMakeup(chat_id, keyboard, u, u, text)
+              break;
+            case ct['☁ 不顯示Line發送者']["text"]:
+              var OName = ALL.opposite.Name
+              var FM = ALL.FastMatch[OName]
+              ALL.data[FM]['Line_to_TG_DisplayName'] = false;
+              ALL.mode = 0
+              write_ALL(ALL, doc) //寫入
+              var keyboard = [
+                [{
+                  'text': ct['💫 降級房間']["text"]
+                }, {
+                  'text': ct['🔖 重新命名']["text"]
+                }],
+                [{
+                  'text': ct["☁ 不顯示TG發送者"]["text"]
+                }, {
+                  'text': ct["☀ 顯示Line發送者"]["text"]
+                }],
+                [{
+                  'text': ct["🔙 返回大廳"]["text"]
+                }]
+              ]
+              if (!ALL.data[FM]["TG_to_Line_DisplayName"]) { //改鍵盤人名顯示與否
+                keyboard[1][0]['text'] = ct["☀ 顯示TG發送者"]["text"]
+              }
+              text = ct['Display_name_ch_ed']['text'].format(OName, ct['☁ 不顯示Line發送者']["text"])
               // ^ {0} 已 {1}
               var u = undefined
               ReplyKeyboardMakeup(chat_id, keyboard, u, u, text)
@@ -1857,7 +1965,7 @@ function doPost(e) {
                 var ORoomId = ALL.data[FM].RoomId
                 var Ostatus = ALL.data[FM].status
                 var Notice = ALL.data[FM].Notice
-                if (ALL.data[FM].Display_name) {
+                if (ALL.data[FM]['TG_to_Line_DisplayName']) {
                   var ODisplay_name = "顯示人名：" + ALL.data[FM].Display_name + '\n'
                 } else {
                   var ODisplay_name = ""
@@ -1913,19 +2021,27 @@ function doPost(e) {
                     [{
                       'text': ct['💫 降級房間']["text"]
                     }, {
-                      'text': ct["☀ 顯示發送者"]["text"]
+                      'text': ct['🔖 重新命名']["text"]
                     }],
                     [{
-                      'text': ct['🔖 重新命名']["text"]
+                      'text': ct["☁ 不顯示TG發送者"]["text"]
                     }, {
+                      'text': ct["☁ 不顯示Line發送者"]["text"]
+                    }],
+                    [{
                       'text': ct["🔙 返回大廳"]["text"]
                     }]
                   ]
+
+                  if (!ALL.data[FM]["TG_to_Line_DisplayName"]) { //改鍵盤人名顯示與否
+                    keyboard2[1][0]['text'] = ct["☀ 顯示TG發送者"]["text"]
+                  }
+                  if (!ALL.data[FM]["Line_to_TG_DisplayName"]) { //改鍵盤人名顯示與否
+                    keyboard2[1][1]['text'] = ct["☀ 顯示Line發送者"]["text"]
+                  }
                   keyboard = keyboard2
                 }
-                if (ALL.data[FM]["Display_name"]) { //改鍵盤人名顯示與否
-                  keyboard2[0][1]['text'] = '☁ 不顯示發送者'
-                }
+
                 var resize_keyboard = true
                 var one_time_keyboard = false
                 ReplyKeyboardMakeup(chat_id, keyboard, resize_keyboard, one_time_keyboard, text)
@@ -2218,7 +2334,11 @@ function doPost(e) {
           }
           try {
             if (message_json.type == "text") {
-              text = ct['text_format']['text'].format(message_json.userName, message_json.text)
+              if (ALL.data[ALL.FastMatch2[line_roomID]]['Line_to_TG_DisplayName']) {
+                text = ct['text_format']['text'].format(message_json.userName, message_json.text)
+              } else {
+                text = message_json.text
+              }
               sendtext(chat_id, text);
               //{"type":"text","message_id":"6481485539588","userName":"永格天@李孟哲",
               //"text":"51"}

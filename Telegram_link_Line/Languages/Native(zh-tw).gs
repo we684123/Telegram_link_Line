@@ -689,7 +689,7 @@ function language() {
       },
       "bing_success": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-        "text": '{0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n請記得去這個房間並開啟"☀ 顯示發送者"，以免Line端眾不知何人發送。',
+        "text": '{0} 綁定成功!\n\n提醒您! 如果這群不只主人你一個人的話\n請記得去這個房間並開啟"☀ 顯示TG發送者"，以免Line端眾不知何人發送。',
         // {0} = 房間名稱
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
@@ -714,13 +714,21 @@ function language() {
         "notification": false, //不通知? true or false
         "parse_mode": "" //送出文字模式 "HTML" or "Markdown" or ""
       },
-      "☀ 顯示發送者": {
+      "☀ 顯示TG發送者": {
         "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-        "text": '☀ 顯示發送者',
+        "text": '☀ 顯示TG發送者',
       },
-      "☁ 不顯示發送者": {
+      "☁ 不顯示TG發送者": {
         "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
-        "text": '☁ 不顯示發送者',
+        "text": '☁ 不顯示TG發送者',
+      },
+      "☀ 顯示Line發送者": {
+        "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": '☀ 顯示Line發送者',
+      },
+      "☁ 不顯示Line發送者": {
+        "type": "command(Telegram)", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
+        "text": '☁ 不顯示Line發送者',
       },
       "Display_name_ch_ed": {
         "type": "to_Telegram", // "to_Line"、"to_Telegram"、"command(Telegram)"、"to_Telegram(only_text)"
