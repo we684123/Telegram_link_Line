@@ -404,7 +404,7 @@ function doPost(e) {
           } catch (e) {}
 
           // 處理 群組 升 超級群 。
-          if (estringa['message']['migrate_to_chat_id']) {
+          if (estringa?.['message']?.['migrate_to_chat_id']) {
             var n = number
             var mtci = estringa['message']['migrate_to_chat_id']
             ALL.data[n]['Bind_groud_chat_id'] = mtci
@@ -418,7 +418,7 @@ function doPost(e) {
           }
 
           // left_chat_member事件，bot被踢先降房間等級
-          if (estringa['message']['left_chat_member']) {
+          if (estringa?.['message']?.['left_chat_member']) {
             if (estringa['message']['left_chat_member']['id'] == ALL['ctrl_bot_id']) {
               sendtext(Telegram_id, ct['Emergency_downgrade']['text'].format(
                 ALL.data[number]['Name']
@@ -450,6 +450,15 @@ function doPost(e) {
               lock.releaseLock();
               return 0;
             }
+          }
+
+          // 因應新增了頻道發言做的轉換
+          if ('channel_post' in estringa) {
+            estringa['message'] = estringa['channel_post']
+            estringa['message']['from'] = estringa['channel_post']['sender_chat']
+            estringa['message']['from']['first_name'] = estringa['channel_post']['chat']['title']
+            delete estringa['channel_post']
+            delete estringa['message']['sender_chat']
           }
 
           // 下面才是正常的流程
